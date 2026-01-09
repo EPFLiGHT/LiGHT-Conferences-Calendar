@@ -1,6 +1,6 @@
 - id: mary-anne-hartley
   name: Mary Anne Hartley
-  imageUrl: https://media.licdn.com/dms/image/v2/D4D03AQHRp2tWL2Vgtg/profile-displayphoto-shrink_200_200/B4DZX4i6cjHwAg-/0/1743631657484?e=1766016000&v=beta&t=sOyzYxwLw0EqJ_uWURQa754m7LJmA7v89IW59kKxhXQ
+  imageUrl: /profile-pictures/mary-anne-hartley.jpeg
   presentations:
     - topic: "FedMoDN: Federated Modular Decision Support Networks"
       event: ICLR Singapore 2025
@@ -10,7 +10,7 @@
 
 - id: david-sasu
   name: David Sasu
-  imageUrl: https://media.licdn.com/dms/image/v2/C4D03AQGifjPH0cMUkw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1636027215392?e=1766016000&v=beta&t=x5x5dkcO9QUhBAV4QS_aT_GJh2ByVK-sqk9BOVmcqRU
+  imageUrl: /profile-pictures/david-sasu.jpeg
   presentations:
     - topic: "Pitch Accent Detection improves Pretrained Automatic Speech Recognition"
       event: Interspeech 2025
@@ -21,8 +21,8 @@
 - id: michael-zhang-guillaume-boye
   name: "Michael Zhang, Guillaume Boyé"
   imageUrl:
-    - https://media.licdn.com/dms/image/v2/D4D03AQFUSBjeqyCJQQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1724349529852?e=1766016000&v=beta&t=PCGKBjoF3y8i6Jmz9rX9jmXKvddSPIGTRjvA_aHDPzU
-    - https://media.licdn.com/dms/image/v2/D4D35AQEfs5WrPptuFQ/profile-framedphoto-shrink_200_200/B4DZoC8FotHwAg-/0/1760985897841?e=1766059200&v=beta&t=Kp7NtwNpgI9hAj3AyRSDfDgp3kEL9Yf8CBklP14c9yc
+    - /profile-pictures/michael-zhang.jpeg
+    - /profile-pictures/guillaume-boyé.jpeg
   presentations:
     - topic: "Meditron: Fine-tuning models for medical use"
       event: AAAI Conference on Artificial Intelligence (AAAI-25)
@@ -36,9 +36,9 @@
 - id: xavier-theimer-lienhard-team
   name: "Xavier Theimer-Lienhard, Etienne Boisson, Bastien Bernath"
   imageUrl:
-    - https://media.licdn.com/dms/image/v2/D4E03AQG-EBAExc-YzA/profile-displayphoto-scale_200_200/B4EZgFSSDqH4Ak-/0/1752435336306?e=1766016000&v=beta&t=o0s1aGn4I6GtevXpauroqcuxUGgYjJA1CHJ5hLKfaFo
-    - https://media.licdn.com/dms/image/v2/D4D03AQHQUSrU9aGDpQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1690451082375?e=1766016000&v=beta&t=AyU3xXA_Q8QfejlhV9sY6SdtooHsgXtaw2PaR738gSY
-    - https://media.licdn.com/dms/image/v2/D5603AQEdfQa8CgsZaw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1713548989166?e=1766016000&v=beta&t=PJ7SbXgtuIKUnBnyKj6Qei_UEh_WbVIWMknfds7GDmo
+    - /profile-pictures/xavier-theimer-lienhard.jpeg
+    - /profile-pictures/etienne-boisson.jpeg
+    - /profile-pictures/bastien-bernath.jpeg
   presentations:
     - topic: "Presentation of Meditron 3 and the MOOVE platform"
       event: Meta Open-Source AI Summit 2024
@@ -47,7 +47,7 @@
 
 - id: tony-ohalloran
   name: Tony O'Halloran
-  imageUrl: https://media.licdn.com/dms/image/v2/D4E03AQEbSd2P76A4yw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1697545591400?e=1766016000&v=beta&t=AP6jbE9_9dqU7DMowfurozzdoS3UppWxAWnBrpZHpMw
+  imageUrl: /profile-pictures/tony-o'halloran.jpeg
   presentations:
     - topic: "AI Induced Psychosis: A shallow investigation"
       event: Neural Information Processing System Canada 2025
@@ -57,7 +57,7 @@
 
 - id: arianna-francesconi
   name: Arianna Francesconi
-  imageUrl: https://media.licdn.com/dms/image/v2/D4D03AQGsquwbTUSprA/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1705663157212?e=1766016000&v=beta&t=XKaGGL2iDZTyEgFl6YtApBNGj79yTQuPtE9aMPdBPho
+  imageUrl: /profile-pictures/arianna-francesconi.jpeg
   presentations:
     - topic: "Cross-dataset Multivariate Time-series Model for Parkinson's Diagnosis via Keyboard Dynamics."
       event: "European Conference on Artificial Intelligence (ECAI 2025)"
@@ -71,7 +71,7 @@
 
 - id: veronique-suttels
   name: Véronique Suttels
-  imageUrl: https://media.licdn.com/dms/image/v2/D4E03AQEhzV823hZJhw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1713199597385?e=1766016000&v=beta&t=RdyuTX8GfnNK3i4djw69VOSgMtFpX6D3zAgR2PyB23I
+  imageUrl: /profile-pictures/véronique-suttels.jpeg
   presentations:
     - topic: "Lung Ultrasound for Tuberculosis Detection"
       event: LiGHT Research Seminar
@@ -81,7 +81,7 @@
 
 - id: daniel-ohene-kwofie
   name: Daniel Ohene-Kwofie
-  imageUrl: https://media.licdn.com/dms/image/v2/C5603AQFrE4TUAyrz8w/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1647401491061?e=1766016000&v=beta&t=d11EVRDX4r01cqYbKGzCDO89pJPpOM2uVV8LnFQpCXc
+  imageUrl: /profile-pictures/daniel-ohene-kwofie.jpeg
   presentations:
     - topic: "The Single Matrix Block Shift (SMBS) Dense Matrix Multiplication Algorithm"
       event: LiGHT Research Seminar
@@ -90,7 +90,7 @@
 
 - id: wendy-essuman
   name: Wendy Essuman
-  imageUrl: https://media.licdn.com/dms/image/v2/D4D03AQHkx1aYBN_95w/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1724951724909?e=1766016000&v=beta&t=D641lpk56tNUb-17WGDnYixU5kh3ZMtA1NddLcj4BTY
+  imageUrl: /profile-pictures/wendy-essuman.jpeg
   presentations:
     - topic: "We didn't learn much from the IMO"
       event: LiGHT Research Seminar
@@ -99,7 +99,7 @@
 
 - id: toufiq-musah
   name: Toufiq Musah
-  imageUrl: https://media.licdn.com/dms/image/v2/D4D03AQFJlFUkI-McIw/profile-displayphoto-scale_200_200/B4DZnNdlBNJEAY-/0/1760088709356?e=1766016000&v=beta&t=4eSUKO7p2xGOHT60knBIkyMCp-nr55QFPlYbdNNzrJA
+  imageUrl: /profile-pictures/toufiq-musah.jpeg
   presentations:
     - topic: "Automated 3D Medical Image Segulation: Towards Trustworthy Clinical Tools"
       event: LiGHT Research Seminar
