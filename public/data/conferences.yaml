@@ -1,3 +1,18 @@
+- title: ESMycobacteriology
+  year: 2026
+  id: esmyco26
+  full_name: 46th ANNUAL CONGRESS of the European Society of Mycobacteriology
+  link: "https://www.esmycobacteriology.eu/event-home"
+  abstract_deadline: "2026-01-15 23:59"
+  deadline: "2026-05-06 23:59"
+  timezone: "UTC-12"
+  place: "Verona, Italy"
+  date: "June 22-25, 2026"
+  start: "2026-06-22"
+  end: "2026-06-25"
+  sub: Global Health
+  type: conference
+
 - title: NDSS Symposium
   year: 2026
   id: ndss26
