@@ -60,6 +60,8 @@ jobs:
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}-
       - name: Install dependencies
         run: pnpm install
+      - name: Validate YAML data
+        run: pnpm validate
       - name: Temporarily disable API routes for static export
         run: |
           # Move API directory outside app folder to exclude it from the build
