@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Box, Container, Grid, Button, Flex, Text, Link } from '@chakra-ui/react';
-import NextLink from 'next/link';
+import { Box, Container, Grid, Button, Flex, Text } from '@chakra-ui/react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ConferenceCard from '@/components/ConferenceCard';
@@ -14,7 +13,6 @@ import { useConferences } from '@/hooks/useConferences';
 import { useConferenceFilters, type ConferenceFiltersState } from '@/hooks/useConferenceFilters';
 import { paginationContainerStyle } from '@/styles/containerStyles';
 import { primaryButtonStyle } from '@/styles/buttonStyles';
-import { brandAlpha } from '@/theme';
 import type { Conference } from '@/types/conference';
 
 const ITEMS_PER_PAGE = 12;
@@ -62,7 +60,8 @@ export default function Page() {
         <Container maxW="1200px" px={{ base: '4', md: '6' }} mx="auto">
           <ConferenceFiltersPanel
             title="Research Conferences"
-            description="Track upcoming conferences and never miss a deadline. Click on a card for more details."
+            eyebrow="LiGHT · Index"
+            description="Track upcoming conferences and never miss a deadline. Click on any entry for full details and to export."
             searchValue={searchQuery}
             onSearchChange={setSearchQuery}
             conferences={conferences}
@@ -70,56 +69,37 @@ export default function Page() {
             onFilterChange={handleFilterChange}
           />
 
-          {/* Slack Bot Banner */}
-          <Box
+          <Flex
+            align="baseline"
+            justify="space-between"
             mb="6"
-            p="4"
-            bg={`linear-gradient(135deg, ${brandAlpha(500, 0.05)} 0%, ${brandAlpha(400, 0.08)} 100%)`}
-            borderRadius="12px"
-            border="1px solid"
-            borderColor="brand.200"
+            pb="3"
+            borderBottom="1px solid"
+            borderColor="rgba(46, 95, 168, 0.18)"
+            gap="4"
+            flexWrap="wrap"
           >
-            <Flex
-              align="center"
-              justify="center"
-              gap="3"
-              flexWrap="wrap"
+            <Text
+              fontSize="11px"
+              color="brand.400"
+              textTransform="uppercase"
+              letterSpacing="0.22em"
+              fontWeight="600"
+              className="tabular"
             >
-              <Text fontSize="sm" color="gray.700" fontWeight="500">
-                💬 Get deadline reminders in Slack
-              </Text>
-              <Link
-                as={NextLink}
-                href="/slack-install"
-                fontSize="sm"
-                fontWeight="700"
-                color="brand.600"
-                px="4"
-                py="1.5"
-                borderRadius="8px"
-                bg="white"
-                border="1px solid"
-                borderColor="brand.300"
-                transition="all 0.2s ease"
-                _hover={{
-                  bg: 'brand.50',
-                  borderColor: 'brand.400',
-                  color: 'brand.700',
-                  textDecoration: 'none',
-                  transform: 'scale(1.05)',
-                }}
-                _active={{
-                  transform: 'scale(0.98)',
-                }}
-              >
-                Add to Slack →
-              </Link>
-            </Flex>
-          </Box>
-
-          <Text fontSize="sm" color="gray.600" mb="6" textAlign="center">
-            Showing {paginatedConferences.length > 0 ? (currentPage - 1) * ITEMS_PER_PAGE + 1 : 0}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredAndSortedConferences.length)} of {filteredAndSortedConferences.length} events
-          </Text>
+              Page {String(currentPage).padStart(2, '0')} / {String(totalPages || 1).padStart(2, '0')}
+            </Text>
+            <Text
+              fontSize="11px"
+              color="brand.400"
+              textTransform="uppercase"
+              letterSpacing="0.18em"
+              fontWeight="600"
+              className="tabular"
+            >
+              {paginatedConferences.length > 0 ? (currentPage - 1) * ITEMS_PER_PAGE + 1 : 0}–{Math.min(currentPage * ITEMS_PER_PAGE, filteredAndSortedConferences.length)} of {filteredAndSortedConferences.length} entries
+            </Text>
+          </Flex>
 
           <Grid
             templateColumns={{ base: '1fr', md: 'repeat(auto-fill, minmax(350px, 1fr))' }}

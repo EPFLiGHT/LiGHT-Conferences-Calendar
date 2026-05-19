@@ -45,60 +45,41 @@ export default function Countdown({ deadline, label }: CountdownProps): JSX.Elem
 
   if (timeLeft.expired) {
     return (
-      <Flex direction="column" gap="1.5">
-        <Text
-          fontSize="xs"
-          fontWeight="600"
-          color="gray.600"
-          textTransform="uppercase"
-          letterSpacing="wider"
-        >
-          {label}
-        </Text>
-        <Text fontSize="sm" color="gray.500" fontStyle="italic">
-          Expired
-        </Text>
-      </Flex>
+      <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.14em" fontWeight="500">
+        Passed
+      </Text>
     );
   }
 
+  const pad = (n?: number) => String(n ?? 0).padStart(2, '0');
+
   return (
-    <Flex direction="column" gap="1.5">
-      <Text
-        fontSize="xs"
-        fontWeight="600"
-        color="gray.600"
-        textTransform="uppercase"
-        letterSpacing="wider"
-      >
-        {label}
-      </Text>
-      <Flex gap="2" align="baseline">
+    <Flex direction="column" gap="0.5">
+      {label && (
+        <Text
+          fontSize="10px"
+          fontWeight="600"
+          color="brand.400"
+          textTransform="uppercase"
+          letterSpacing="0.2em"
+        >
+          {label}
+        </Text>
+      )}
+      <Flex gap="1" align="baseline" style={{ fontVariantNumeric: 'tabular-nums' }}>
         {(timeLeft.days ?? 0) > 0 && (
-          <Text fontSize="sm" color="gray.700">
-            <Text as="span" fontSize="lg" fontWeight="700" color="brand.500">
-              {timeLeft.days}
-            </Text>
-            d
+          <Text fontSize="sm" color="brand.500" fontWeight="600">
+            {timeLeft.days}<Text as="span" color="brand.400" fontWeight="400">d</Text>
           </Text>
         )}
-        <Text fontSize="sm" color="gray.700">
-          <Text as="span" fontSize="lg" fontWeight="700" color="brand.500">
-            {timeLeft.hours ?? 0}
-          </Text>
-          h
+        <Text fontSize="sm" color="brand.500" fontWeight="600">
+          {pad(timeLeft.hours)}<Text as="span" color="brand.400" fontWeight="400">h</Text>
         </Text>
-        <Text fontSize="sm" color="gray.700">
-          <Text as="span" fontSize="lg" fontWeight="700" color="brand.500">
-            {timeLeft.minutes ?? 0}
-          </Text>
-          m
+        <Text fontSize="sm" color="brand.500" fontWeight="600">
+          {pad(timeLeft.minutes)}<Text as="span" color="brand.400" fontWeight="400">m</Text>
         </Text>
-        <Text fontSize="sm" color="gray.700">
-          <Text as="span" fontSize="lg" fontWeight="700" color="brand.500">
-            {timeLeft.seconds ?? 0}
-          </Text>
-          s
+        <Text fontSize="sm" color="brand.400" fontWeight="400">
+          {pad(timeLeft.seconds)}s
         </Text>
       </Flex>
     </Flex>

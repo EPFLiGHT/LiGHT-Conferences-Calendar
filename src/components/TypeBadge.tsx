@@ -1,22 +1,4 @@
-import { Badge } from '@chakra-ui/react';
-
-const TYPE_COLORS: Record<string, { bg: string; color: string; border: string }> = {
-  conference: {
-    bg: '#f3e8ff',
-    color: '#9333EA',
-    border: '#d8b4fe',
-  },
-  workshop: {
-    bg: '#ccfbf1',
-    color: '#14B8A6',
-    border: '#5eead4',
-  },
-  summit: {
-    bg: '#fef3c7',
-    color: '#F59E0B',
-    border: '#fde68a',
-  },
-};
+import { Text } from '@chakra-ui/react';
 
 interface TypeBadgeProps {
   type: string;
@@ -25,23 +7,23 @@ interface TypeBadgeProps {
 export default function TypeBadge({ type }: TypeBadgeProps): JSX.Element | null {
   if (!type) return null;
 
-  const colors = TYPE_COLORS[type.toLowerCase()] || TYPE_COLORS.conference;
-
   return (
-    <Badge
-      px="3"
+    <Text
+      as="span"
+      fontSize="10px"
+      fontWeight="700"
+      color="brand.500"
+      textTransform="uppercase"
+      letterSpacing="0.2em"
+      border="1px solid"
+      borderColor="rgba(46, 95, 168, 0.35)"
+      borderRadius="2px"
+      px="2"
       py="1"
-      borderRadius="full"
-      fontSize="xs"
-      fontWeight="600"
-      bg={colors.bg}
-      color={colors.color}
-      border="1px"
-      borderColor={colors.border}
       whiteSpace="nowrap"
-      textTransform="capitalize"
+      lineHeight="1"
     >
       {type}
-    </Badge>
+    </Text>
   );
 }

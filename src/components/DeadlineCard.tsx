@@ -26,101 +26,180 @@ export default function DeadlineCard({
   const isExpired = deadline.localDatetime <= now;
 
   if (variant === 'detailed') {
+    const detailDay = deadline.localDatetime.toFormat('dd');
+    const detailMonth = deadline.localDatetime.toFormat('MMM yyyy').toUpperCase();
+
     return (
       <Box
-        bg="gray.50"
-        border="1px"
-        borderColor="gray.200"
-        borderRadius="lg"
-        overflow="hidden"
+        bg="white"
+        border="1px solid"
+        borderColor="rgba(46, 95, 168, 0.25)"
       >
-        <Box
-          p="3"
-          bg="blue.50"
-          borderBottom="1px"
-          borderColor="blue.200"
+        {/* Header */}
+        <Flex
+          align="center"
+          justify="space-between"
+          px="5"
+          py="3"
+          borderBottom="1px solid"
+          borderColor="rgba(46, 95, 168, 0.18)"
+          bg="brand.50"
         >
           <Text
-            fontSize="sm"
-            fontWeight="600"
+            fontSize="11px"
+            fontWeight="700"
             color="brand.500"
             textTransform="uppercase"
-            letterSpacing="wider"
+            letterSpacing="0.22em"
           >
             {deadline.label}
           </Text>
-        </Box>
-        <VStack align="stretch" gap="4" p="4">
-          <VStack align="start" gap="1">
-            <Text fontSize="xs" fontWeight="600" color="gray.600" textTransform="uppercase" letterSpacing="wider">
-              Original Time:
+          {isExpired && (
+            <Text
+              fontSize="11px"
+              fontWeight="600"
+              color="gray.500"
+              textTransform="uppercase"
+              letterSpacing="0.18em"
+            >
+              Passed
             </Text>
-            <Text fontSize="sm" color="gray.800" fontFamily="mono" lineHeight="1.6">
-              {deadline.datetime.toFormat('EEEE, MMMM dd, yyyy')}
-              <br />
-              {deadline.datetime.toFormat('HH:mm')} {timezone}
+          )}
+        </Flex>
+
+        {/* Body */}
+        <Flex gap="5" align="stretch" p="5">
+          {/* Big date numeral */}
+          <Flex
+            direction="column"
+            align="flex-start"
+            justify="center"
+            minW="80px"
+            pr="5"
+            borderRight="1px solid"
+            borderColor="rgba(46, 95, 168, 0.22)"
+          >
+            <Text
+              fontSize="56px"
+              lineHeight="0.95"
+              fontWeight="500"
+              color={isExpired ? 'gray.400' : 'brand.500'}
+              letterSpacing="-0.035em"
+              className="tabular"
+            >
+              {detailDay}
             </Text>
+            <Text
+              fontSize="11px"
+              color="brand.400"
+              textTransform="uppercase"
+              letterSpacing="0.2em"
+              fontWeight="600"
+              mt="2"
+              className="tabular"
+            >
+              {detailMonth}
+            </Text>
+          </Flex>
+
+          {/* Times */}
+          <VStack align="stretch" gap="4" flex="1" justify="center">
+            <VStack align="start" gap="1">
+              <Text fontSize="10px" fontWeight="600" color="brand.400" textTransform="uppercase" letterSpacing="0.2em">
+                Original time
+              </Text>
+              <Text fontSize="sm" color="brand.500" fontWeight="500" className="tabular" lineHeight="1.5">
+                {deadline.datetime.toFormat('EEEE, MMMM dd, yyyy')}
+              </Text>
+              <Text fontSize="xs" color="gray.600" className="tabular">
+                {deadline.datetime.toFormat('HH:mm')} {timezone}
+              </Text>
+            </VStack>
+            <VStack align="start" gap="1">
+              <Text fontSize="10px" fontWeight="600" color="brand.400" textTransform="uppercase" letterSpacing="0.2em">
+                Your local time
+              </Text>
+              <Text fontSize="sm" color="brand.500" fontWeight="500" className="tabular" lineHeight="1.5">
+                {deadline.localDatetime.toFormat('EEEE, MMMM dd, yyyy')}
+              </Text>
+              <Text fontSize="xs" color="gray.600" className="tabular">
+                {deadline.localDatetime.toFormat('HH:mm')} {deadline.localDatetime.zoneName}
+              </Text>
+            </VStack>
+
+            {!isExpired && (
+              <Box pt="1" borderTop="1px solid" borderColor="rgba(46, 95, 168, 0.18)">
+                <Countdown deadline={deadline.localDatetime} label="Time remaining" />
+              </Box>
+            )}
           </VStack>
-          <VStack align="start" gap="1">
-            <Text fontSize="xs" fontWeight="600" color="gray.600" textTransform="uppercase" letterSpacing="wider">
-              Your Local Time:
-            </Text>
-            <Text fontSize="sm" color="gray.800" fontFamily="mono" lineHeight="1.6">
-              {deadline.localDatetime.toFormat('EEEE, MMMM dd, yyyy')}
-              <br />
-              {deadline.localDatetime.toFormat('HH:mm')} {deadline.localDatetime.zoneName}
-            </Text>
-          </VStack>
-        </VStack>
+        </Flex>
       </Box>
     );
   }
 
+  const day = deadline.localDatetime.toFormat('dd');
+  const monthYear = deadline.localDatetime.toFormat('MMM yyyy').toUpperCase();
+  const time = deadline.localDatetime.toFormat('HH:mm');
+
   return (
-    <VStack align="stretch" gap="3">
-      <VStack align="stretch" gap="1">
+    <Flex gap="4" align="stretch">
+      {/* Date block */}
+      <Flex
+        direction="column"
+        align="flex-start"
+        minW="56px"
+        pr="4"
+        borderRight="1px solid"
+        borderColor="rgba(46, 95, 168, 0.22)"
+      >
         <Text
-          fontSize="xs"
+          fontSize="38px"
+          lineHeight="0.95"
+          fontWeight="500"
+          color={isExpired ? 'gray.400' : 'brand.500'}
+          letterSpacing="-0.03em"
+          className="tabular"
+        >
+          {day}
+        </Text>
+        <Text
+          fontSize="10px"
+          color="brand.400"
+          textTransform="uppercase"
+          letterSpacing="0.2em"
+          fontWeight="600"
+          mt="1.5"
+          className="tabular"
+        >
+          {monthYear}
+        </Text>
+      </Flex>
+
+      {/* Detail */}
+      <VStack align="stretch" gap="1.5" flex="1" justify="center">
+        <Text
+          fontSize="10px"
           fontWeight="600"
           color="brand.500"
           textTransform="uppercase"
-          letterSpacing="wider"
+          letterSpacing="0.2em"
         >
           {deadline.label}
         </Text>
-        <Flex fontSize="sm" gap="2">
-          <Text color="gray.600" fontWeight="500" minW="60px">
-            Original:
-          </Text>
-          <Text color="gray.800" fontFamily="mono" fontSize="xs">
-            {deadline.datetime.toFormat('MMM dd, yyyy HH:mm')} {timezone}
-          </Text>
-        </Flex>
-        <Flex fontSize="sm" gap="2">
-          <Text color="gray.600" fontWeight="500" minW="60px">
-            Local:
-          </Text>
-          <Text color="gray.800" fontFamily="mono" fontSize="xs">
-            {deadline.localDatetime.toFormat('MMM dd, yyyy HH:mm')} {deadline.localDatetime.zoneName}
-          </Text>
-        </Flex>
-      </VStack>
-
-      <Box
-        p="3"
-        bg={isExpired ? 'red.50' : 'blue.50'}
-        borderRadius="md"
-        border="1px"
-        borderColor={isExpired ? 'red.200' : 'blue.200'}
-      >
+        <Text fontSize="xs" color="gray.600" className="tabular" lineHeight="1.5">
+          {time} {timezone}
+        </Text>
         {isExpired ? (
-          <Text fontSize="sm" color="red.600" fontWeight="600">
-            Expired
+          <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.14em" fontWeight="500">
+            Passed
           </Text>
         ) : (
-          <Countdown deadline={deadline.localDatetime} label="Time remaining" />
+          <Box className="tabular">
+            <Countdown deadline={deadline.localDatetime} label="" />
+          </Box>
         )}
-      </Box>
-    </VStack>
+      </VStack>
+    </Flex>
   );
 }

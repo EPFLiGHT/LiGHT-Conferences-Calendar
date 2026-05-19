@@ -3,42 +3,16 @@
 import { useState, useEffect } from 'react';
 import {
   Box,
-  Button,
   Flex,
   Heading,
   Text,
   VStack,
-  Badge,
   Portal,
 } from '@chakra-ui/react';
 import { X, ExternalLink } from 'lucide-react';
-import { Speaker, Presentation } from '@/types/speaker';
-import { COLORS } from '@/theme';
+import { Speaker } from '@/types/speaker';
 import ExternalLinkButton from './ExternalLinkButton';
 import SpeakerAvatar from './SpeakerAvatar';
-
-const EVENT_TYPE_COLORS: Record<Presentation['eventType'], { bg: string; color: string; border: string }> = {
-  conference: {
-    bg: '#f3e8ff',
-    color: '#9333EA',
-    border: '#d8b4fe',
-  },
-  workshop: {
-    bg: '#ccfbf1',
-    color: '#14B8A6',
-    border: '#5eead4',
-  },
-  summit: {
-    bg: '#fef3c7',
-    color: '#F59E0B',
-    border: '#fde68a',
-  },
-  seminar: {
-    bg: COLORS.brand[50],
-    color: COLORS.brand[600],
-    border: COLORS.brand[200],
-  },
-};
 
 interface SpeakerModalProps {
   speaker: Speaker;
@@ -48,7 +22,6 @@ interface SpeakerModalProps {
 export default function SpeakerModal({ speaker, onClose }: SpeakerModalProps): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(true);
 
-  // Sort presentations by year (most recent first)
   const sortedPresentations = [...speaker.presentations].sort((a, b) => b.year - a.year);
 
   const handleClose = () => {
@@ -68,10 +41,8 @@ export default function SpeakerModal({ speaker, onClose }: SpeakerModalProps): J
         handleClose();
       }
     };
-
     document.addEventListener('keydown', handleEscapeKey);
     document.body.style.overflow = 'hidden';
-
     return () => {
       document.removeEventListener('keydown', handleEscapeKey);
       document.body.style.overflow = 'unset';
@@ -79,6 +50,8 @@ export default function SpeakerModal({ speaker, onClose }: SpeakerModalProps): J
   }, []);
 
   if (!isOpen) return null;
+
+  const total = sortedPresentations.length;
 
   return (
     <Portal>
@@ -88,182 +61,220 @@ export default function SpeakerModal({ speaker, onClose }: SpeakerModalProps): J
         left="0"
         right="0"
         bottom="0"
-        bg="rgba(0, 0, 0, 0.6)"
-        backdropFilter="blur(8px)"
+        bg="rgba(10, 26, 61, 0.45)"
+        backdropFilter="blur(2px)"
         display="flex"
         alignItems="center"
         justifyContent="center"
         zIndex="modal"
-        p="4"
+        p={{ base: '3', md: '6' }}
         onClick={handleBackdropClick}
       >
         <Box
           bg="white"
-          borderRadius="2xl"
-          boxShadow="0 20px 60px rgba(46, 95, 169, 0.3)"
-          border="1px"
-          borderColor="brand.200"
-          overflow="hidden"
-          maxW="800px"
-          maxH="90vh"
+          borderRadius="4px"
+          maxW="860px"
           w="full"
-          display="flex"
-          flexDirection="column"
+          maxH="90vh"
+          overflowY="auto"
+          border="1px solid"
+          borderColor="brand.500"
+          position="relative"
+          onClick={(e) => e.stopPropagation()}
         >
+          {/* Top accent rule */}
+          <Box h="3px" bg="brand.500" />
+
+          {/* Header */}
           <Box
-            bg={`linear-gradient(135deg, ${COLORS.brand[500]} 0%, ${COLORS.brand[600]} 100%)`}
-            p="6"
-            borderBottom="1px"
-            borderColor="brand.300"
+            position="sticky"
+            top="0"
+            bg="white"
+            borderBottom="1px solid"
+            borderColor="rgba(46, 95, 168, 0.25)"
+            px={{ base: '6', md: '8' }}
+            py={{ base: '5', md: '6' }}
+            zIndex="10"
           >
-            <Flex align="center" justify="space-between" gap="4">
-              <Flex align="center" gap="4">
-                <SpeakerAvatar
-                  imageUrl={speaker.imageUrl}
-                  name={speaker.name}
-                  size="md"
-                />
-                <VStack align="start" gap="1">
-                  <Heading
-                    fontSize="2xl"
-                    fontWeight="700"
-                    color="white"
-                    lineHeight="1.3"
-                  >
-                    {speaker.name}
-                  </Heading>
-                  <Text fontSize="sm" color="whiteAlpha.900" fontWeight="500">
-                    {speaker.presentations.length} {speaker.presentations.length === 1 ? 'Presentation' : 'Presentations'}
-                  </Text>
-                </VStack>
-              </Flex>
-              <Button
-                onClick={handleClose}
-                p="2"
-                minW="auto"
-                h="auto"
-                borderRadius="lg"
-                bg="whiteAlpha.200"
-                color="white"
-                _hover={{
-                  bg: 'whiteAlpha.300',
-                }}
-                transition="all 0.2s"
-              >
-                <X size={20} />
-              </Button>
+            <Box
+              as="button"
+              position="absolute"
+              top="5"
+              right="5"
+              w="32px"
+              h="32px"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              border="1px solid"
+              borderColor="rgba(46, 95, 168, 0.35)"
+              borderRadius="3px"
+              bg="white"
+              color="brand.500"
+              cursor="pointer"
+              transition="all 0.2s ease"
+              _hover={{ bg: 'brand.500', color: 'white', borderColor: 'brand.500' }}
+              onClick={handleClose}
+              aria-label="Close"
+            >
+              <X size={16} strokeWidth={2} />
+            </Box>
+
+            <Text
+              fontSize="11px"
+              color="brand.400"
+              textTransform="uppercase"
+              letterSpacing="0.22em"
+              fontWeight="700"
+              mb="3"
+            >
+              Speaker Profile
+            </Text>
+
+            <Flex align="center" gap="5" pr="12">
+              <SpeakerAvatar imageUrl={speaker.imageUrl} name={speaker.name} size="md" />
+              <Box>
+                <Heading
+                  as="h2"
+                  fontSize={{ base: '2xl', md: '4xl' }}
+                  fontWeight="600"
+                  color="brand.500"
+                  lineHeight="1.05"
+                  letterSpacing="-0.02em"
+                  mb="2"
+                >
+                  {speaker.name}
+                </Heading>
+                <Text
+                  fontSize="11px"
+                  color="brand.400"
+                  textTransform="uppercase"
+                  letterSpacing="0.22em"
+                  fontWeight="600"
+                  className="tabular"
+                >
+                  {String(total).padStart(2, '0')} presentation{total === 1 ? '' : 's'}
+                </Text>
+              </Box>
             </Flex>
           </Box>
 
-          <Box p="6" overflowY="auto" maxH="calc(90vh - 150px)">
-            <VStack gap="5" align="stretch">
+          {/* Body */}
+          <Box px={{ base: '6', md: '8' }} py={{ base: '6', md: '8' }}>
+            <Flex
+              align="baseline"
+              justify="space-between"
+              pb="3"
+              mb="6"
+              borderBottom="1px solid"
+              borderColor="rgba(46, 95, 168, 0.22)"
+            >
+              <Text
+                fontSize="11px"
+                fontWeight="700"
+                color="brand.500"
+                textTransform="uppercase"
+                letterSpacing="0.22em"
+              >
+                Talks
+              </Text>
+              <Text
+                fontSize="11px"
+                fontWeight="600"
+                color="brand.400"
+                textTransform="uppercase"
+                letterSpacing="0.22em"
+                className="tabular"
+              >
+                Most recent first
+              </Text>
+            </Flex>
+
+            <VStack gap="0" align="stretch">
               {sortedPresentations.map((presentation, index) => (
-                <Box
+                <Flex
                   key={`${speaker.id}-presentation-${index}`}
-                  p="5"
-                  bg={index === 0 ? COLORS.brand[50] : 'white'}
-                  borderRadius="xl"
-                  border="2px"
-                  borderColor={index === 0 ? COLORS.brand[300] : 'gray.200'}
-                  boxShadow={index === 0 ? '0 4px 12px rgba(46, 95, 169, 0.15)' : '0 2px 6px rgba(0, 0, 0, 0.05)'}
-                  position="relative"
-                  transition="all 0.2s"
-                  _hover={{
-                    borderColor: index === 0 ? COLORS.brand[400] : 'gray.300',
-                    boxShadow: index === 0 ? '0 6px 16px rgba(46, 95, 169, 0.2)' : '0 4px 10px rgba(0, 0, 0, 0.1)',
-                  }}
+                  gap={{ base: '4', md: '8' }}
+                  py="6"
+                  borderTop={index === 0 ? 'none' : '1px solid'}
+                  borderColor="rgba(46, 95, 168, 0.18)"
+                  direction={{ base: 'column', md: 'row' }}
                 >
-                  {index === 0 && (
-                    <Badge
-                      position="absolute"
-                      top="3"
-                      right="3"
-                      px="3"
-                      py="1"
-                      borderRadius="full"
-                      fontSize="xs"
-                      fontWeight="600"
-                      bg={COLORS.brand[500]}
-                      color="white"
+                  {/* Year gutter */}
+                  <Box minW={{ md: '100px' }}>
+                    <Text
+                      fontSize="32px"
+                      fontWeight="500"
+                      color="brand.500"
+                      letterSpacing="-0.03em"
+                      lineHeight="1"
+                      className="tabular"
                     >
-                      Most Recent
-                    </Badge>
-                  )}
+                      {presentation.year}
+                    </Text>
+                    <Text
+                      fontSize="10px"
+                      fontWeight="700"
+                      color="brand.400"
+                      textTransform="uppercase"
+                      letterSpacing="0.2em"
+                      mt="2"
+                    >
+                      {presentation.eventType}
+                      {index === 0 && ' · Latest'}
+                    </Text>
+                  </Box>
 
-                  <VStack gap="3" align="stretch">
-                    <Flex align="center" gap="2" wrap="wrap">
-                      <Badge
-                        px="3"
-                        py="1"
-                        borderRadius="full"
-                        fontSize="xs"
-                        fontWeight="600"
-                        bg={EVENT_TYPE_COLORS[presentation.eventType].bg}
-                        color={EVENT_TYPE_COLORS[presentation.eventType].color}
-                        border="1px"
-                        borderColor={EVENT_TYPE_COLORS[presentation.eventType].border}
-                        textTransform="capitalize"
-                      >
-                        {presentation.eventType}
-                      </Badge>
-                      <Text fontSize="sm" color="gray.500" fontWeight="500">
-                        {presentation.year}
-                      </Text>
-                    </Flex>
-
+                  {/* Body */}
+                  <VStack align="stretch" gap="4" flex="1">
                     <Box>
                       <Text
-                        fontSize="sm"
+                        fontSize="10px"
                         fontWeight="600"
-                        color="gray.700"
-                        mb="1"
+                        color="brand.400"
+                        textTransform="uppercase"
+                        letterSpacing="0.2em"
+                        mb="2"
                       >
                         Topic
                       </Text>
-                      <Text
-                        fontSize="md"
-                        color="gray.800"
-                        lineHeight="1.5"
-                        fontStyle="italic"
-                      >
+                      <Text fontSize="md" color="brand.500" fontWeight="500" lineHeight="1.5" fontStyle="italic">
                         &ldquo;{presentation.topic}&rdquo;
                       </Text>
                     </Box>
 
                     <Box>
                       <Text
-                        fontSize="sm"
+                        fontSize="10px"
                         fontWeight="600"
-                        color="gray.700"
-                        mb="1"
+                        color="brand.400"
+                        textTransform="uppercase"
+                        letterSpacing="0.2em"
+                        mb="2"
                       >
                         Event
                       </Text>
-                      <Text
-                        fontSize="md"
-                        color={COLORS.brand[600]}
-                        fontWeight="500"
-                      >
+                      <Text fontSize="sm" color="gray.700" lineHeight="1.55">
                         {presentation.event}
                       </Text>
                     </Box>
 
                     {presentation.link && (
-                      <Box pt="2">
+                      <Box>
                         <ExternalLinkButton
                           href={presentation.link}
                           variant="secondary"
                           size="sm"
                         >
                           <Flex align="center" gap="2">
-                            <ExternalLink size={16} />
+                            <ExternalLink size={13} strokeWidth={1.75} />
                             <Text>View Presentation</Text>
                           </Flex>
                         </ExternalLinkButton>
                       </Box>
                     )}
                   </VStack>
-                </Box>
+                </Flex>
               ))}
             </VStack>
           </Box>

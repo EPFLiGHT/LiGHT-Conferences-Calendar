@@ -27,40 +27,45 @@ export default function ConferenceCard({ conference, onClick, index = 0 }: Confe
 
   return (
     <MotionBox
-      initial={{ opacity: 0, y: -30, scale: 0.95 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      initial={{ opacity: 0, y: 8 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-30px", amount: 0.1 }}
       transition={{
         duration: animationDuration,
         delay: animationDelay,
         ease: [0.25, 0.46, 0.45, 0.94],
-        layout: { duration: 0.15, ease: 'easeOut' }
       }}
       bg="white"
-      borderRadius="xl"
-      border="1px"
-      borderColor="brand.200"
-      boxShadow="0 1px 3px rgba(46, 95, 169, 0.08)"
+      borderRadius="4px"
+      border="1px solid"
+      borderColor="rgba(46, 95, 168, 0.22)"
       p="6"
       cursor="pointer"
+      position="relative"
       whileHover={{
-        boxShadow: '0 8px 24px rgba(46, 95, 169, 0.2)',
-        y: -4,
-        scale: 1.02,
-        borderColor: 'var(--chakra-colors-brand-400)',
-        transition: { duration: 0.15, ease: [0.25, 0.1, 0.25, 1] }
-      }}
-      whileTap={{
-        scale: 0.98,
-        transition: { duration: 0.1 }
+        borderColor: 'rgba(46, 95, 168, 0.6)',
+        transition: { duration: 0.18, ease: 'easeOut' }
       }}
       onClick={onClick}
     >
       {/* Card Header */}
       <VStack align="stretch" gap="3" mb="3">
         <Flex justify="space-between" align="start" gap="3" wrap="wrap">
-          <Heading as="h3" size="lg" color="gray.800" flex="1" minW="200px">
-            {conference.title} {conference.year}
+          <Heading
+            as="h3"
+            flex="1"
+            minW="200px"
+            fontFamily="Chillax, sans-serif"
+            fontWeight="600"
+            fontSize="22px"
+            lineHeight="1.2"
+            letterSpacing="-0.01em"
+            color="brand.500"
+          >
+            {conference.title}{' '}
+            <Text as="span" color="brand.400" fontWeight="500" className="tabular">
+              {conference.year}
+            </Text>
           </Heading>
           <Flex gap="2" align="center" wrap="wrap" justify="flex-end">
             <TypeBadge type={conference.type} />
@@ -77,7 +82,7 @@ export default function ConferenceCard({ conference, onClick, index = 0 }: Confe
       </VStack>
 
       {/* Subtitle */}
-      <Text fontSize="sm" color="gray.600" mb="4" lineHeight="1.5">
+      <Text fontSize="sm" color="gray.600" mb="5" lineHeight="1.55">
         {conference.full_name}
       </Text>
 
@@ -91,11 +96,11 @@ export default function ConferenceCard({ conference, onClick, index = 0 }: Confe
         <VStack
           align="stretch"
           gap="4"
-          p="4"
-          bg="gray.50"
-          borderRadius="lg"
-          border="1px"
-          borderColor="gray.200"
+          py="4"
+          px="0"
+          borderTop="1px solid"
+          borderBottom="1px solid"
+          borderColor="rgba(46, 95, 168, 0.18)"
           mb="4"
         >
           {allDeadlines.map((deadline, idx) => (
@@ -109,23 +114,21 @@ export default function ConferenceCard({ conference, onClick, index = 0 }: Confe
         </VStack>
       ) : (
         <Box
-          p="3"
+          py="3"
           textAlign="center"
-          bg="gray.50"
-          borderRadius="lg"
-          border="1px"
-          borderColor="gray.200"
-          borderStyle="dashed"
+          borderTop="1px solid"
+          borderBottom="1px solid"
+          borderColor="rgba(46, 95, 168, 0.18)"
           mb="4"
         >
-          <Text fontSize="sm" color="gray.500" fontStyle="italic">
-            No deadlines available
+          <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.14em">
+            No deadlines on record
           </Text>
         </Box>
       )}
 
       {/* Links */}
-      <Flex gap="3" wrap="wrap" pt="4" borderTop="1px" borderColor="gray.200">
+      <Flex gap="3" wrap="wrap" pt="4">
         {conference.link && (
           <ExternalLinkButton
             href={conference.link}

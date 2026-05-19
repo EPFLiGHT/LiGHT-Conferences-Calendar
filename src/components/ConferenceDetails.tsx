@@ -77,10 +77,10 @@ export default function ConferenceDetails({
       <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap="6">
         {MODAL_FIELDS.filter((field) => field.isPresent(conference)).map((field) => (
           <VStack key={field.key} align="start" gap="2">
-            <Text fontSize="xs" fontWeight="600" color="gray.600" textTransform="uppercase" letterSpacing="wider">
+            <Text fontSize="11px" fontWeight="600" color="brand.400" textTransform="uppercase" letterSpacing="0.2em">
               {field.label}
             </Text>
-            <Text fontSize="md" color="gray.800">
+            <Text fontSize="md" color="brand.500" fontWeight="500" className={field.key === 'hindex' ? 'tabular' : undefined}>
               {field.getValue(conference)}
             </Text>
           </VStack>
@@ -88,7 +88,7 @@ export default function ConferenceDetails({
 
         {showSubjects && subjects.length > 0 && (
           <VStack align="start" gap="2">
-            <Text fontSize="xs" fontWeight="600" color="gray.600" textTransform="uppercase" letterSpacing="wider">
+            <Text fontSize="11px" fontWeight="600" color="brand.400" textTransform="uppercase" letterSpacing="0.2em">
               Subject{subjects.length > 1 ? 's' : ''}
             </Text>
             <SubjectBadge subjects={subjects} />
@@ -97,7 +97,7 @@ export default function ConferenceDetails({
 
         {showNote && conference.note && (
           <VStack align="start" gap="2">
-            <Text fontSize="xs" fontWeight="600" color="gray.600" textTransform="uppercase" letterSpacing="wider">
+            <Text fontSize="11px" fontWeight="600" color="brand.400" textTransform="uppercase" letterSpacing="0.2em">
               Note
             </Text>
             <NoteBadge note={conference.note} layout="modal" />

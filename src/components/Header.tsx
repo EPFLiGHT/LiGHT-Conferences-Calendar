@@ -5,7 +5,6 @@ import NextLink from 'next/link';
 import { Box, Container, Flex, HStack, Link, Text, Image } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { Home, Calendar, Users } from 'lucide-react';
-import { GRADIENTS, brandAlpha } from '@/theme';
 
 export default function Header(): JSX.Element {
   const pathname = usePathname();
@@ -46,49 +45,22 @@ export default function Header(): JSX.Element {
       position="sticky"
       top="0"
       zIndex="100"
-      bg="rgba(255, 255, 255, 0.95)"
-      backdropFilter="blur(10px)"
-      borderBottom="1px"
-      borderColor="brand.200"
-      boxShadow={`0 2px 16px ${brandAlpha(500, 0.08)}`}
+      bg="rgba(255, 255, 255, 0.92)"
+      backdropFilter="blur(12px) saturate(140%)"
+      borderBottom="1px solid"
+      borderColor="rgba(46, 95, 168, 0.18)"
     >
       {/* Scroll Progress Bar */}
       <Box
         position="absolute"
-        top="0"
+        bottom="-1px"
         left="0"
-        right="0"
-        h="4px"
-        bg={brandAlpha(500, 0.1)}
-        zIndex="101"
-      >
-        <Box
-          className="progress-bar"
-          h="100%"
-          w={`${scrollProgress}%`}
-          bg={GRADIENTS.headerProgress}
-          transition="width 0.1s linear"
-          boxShadow={`0 0 16px ${brandAlpha(500, 0.8)}, 0 0 8px ${brandAlpha(400, 0.6)}`}
-          borderRadius="0 4px 4px 0"
-          style={{ willChange: 'width' }}
-        />
-      </Box>
-      <style jsx global>{`
-        .progress-bar::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          right: 0;
-          width: 30px;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4));
-          animation: shimmer 2s ease-in-out infinite;
-        }
-        @keyframes shimmer {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.8; }
-        }
-      `}</style>
+        h="1px"
+        w={`${scrollProgress}%`}
+        bg="brand.500"
+        transition="width 0.1s linear"
+        style={{ willChange: 'width' }}
+      />
       <Container maxW="1200px" px={{ base: '4', md: '6' }} mx="auto">
         <Flex align="center" justify="space-between" py="5" gap={{ base: '2', md: '8' }}>
           {/* Logo and Brand */}
@@ -105,52 +77,54 @@ export default function Header(): JSX.Element {
               _hover={{ transform: 'scale(1.05)' }}
             >
               <Image
-                src="/light-logo.svg"
+                src="/light-logo-new.png"
                 alt="LiGHT Lab"
-                h={{ base: '40px', md: '60px' }}
+                h={{ base: '36px', md: '52px' }}
                 w="auto"
-                maxW={{ base: '100px', md: 'none' }}
+                maxW={{ base: '120px', md: 'none' }}
                 objectFit="contain"
-                _hover={{ filter: `drop-shadow(0 4px 8px ${brandAlpha(500, 0.3)})` }}
+                transition="opacity 0.2s ease"
+                _hover={{ opacity: 0.85 }}
               />
               <Box display={{ base: 'none', lg: 'block' }}>
-                <Text fontSize="sm" fontWeight="600" color="brand.500" lineHeight="1.3">
+                <Text fontSize="xs" fontWeight="500" color="brand.500" lineHeight="1.4" textTransform="uppercase" letterSpacing="0.12em">
                   Laboratory for Intelligent
                 </Text>
-                <Text fontSize="sm" fontWeight="600" color="brand.400" lineHeight="1.3">
-                  Global Health & Humanitarian
+                <Text fontSize="xs" fontWeight="500" color="brand.400" lineHeight="1.4" textTransform="uppercase" letterSpacing="0.12em">
+                  Global Health &amp; Humanitarian
                 </Text>
-                <Text fontSize="sm" fontWeight="600" color="brand.400" lineHeight="1.3">
+                <Text fontSize="xs" fontWeight="500" color="brand.400" lineHeight="1.4" textTransform="uppercase" letterSpacing="0.12em">
                   Response Technologies
                 </Text>
               </Box>
             </Link>
 
             <Box
-              w="2px"
-              h="65px"
-              bgGradient="to-b"
-              gradientFrom="transparent"
-              gradientVia="brand.500"
-              gradientTo="transparent"
-              opacity="0.3"
+              w="1px"
+              h="48px"
+              bg="rgba(46, 95, 168, 0.22)"
               display={{ base: 'none', md: 'block' }}
             />
 
             <Box>
               <Text
                 fontSize="xl"
-                fontWeight="700"
-                bgGradient="to-r"
-                gradientFrom="brand.500"
-                gradientTo="brand.400"
-                bgClip="text"
-                lineHeight="1.2"
+                fontWeight="600"
+                color="brand.500"
+                lineHeight="1.15"
+                letterSpacing="-0.015em"
               >
                 Conference Deadlines
               </Text>
-              <Text fontSize="sm" color="gray.600">
-                Track research conferences & deadlines
+              <Text
+                fontSize="11px"
+                color="brand.400"
+                mt="1.5"
+                textTransform="uppercase"
+                letterSpacing="0.2em"
+                fontWeight="500"
+              >
+                Track research deadlines
               </Text>
             </Box>
           </Flex>
@@ -168,33 +142,34 @@ export default function Header(): JSX.Element {
                   key={href}
                   as={NextLink}
                   href={href}
-                  px={{ base: '3', sm: '5' }}
-                  py={{ base: '2', sm: '2.5' }}
-                  borderRadius="10px"
-                  fontWeight="600"
+                  px={{ base: '2.5', sm: '4' }}
+                  py="2"
+                  fontWeight="500"
                   fontSize="sm"
-                  color={isActive ? 'white' : 'gray.600'}
-                  bg={isActive ? 'brand.500' : 'transparent'}
-                  border="2px solid"
-                  borderColor={isActive ? 'brand.600' : 'transparent'}
-                  transition="all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)"
-                  boxShadow={isActive ? `0 4px 12px ${brandAlpha(500, 0.3)}` : 'none'}
+                  color={isActive ? 'brand.500' : 'brand.400'}
+                  bg="transparent"
+                  borderRadius="0"
+                  position="relative"
+                  textTransform="uppercase"
+                  letterSpacing="0.14em"
+                  transition="color 0.2s ease"
                   _hover={{
-                    color: isActive ? 'white' : 'brand.500',
-                    bg: isActive ? 'brand.600' : 'brand.50',
-                    borderColor: isActive ? 'brand.600' : 'brand.200',
-                    transform: 'translateY(-2px) scale(1.05)',
-                    boxShadow: isActive
-                      ? `0 8px 20px ${brandAlpha(500, 0.4)}`
-                      : `0 6px 16px ${brandAlpha(500, 0.2)}`,
+                    color: 'brand.500',
+                    bg: 'transparent',
+                    textDecoration: 'none',
                   }}
-                  _active={{
-                    transform: 'scale(0.95)',
-                    transition: 'all 0.1s ease',
+                  _after={{
+                    content: '""',
+                    position: 'absolute',
+                    left: { base: '10px', sm: '16px' },
+                    right: { base: '10px', sm: '16px' },
+                    bottom: '4px',
+                    height: '1px',
+                    bg: isActive ? 'brand.500' : 'transparent',
                   }}
                 >
                   <Flex align="center" gap="2">
-                    <Icon size={18} strokeWidth={2.5} />
+                    <Icon size={14} strokeWidth={1.5} />
                     <Text as="span" display={{ base: 'none', sm: 'inline' }}>{label}</Text>
                   </Flex>
                 </Link>

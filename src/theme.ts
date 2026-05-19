@@ -35,6 +35,14 @@ export const system = createSystem(defaultConfig, defineConfig({
     },
   },
   globalCss: {
+    'html, body': {
+      background: '#ffffff',
+      color: '#0a1a3d',
+    },
+    '.tabular': {
+      fontVariantNumeric: 'tabular-nums',
+      fontFeatureSettings: '"tnum"',
+    },
     'button, a': {
       transition: 'all 0.2s ease-in-out',
     },
@@ -45,64 +53,66 @@ export const system = createSystem(defaultConfig, defineConfig({
     /* FullCalendar Custom Styles */
     '.fc': {
       fontFamily: 'inherit',
+      fontVariantNumeric: 'tabular-nums',
     },
 
     /* Toolbar buttons */
     '.fc .fc-button': {
-      background: '{colors.brand.500} !important',
-      borderColor: '{colors.brand.500} !important',
-      textTransform: 'capitalize',
-      fontWeight: '500',
-      padding: '0.5rem 1rem',
-      borderRadius: '8px',
-      color: 'white !important',
+      background: 'white !important',
+      borderColor: 'rgba(46, 95, 168, 0.35) !important',
+      textTransform: 'uppercase',
+      fontWeight: '600',
+      letterSpacing: '0.16em',
+      fontSize: '0.7rem',
+      padding: '0.4rem 0.85rem',
+      borderRadius: '2px',
+      color: '{colors.brand.500} !important',
       outline: 'none !important',
       boxShadow: 'none !important',
+      transition: 'all 0.18s ease',
     },
 
-    /* Remove hover effects for prev/next buttons */
-    '.fc .fc-prev-button:hover, .fc .fc-next-button:hover': {
-      background: '{colors.brand.500} !important',
+    '.fc .fc-button:hover': {
+      background: '{colors.brand.50} !important',
       borderColor: '{colors.brand.500} !important',
+      color: '{colors.brand.500} !important',
       transform: 'none !important',
       boxShadow: 'none !important',
     },
 
-    /* Keep hover effect for other buttons (view switcher) */
-    '.fc .fc-button:not(.fc-prev-button):not(.fc-next-button):hover': {
-      background: '{colors.brand.600} !important',
-      borderColor: '{colors.brand.600} !important',
-      transform: 'translateY(-1px)',
-      boxShadow: '0 4px 12px rgba(46, 94, 168, 0.4) !important',
-    },
-
     '.fc .fc-button:active': {
-      transform: 'scale(0.98)',
+      background: '{colors.brand.50} !important',
+      transform: 'none !important',
       boxShadow: 'none !important',
     },
 
     '.fc .fc-button:focus, .fc .fc-button:focus-visible': {
       outline: 'none !important',
       boxShadow: 'none !important',
-      background: '{colors.brand.500} !important',
-      borderColor: '{colors.brand.500} !important',
     },
 
     '.fc .fc-button-active': {
-      background: '{colors.brand.600} !important',
-      borderColor: '{colors.brand.600} !important',
+      background: '{colors.brand.500} !important',
+      borderColor: '{colors.brand.500} !important',
+      color: 'white !important',
       boxShadow: 'none !important',
+    },
+
+    '.fc .fc-button-active:hover': {
+      background: '{colors.brand.700} !important',
+      borderColor: '{colors.brand.700} !important',
+      color: 'white !important',
     },
 
     '.fc .fc-button-active:focus, .fc .fc-button-active:focus-visible': {
       outline: 'none !important',
       boxShadow: 'none !important',
-      background: '{colors.brand.600} !important',
-      borderColor: '{colors.brand.600} !important',
+      background: '{colors.brand.500} !important',
+      borderColor: '{colors.brand.500} !important',
     },
 
     '.fc .fc-button:disabled': {
-      opacity: '0.4',
+      opacity: '0.35',
       cursor: 'not-allowed',
     },
 
@@ -110,67 +120,76 @@ export const system = createSystem(defaultConfig, defineConfig({
     '.fc .fc-toolbar-title': {
       fontSize: '1.5rem',
       fontWeight: '600',
-      color: '{colors.gray.800}',
+      color: '{colors.brand.500}',
+      letterSpacing: '-0.015em',
     },
 
     /* Grid borders */
     '.fc-theme-standard td, .fc-theme-standard th': {
-      borderColor: '{colors.gray.200}',
+      borderColor: 'rgba(46, 95, 168, 0.14)',
     },
 
     '.fc-theme-standard .fc-scrollgrid': {
-      borderColor: '{colors.gray.200}',
+      borderColor: 'rgba(46, 95, 168, 0.22)',
     },
 
     /* Day numbers */
     '.fc .fc-daygrid-day-number': {
-      color: '{colors.gray.600}',
+      color: '{colors.brand.400}',
       padding: '0.5rem',
-      fontSize: '0.9rem',
+      fontSize: '0.8rem',
+      fontWeight: '600',
+      fontVariantNumeric: 'tabular-nums',
     },
 
     '.fc .fc-day-today .fc-daygrid-day-number': {
       background: '{colors.brand.500}',
       color: 'white',
-      borderRadius: '50%',
-      width: '1.8rem',
-      height: '1.8rem',
-      display: 'flex',
+      borderRadius: '2px',
+      minWidth: '1.6rem',
+      height: '1.6rem',
+      display: 'inline-flex',
       alignItems: 'center',
       justifyContent: 'center',
+      padding: '0 0.4rem',
     },
 
     /* Column headers */
     '.fc .fc-col-header-cell-cushion': {
-      color: '{colors.gray.500}',
-      fontWeight: '600',
-      fontSize: '0.875rem',
-      padding: '0.75rem',
+      color: '{colors.brand.500}',
+      fontWeight: '700',
+      fontSize: '0.7rem',
+      letterSpacing: '0.18em',
+      textTransform: 'uppercase',
+      padding: '0.7rem 0.5rem',
     },
 
     '.fc .fc-col-header-cell': {
-      background: '{colors.gray.50}',
-      borderColor: '{colors.gray.200}',
+      background: 'white',
+      borderColor: 'rgba(46, 95, 168, 0.22)',
+      borderBottomWidth: '2px',
     },
 
     /* Today background */
     '.fc .fc-day-today': {
-      background: '{colors.brand.50} !important',
+      background: 'rgba(46, 95, 168, 0.04) !important',
     },
 
     /* Events */
     '.fc .fc-event': {
       cursor: 'pointer',
-      borderRadius: '6px',
+      borderRadius: '2px',
       padding: '2px 6px',
-      fontSize: '0.875rem',
-      border: 'none',
-      transition: 'all 0.2s ease-in-out',
+      fontSize: '0.78rem',
+      fontWeight: '500',
+      border: '1px solid transparent',
+      transition: 'opacity 0.18s ease',
     },
 
     '.fc .fc-event:hover': {
-      transform: 'translateY(-1px)',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+      transform: 'none',
+      opacity: '0.85',
+      boxShadow: 'none',
     },
 
     '.fc .fc-event-time': {
@@ -180,6 +199,31 @@ export const system = createSystem(defaultConfig, defineConfig({
     '.fc-timegrid-event .fc-event-time': {
       display: 'block !important',
       fontWeight: '600',
+      fontVariantNumeric: 'tabular-nums',
+    },
+
+    /* List view */
+    '.fc-list-day-cushion, .fc-list-day-cushion.fc-cell-shaded': {
+      background: 'white !important',
+      borderTop: '1px solid rgba(46, 95, 168, 0.22)',
+      borderBottom: '1px solid rgba(46, 95, 168, 0.14)',
+    },
+
+    '.fc-list-day-text, .fc-list-day-side-text': {
+      color: '{colors.brand.500}',
+      fontWeight: '700',
+      fontSize: '0.7rem',
+      letterSpacing: '0.18em',
+      textTransform: 'uppercase',
+      textDecoration: 'none !important',
+    },
+
+    '.fc-list-event:hover td': {
+      background: 'rgba(46, 95, 168, 0.04) !important',
+    },
+
+    '.fc-list-event-time, .fc-list-event-title': {
+      fontVariantNumeric: 'tabular-nums',
     },
 
     /* Mobile responsive */

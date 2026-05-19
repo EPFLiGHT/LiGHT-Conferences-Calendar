@@ -1,6 +1,6 @@
-import { Badge, Flex, FlexProps } from '@chakra-ui/react';
+import { Flex, FlexProps, Text } from '@chakra-ui/react';
 import InfoTooltip from './InfoTooltip';
-import { getSubjectColor, getSubjectsArray } from '@/utils/parser';
+import { getSubjectsArray } from '@/utils/parser';
 import { SUBJECT_LABELS } from '@/constants/subjects';
 
 interface SubjectBadgeProps extends Omit<FlexProps, 'children'> {
@@ -19,29 +19,25 @@ export default function SubjectBadge({
 
   return (
     <Flex gap={gap} wrap={wrap} {...flexProps}>
-      {normalizedSubjects.map((subject) => {
-        const colors = getSubjectColor(subject);
-
-        return (
-          <InfoTooltip key={subject} label={SUBJECT_LABELS[subject] || subject}>
-            <Badge
-              px="3"
-              py="1"
-              borderRadius="full"
-              fontSize="xs"
-              fontWeight="600"
-              bg={colors.bg}
-              color={colors.color}
-              border="1px"
-              borderColor={colors.border}
-              whiteSpace="nowrap"
-              cursor="help"
-            >
-              {subject}
-            </Badge>
-          </InfoTooltip>
-        );
-      })}
+      {normalizedSubjects.map((subject) => (
+        <InfoTooltip key={subject} label={SUBJECT_LABELS[subject] || subject}>
+          <Text
+            as="span"
+            fontSize="10px"
+            fontWeight="700"
+            color="brand.400"
+            textTransform="uppercase"
+            letterSpacing="0.2em"
+            whiteSpace="nowrap"
+            cursor="help"
+            borderBottom="1px solid"
+            borderColor="rgba(46, 95, 168, 0.3)"
+            pb="1px"
+          >
+            {subject}
+          </Text>
+        </InfoTooltip>
+      ))}
     </Flex>
   );
 }

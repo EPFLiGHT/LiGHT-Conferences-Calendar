@@ -1,417 +1,354 @@
 'use client';
 
-import { Box, Container, Flex, Text, Link, Image } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
-import { GRADIENTS, brandAlpha } from '@/theme';
-import { MapPin, Mail, Linkedin, Github, Activity } from 'lucide-react';
+import { Box, Container, Flex, Grid, Heading, Text, Link, Image } from '@chakra-ui/react';
+import { MapPin, Mail, Linkedin, Github, ArrowUpRight, ArrowUp } from 'lucide-react';
+
+const linkUnderline = {
+  borderBottom: '1px solid',
+  borderColor: 'rgba(46, 95, 168, 0.5)',
+  pb: '1px',
+  transition: 'all 0.2s ease',
+} as const;
+
+const linkHover = {
+  color: 'brand.700',
+  borderColor: 'brand.700',
+  textDecoration: 'none',
+} as const;
+
+const colHeadStyle = {
+  fontSize: '11px',
+  color: 'brand.500',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.22em',
+  fontWeight: 700,
+  mb: '2',
+  pb: '3',
+  borderBottom: '1px solid',
+  borderColor: 'rgba(46, 95, 168, 0.3)',
+};
 
 export default function Footer(): JSX.Element {
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      const scrollTop = window.scrollY;
-      const scrollableHeight = documentHeight - windowHeight;
-      const progress = scrollableHeight > 0 ? (scrollTop / scrollableHeight) * 100 : 0;
-
-      setScrollProgress(progress);
-      setIsVisible(progress > 65); // Show animations when 65% scrolled
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Initial call
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Animation values that change as you scroll
-  const bannerScale = 0.85 + (scrollProgress / 100) * 0.15;
-  const textOpacity = Math.min(scrollProgress / 75, 1);
-  const waveOffset = scrollProgress * 1.5;
+  const scrollTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   return (
-    <>
-      <style jsx global>{`
-        @keyframes smoothFloat {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-12px); }
-        }
-
-        @keyframes gentlePulse {
-          0%, 100% { opacity: 0.25; transform: scale(1); }
-          50% { opacity: 0.5; transform: scale(1.05); }
-        }
-
-        @keyframes fadeSlideIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes smoothShimmer {
-          0% { background-position: -1200px 0; }
-          100% { background-position: 1200px 0; }
-        }
-
-        @keyframes bounceIn {
-          0% { opacity: 0; transform: scale(0); }
-          50% { transform: scale(1.1); }
-          100% { opacity: 1; transform: scale(1); }
-        }
-      `}</style>
+    <Box as="footer" mt="auto" position="relative">
+      {/* Top accent rule */}
+      <Box position="relative" h="3px" overflow="hidden" bg="rgba(46, 95, 168, 0.12)">
+        <Box
+          position="absolute"
+          top="0"
+          left="0"
+          h="100%"
+          w="38%"
+          bgGradient="to-r"
+          gradientFrom="brand.500"
+          gradientTo="brand.400"
+        />
+      </Box>
 
       <Box
-        as="footer"
-        mt="auto"
-        py={{ base: '12', md: '16' }}
-        position="relative"
-        overflow="hidden"
-        bg={GRADIENTS.footerBackground}
+        bg="brand.50"
+        bgGradient="to-b"
+        gradientFrom="white"
+        gradientTo="brand.50"
+        pt={{ base: '14', md: '20' }}
+        pb={{ base: '8', md: '10' }}
+        borderBottom="1px solid"
+        borderColor="brand.500"
       >
-        {/* Background wave effects that pulse and move */}
-        <Box
-          position="absolute"
-          top="-25%"
-          left={`${-20 + waveOffset * 0.2}%`}
-          w="65%"
-          h="65%"
-          bg={`radial-gradient(circle, ${brandAlpha(400, 0.18)} 0%, transparent 70%)`}
-          borderRadius="50%"
-          transition="left 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
-          css={{
-            animation: 'gentlePulse 10s ease-in-out infinite',
-          }}
-        />
-        <Box
-          position="absolute"
-          bottom="-35%"
-          right={`${-15 - waveOffset * 0.15}%`}
-          w="75%"
-          h="75%"
-          bg={`radial-gradient(circle, ${brandAlpha(500, 0.15)} 0%, transparent 70%)`}
-          borderRadius="50%"
-          transition="right 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
-          css={{
-            animation: 'gentlePulse 12s ease-in-out infinite 3s',
-          }}
-        />
-
-        {/* Little floating dots */}
-        {[...Array(6)].map((_, i) => (
-          <Box
-            key={i}
-            position="absolute"
-            top={`${15 + i * 14}%`}
-            left={`${8 + i * 18}%`}
-            w={i % 2 === 0 ? '5px' : '3px'}
-            h={i % 2 === 0 ? '5px' : '3px'}
-            bg={i % 2 === 0 ? 'brand.400' : 'brand.500'}
-            borderRadius="50%"
-            opacity={isVisible ? 0.35 : 0}
-            transition="opacity 1s cubic-bezier(0.4, 0, 0.2, 1)"
-            css={{
-              animation: isVisible ? `smoothFloat ${3.5 + i * 0.4}s ease-in-out infinite ${i * 0.25}s` : 'none',
-            }}
-          />
-        ))}
-
-        <Container maxW="1200px" px={{ base: '4', md: '6' }} mx="auto" position="relative" zIndex="1">
+        <Container maxW="1200px" px={{ base: '4', md: '6' }} mx="auto">
+          {/* Masthead colophon */}
           <Flex
-            direction="column"
-            gap={{ base: '12', md: '16' }}
+            align="baseline"
+            justify="space-between"
+            mb={{ base: '10', md: '14' }}
+            pb="4"
+            borderBottom="2px solid"
+            borderColor="brand.500"
+            gap="4"
+            flexWrap="wrap"
           >
-            {/* Top section: Banner and Contact Info */}
-            <Flex
-              direction={{ base: 'column', md: 'row' }}
-              align="center"
-              justify="space-between"
-              gap={{ base: '8', md: '12' }}
+            <Text
+              fontSize={{ base: '11px', md: '12px' }}
+              color="brand.500"
+              textTransform="uppercase"
+              letterSpacing="0.28em"
+              fontWeight="700"
             >
-              {/* LiGHT Lab banner with animations */}
-              <Box
-                flex={{ base: '0 0 auto', md: '0 0 400px' }}
-                w={{ base: '100%', sm: '400px' }}
-                maxW="100%"
-                position="relative"
+              LiGHT Laboratory
+            </Text>
+            <Text
+              fontSize="11px"
+              color="brand.400"
+              textTransform="uppercase"
+              letterSpacing="0.24em"
+              fontWeight="600"
+              className="tabular"
+            >
+              EPFL
+            </Text>
+          </Flex>
+
+          {/* Main grid */}
+          <Grid
+            templateColumns={{ base: '1fr', lg: '1.4fr 1fr 1fr' }}
+            gap={{ base: '12', lg: '14' }}
+            mb={{ base: '12', md: '14' }}
+          >
+            {/* Banner block */}
+            <Box>
+              <Box position="relative" mb="8" pb="3" pr="3">
+                {/* Offset accent block in lighter brand blue */}
+                <Box
+                  position="absolute"
+                  top="10px"
+                  left="10px"
+                  right="0"
+                  bottom="0"
+                  bg="brand.400"
+                  zIndex="0"
+                />
+
+                {/* Banner card */}
+                <Link
+                  href="https://www.light-laboratory.org/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  position="relative"
+                  zIndex="1"
+                  display="block"
+                  border="1px solid"
+                  borderColor="brand.500"
+                  overflow="hidden"
+                  bg="brand.500"
+                  transition="transform 0.25s ease"
+                  _hover={{ transform: 'translate(-3px, -3px)' }}
+                >
+                  <Image
+                    src="/light-banner-new.png"
+                    alt="LiGHT Laboratory"
+                    w="100%"
+                    h="auto"
+                    objectFit="cover"
+                    display="block"
+                  />
+                </Link>
+
+                {/* Corner crop marks */}
+                <Box
+                  position="absolute"
+                  top="-6px"
+                  left="-6px"
+                  zIndex="2"
+                  w="14px"
+                  h="14px"
+                  borderTop="2px solid"
+                  borderLeft="2px solid"
+                  borderColor="brand.500"
+                />
+                <Box
+                  position="absolute"
+                  bottom="-3px"
+                  right="-3px"
+                  zIndex="2"
+                  w="14px"
+                  h="14px"
+                  borderBottom="2px solid"
+                  borderRight="2px solid"
+                  borderColor="brand.500"
+                />
+              </Box>
+
+              <Heading
+                as="p"
+                fontSize={{ base: '2xl', md: '3xl' }}
+                fontWeight="600"
+                color="brand.500"
+                letterSpacing="-0.02em"
+                lineHeight="1.1"
+                mb="3"
+                mt="2"
               >
-              {/* Shimmer effect around the banner */}
-              <Box
-                position="absolute"
-                top="-12px"
-                left="-12px"
-                right="-12px"
-                bottom="-12px"
-                borderRadius="20px"
-                opacity={isVisible ? 0.25 : 0}
-                transition="opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1)"
-                background={`linear-gradient(90deg, transparent, ${brandAlpha(400, 0.35)}, transparent)`}
-                backgroundSize="1200px 100%"
-                css={{
-                  animation: isVisible ? 'smoothShimmer 4s linear infinite' : 'none',
-                }}
-              />
+                Laboratory for Intelligent Global Health
+                <Text as="span" color="brand.400">{' '}&amp; Humanitarian Response Technologies.</Text>
+              </Heading>
+
+              <Text fontSize="sm" color="gray.600" lineHeight="1.65" maxW="440px" mb="6">
+                Building open tools for research that matters, from conference deadlines to
+                clinical decision support.
+              </Text>
 
               <Link
                 href="https://www.light-laboratory.org/"
                 target="_blank"
                 rel="noopener noreferrer"
-                display="block"
-                transform={`scale(${bannerScale})`}
-                transition="transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
-                style={{
-                  transformOrigin: 'center',
-                }}
-                cursor="pointer"
+                display="inline-flex"
+                alignItems="center"
+                gap="2"
+                fontSize="sm"
+                fontWeight="600"
+                color="brand.500"
+                {...linkUnderline}
+                _hover={linkHover}
               >
-                <Image
-                  src="/light-banner.png"
-                  alt="LiGHT Laboratory"
-                  w="100%"
-                  h="auto"
-                  objectFit="contain"
-                  opacity={isVisible ? 1 : 0.75}
-                  transition="all 1s cubic-bezier(0.4, 0, 0.2, 1)"
-                  borderRadius="16px"
-                  boxShadow={isVisible ? `0 20px 60px ${brandAlpha(500, 0.25)}` : `0 10px 30px ${brandAlpha(500, 0.12)}`}
-                  _hover={{
-                    transform: 'scale(1.03)',
-                    boxShadow: `0 25px 80px ${brandAlpha(500, 0.35)}`,
-                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                  }}
-                />
+                Visit the lab
+                <ArrowUpRight size={15} strokeWidth={2} />
               </Link>
-
-              {/* Decorative circles in the corners */}
-              <Box
-                position="absolute"
-                top="-10px"
-                right="-10px"
-                w="35px"
-                h="35px"
-                border="3px solid"
-                borderColor="brand.500"
-                borderRadius="50%"
-                opacity={isVisible ? 0.8 : 0}
-                css={{
-                  animation: isVisible ? 'bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s both, smoothFloat 4s ease-in-out infinite 1s' : 'none',
-                }}
-              />
-              <Box
-                position="absolute"
-                bottom="-10px"
-                left="-10px"
-                w="45px"
-                h="45px"
-                border="3px solid"
-                borderColor="brand.400"
-                borderRadius="50%"
-                opacity={isVisible ? 0.7 : 0}
-                css={{
-                  animation: isVisible ? 'bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.5s both, smoothFloat 5s ease-in-out infinite 1.5s' : 'none',
-                }}
-              />
             </Box>
 
-            {/* Contact Information */}
-            <Flex
-              direction="column"
-              align={{ base: 'center', md: 'flex-start' }}
-              gap="5"
-              textAlign={{ base: 'center', md: 'left' }}
-              opacity={textOpacity}
-              transition="opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1)"
-              css={{
-                animation: isVisible ? 'fadeSlideIn 1s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both' : 'none',
-              }}
-            >
-              <Box>
-                <Flex align="center" gap="2" mb="2">
-                  <MapPin size={18} color="var(--chakra-colors-brand-500)" />
-                  <Text fontSize="md" fontWeight="700" color="brand.500">
-                    Location
-                  </Text>
-                </Flex>
-                <Text fontSize="sm" color="gray.600" fontWeight="500">
-                  EPFL, Lausanne, Switzerland
-                </Text>
-                <Text fontSize="sm" color="gray.600" fontWeight="500">
-                  Harvard, Ariadne Labs, Boston, USA
-                </Text>
-              </Box>
+            {/* Contact block */}
+            <Box>
+              <Text {...colHeadStyle}>Contact</Text>
 
-              <Box>
-                <Flex align="center" gap="2" mb="2">
-                  <Mail size={18} color="var(--chakra-colors-brand-500)" />
-                  <Text fontSize="md" fontWeight="700" color="brand.500">
-                    Email
+              <Flex direction="column" gap="6" mt="6">
+                <Box>
+                  <Flex align="center" gap="2" mb="2">
+                    <MapPin size={14} strokeWidth={1.75} color="var(--chakra-colors-brand-500)" />
+                    <Text fontSize="xs" fontWeight="700" color="brand.500" textTransform="uppercase" letterSpacing="0.16em">
+                      Location
+                    </Text>
+                  </Flex>
+                  <Text fontSize="sm" color="gray.700" lineHeight="1.6">
+                    EPFL · Lausanne, Switzerland
                   </Text>
-                </Flex>
-                <Link
-                  href="mailto:mary-anne.hartley@epfl.ch"
-                  fontSize="sm"
-                  color="gray.600"
-                  fontWeight="600"
-                  position="relative"
-                  transition="color 0.3s ease"
-                  _hover={{
-                    color: 'brand.400',
-                    _after: {
-                      width: '100%',
-                    }
-                  }}
-                  _after={{
-                    content: '""',
-                    position: 'absolute',
-                    bottom: '-2px',
-                    left: 0,
-                    width: 0,
-                    height: '2px',
-                    bg: 'brand.400',
-                    transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                  }}
-                >
-                  mary-anne.hartley@epfl.ch
-                </Link>
-              </Box>
+                  <Text fontSize="sm" color="gray.700" lineHeight="1.6">
+                    Ariadne Labs · Harvard, USA
+                  </Text>
+                </Box>
 
-              <Box>
-                <Flex align="center" gap="2" mb="2">
-                  <Linkedin size={18} color="var(--chakra-colors-brand-500)" />
-                  <Text fontSize="md" fontWeight="700" color="brand.500">
-                    LinkedIn
-                  </Text>
-                </Flex>
+                <Box>
+                  <Flex align="center" gap="2" mb="2">
+                    <Mail size={14} strokeWidth={1.75} color="var(--chakra-colors-brand-500)" />
+                    <Text fontSize="xs" fontWeight="700" color="brand.500" textTransform="uppercase" letterSpacing="0.16em">
+                      Email
+                    </Text>
+                  </Flex>
+                  <Link
+                    href="mailto:mary-anne.hartley@epfl.ch"
+                    fontSize="sm"
+                    color="brand.500"
+                    fontWeight="500"
+                    {...linkUnderline}
+                    _hover={linkHover}
+                  >
+                    mary-anne.hartley@epfl.ch
+                  </Link>
+                </Box>
+
+                <Box>
+                  <Flex align="center" gap="2" mb="2">
+                    <Linkedin size={14} strokeWidth={1.75} color="var(--chakra-colors-brand-500)" />
+                    <Text fontSize="xs" fontWeight="700" color="brand.500" textTransform="uppercase" letterSpacing="0.16em">
+                      LinkedIn
+                    </Text>
+                  </Flex>
+                  <Link
+                    href="https://www.linkedin.com/company/light-laboratory/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    fontSize="sm"
+                    color="brand.500"
+                    fontWeight="500"
+                    display="inline-flex"
+                    alignItems="center"
+                    gap="1"
+                    {...linkUnderline}
+                    _hover={linkHover}
+                  >
+                    LiGHT Laboratory
+                    <ArrowUpRight size={12} strokeWidth={2} />
+                  </Link>
+                </Box>
+              </Flex>
+            </Box>
+
+            {/* Project block */}
+            <Box>
+              <Text {...colHeadStyle}>This Project</Text>
+
+              <Flex direction="column" gap="3.5" mt="6">
                 <Link
-                  href="https://www.linkedin.com/company/light-laboratory/"
+                  href="https://github.com/EPFLiGHT/Conferences-Calendar"
                   target="_blank"
                   rel="noopener noreferrer"
                   fontSize="sm"
-                  color="gray.600"
-                  fontWeight="600"
-                  position="relative"
-                  transition="color 0.3s ease"
-                  _hover={{
-                    color: 'brand.400',
-                    _after: {
-                      width: '100%',
-                    }
-                  }}
-                  _after={{
-                    content: '""',
-                    position: 'absolute',
-                    bottom: '-2px',
-                    left: 0,
-                    width: 0,
-                    height: '2px',
-                    bg: 'brand.400',
-                    transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                  }}
+                  color="brand.500"
+                  fontWeight="500"
+                  display="inline-flex"
+                  alignItems="center"
+                  gap="2"
+                  alignSelf="flex-start"
+                  {...linkUnderline}
+                  _hover={linkHover}
                 >
-                  LiGHT Laboratory
+                  <Github size={14} strokeWidth={1.75} />
+                  Contribute on GitHub
+                  <ArrowUpRight size={12} strokeWidth={2} />
                 </Link>
-              </Box>
-            </Flex>
-            </Flex>
 
-            {/* Activity icon separator with line */}
-            <Box
-              position="relative"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              w="100%"
-              my="6"
-              opacity={isVisible ? 1 : 0}
-              transition="opacity 1s cubic-bezier(0.4, 0, 0.2, 1) 0.4s"
-            >
-              {/* Left line */}
-              <Box
-                flex="1"
-                h="1px"
-                bg="gray.200"
-              />
+                <Link
+                  href="/slack-install"
+                  fontSize="sm"
+                  color="brand.500"
+                  fontWeight="500"
+                  alignSelf="flex-start"
+                  {...linkUnderline}
+                  _hover={linkHover}
+                >
+                  Add the Slack bot →
+                </Link>
 
-              {/* Activity icon in the middle */}
+                <Link
+                  href="/slack-install/privacy"
+                  fontSize="sm"
+                  color="brand.500"
+                  fontWeight="500"
+                  alignSelf="flex-start"
+                  {...linkUnderline}
+                  _hover={linkHover}
+                >
+                  Privacy policy
+                </Link>
+              </Flex>
+
+              {/* Credits card */}
               <Box
+                mt="8"
+                p="5"
                 bg="white"
-                borderRadius="50%"
-                p="2"
-                mx="4"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                boxShadow={`0 4px 12px ${brandAlpha(500, 0.2)}`}
-                css={{
-                  animation: isVisible ? 'fadeSlideIn 1s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both' : 'none',
-                }}
+                border="1px solid"
+                borderColor="rgba(46, 95, 168, 0.3)"
+                position="relative"
               >
-                <Activity size={20} color="var(--chakra-colors-brand-500)" strokeWidth={2.5} />
-              </Box>
-
-              {/* Right line */}
-              <Box
-                flex="1"
-                h="1px"
-                bg="gray.200"
-              />
-            </Box>
-
-            {/* Bottom section: Credits */}
-            <Flex
-              direction="column"
-              align="center"
-              gap="3"
-              textAlign="center"
-              opacity={textOpacity}
-              transition="opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1)"
-            >
-              <Box
-                css={{
-                  animation: isVisible ? 'fadeSlideIn 1s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both' : 'none',
-                }}
-              >
+                <Box
+                  position="absolute"
+                  top="-1px"
+                  left="-1px"
+                  w="24px"
+                  h="3px"
+                  bg="brand.500"
+                />
                 <Text
-                  fontSize="lg"
+                  fontSize="10px"
+                  color="brand.400"
+                  textTransform="uppercase"
+                  letterSpacing="0.22em"
                   fontWeight="700"
-                  bgGradient={GRADIENTS.footerSurface}
-                  bgClip="text"
                   mb="2"
                 >
-                  LiGHT Laboratory
+                  Credits
                 </Text>
-                <Text fontSize="sm" color="gray.600" maxW="400px">
-                  Made with ❤️ by{' '}
+                <Text fontSize="sm" color="gray.700" lineHeight="1.6">
+                  Built by{' '}
                   <Link
                     href="https://github.com/AZOGOAT"
                     target="_blank"
                     rel="noopener noreferrer"
                     color="brand.500"
                     fontWeight="600"
-                    position="relative"
-                    transition="color 0.3s ease"
-                    _hover={{
-                      color: 'brand.400',
-                      _after: {
-                        width: '100%',
-                      }
-                    }}
-                    _after={{
-                      content: '""',
-                      position: 'absolute',
-                      bottom: '-2px',
-                      left: 0,
-                      width: 0,
-                      height: '2px',
-                      bg: 'brand.400',
-                      transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                    }}
+                    {...linkUnderline}
+                    _hover={linkHover}
                   >
                     AZO
                   </Link>
@@ -422,97 +359,79 @@ export default function Footer(): JSX.Element {
                     rel="noopener noreferrer"
                     color="brand.500"
                     fontWeight="600"
-                    position="relative"
-                    transition="color 0.3s ease"
-                    _hover={{
-                      color: 'brand.400',
-                      _after: {
-                        width: '100%',
-                      }
-                    }}
-                    _after={{
-                      content: '""',
-                      position: 'absolute',
-                      bottom: '-2px',
-                      left: 0,
-                      width: 0,
-                      height: '2px',
-                      bg: 'brand.400',
-                      transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                    }}
+                    {...linkUnderline}
+                    _hover={linkHover}
                   >
                     LiGHT Lab
                   </Link>
+                  .
                 </Text>
               </Box>
+            </Box>
+          </Grid>
 
-              <Box
-                css={{
-                  animation: isVisible ? 'fadeSlideIn 1s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both' : 'none',
-                }}
+          {/* Bottom bar */}
+          <Flex
+            align="center"
+            justify="space-between"
+            pt="6"
+            borderTop="1px solid"
+            borderColor="rgba(46, 95, 168, 0.3)"
+            gap="4"
+            flexWrap="wrap"
+          >
+            <Text
+              fontSize="11px"
+              color="brand.500"
+              textTransform="uppercase"
+              letterSpacing="0.2em"
+              fontWeight="600"
+              className="tabular"
+            >
+              © {new Date().getFullYear()} LiGHT Laboratory · All rights reserved
+            </Text>
+            <Flex gap="6" align="center">
+              <Link
+                href="https://github.com/EPFLiGHT/Conferences-Calendar"
+                target="_blank"
+                rel="noopener noreferrer"
+                fontSize="11px"
+                color="brand.500"
+                textTransform="uppercase"
+                letterSpacing="0.2em"
+                fontWeight="600"
+                {...linkUnderline}
+                _hover={linkHover}
               >
-                <Flex align="center" justify="center" gap="1.5">
-                  <Text fontSize="sm" color="gray.600">
-                    Contribute on{' '}
-                  </Text>
-                  <Link
-                    href="https://github.com/EPFLiGHT/Conferences-Calendar"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    color="brand.500"
-                    fontWeight="600"
-                    position="relative"
-                    transition="color 0.3s ease"
-                    display="inline-flex"
-                    alignItems="center"
-                    gap="1.5"
-                    _hover={{
-                      color: 'brand.400',
-                      _after: {
-                        width: '100%',
-                      }
-                    }}
-                    _after={{
-                      content: '""',
-                      position: 'absolute',
-                      bottom: '-2px',
-                      left: 0,
-                      width: 0,
-                      height: '2px',
-                      bg: 'brand.400',
-                      transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                    }}
-                  >
-                    <Github size={16} />
-                    GitHub
-                  </Link>
-                </Flex>
-              </Box>
-
-              {/* Nice gradient divider line */}
+                Source
+              </Link>
               <Box
-                w={isVisible ? '140px' : '0px'}
-                h="3px"
-                bgGradient={GRADIENTS.footerAccent}
-                borderRadius="full"
-                transition="width 1s cubic-bezier(0.4, 0, 0.2, 1) 0.6s"
-              />
+                as="button"
+                onClick={scrollTop}
+                aria-label="Back to top"
+                display="inline-flex"
+                alignItems="center"
+                gap="1.5"
+                fontSize="11px"
+                color="brand.500"
+                textTransform="uppercase"
+                letterSpacing="0.2em"
+                fontWeight="600"
+                border="1px solid"
+                borderColor="brand.500"
+                px="3"
+                py="1.5"
+                cursor="pointer"
+                transition="all 0.2s ease"
+                _hover={{ bg: 'brand.500', color: 'white' }}
+              >
+                Top
+                <ArrowUp size={11} strokeWidth={2} />
+              </Box>
             </Flex>
           </Flex>
         </Container>
-
-        {/* Gradient line at the very bottom */}
-        <Box
-          position="absolute"
-          bottom="0"
-          left="0"
-          right="0"
-          h="2px"
-          bg={`linear-gradient(90deg, transparent, ${brandAlpha(400, 0.9)}, ${brandAlpha(500, 0.9)}, ${brandAlpha(400, 0.9)}, transparent)`}
-          opacity={isVisible ? 1 : 0}
-          transition="opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1)"
-        />
       </Box>
-    </>
+    </Box>
   );
 }

@@ -1,9 +1,9 @@
 'use client';
 
 import { Box, Container, Flex, Text, Heading, Grid, Image, Link as ChakraLink } from '@chakra-ui/react';
+import { Bell, Search, SlidersHorizontal } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { COLORS, SHADOWS, brandAlpha } from '@/theme';
 import { COMMAND_DESCRIPTIONS } from '@/slack-bot/config/constants';
 import Link from 'next/link';
 
@@ -12,252 +12,254 @@ import Link from 'next/link';
  * Displays an "Add to Slack" button for OAuth installation
  */
 export default function SlackInstallPage() {
+  const features = [
+    {
+      Icon: Bell,
+      title: 'Smart Notifications',
+      description: 'Reminders 30, 7, and 3 days before each deadline.',
+    },
+    {
+      Icon: Search,
+      title: 'Quick Search',
+      description: 'Search conferences by name or subject area.',
+    },
+    {
+      Icon: SlidersHorizontal,
+      title: 'Customizable',
+      description: 'Filter by subjects: ML, CV, NLP, Security, and more.',
+    },
+  ];
+
   return (
     <>
       <Header />
-      <Box py={{ base: '12', md: '16' }} minH="calc(100vh - 200px)">
-        <Container maxW="1200px" px={{ base: '4', md: '6' }} mx="auto">
-          {/* Hero Section */}
-          <Box textAlign="center" mb="16">
-            {/* Slack Bot Logo */}
+      <Box py={{ base: '12', md: '20' }} minH="calc(100vh - 200px)" bg="white">
+        <Container maxW="960px" px={{ base: '4', md: '6' }} mx="auto">
+          {/* Eyebrow */}
+          <Text
+            fontSize="11px"
+            color="brand.400"
+            textTransform="uppercase"
+            letterSpacing="0.22em"
+            fontWeight="600"
+            textAlign="center"
+            mb="6"
+          >
+            LiGHT · Slack Integration
+          </Text>
+
+          {/* Hero */}
+          <Box textAlign="center" mb="14">
             <Flex justify="center" mb="8">
-              <Box
-                p="4"
-                bg={`linear-gradient(135deg, ${brandAlpha(500, 0.05)} 0%, ${brandAlpha(400, 0.08)} 100%)`}
-                borderRadius="32px"
-                border="2px solid"
-                borderColor="brand.200"
-                boxShadow={`0 4px 16px ${brandAlpha(500, 0.1)}`}
-                display="inline-block"
-              >
-                <Image
-                  src="/slack-bot-logo.png"
-                  alt="Conferences Calendar Slack Bot"
-                  h={{ base: '100px', md: '120px' }}
-                  w="auto"
-                  borderRadius="24px"
-                />
-              </Box>
+              <Image
+                src="/slack-bot-logo.png"
+                alt="Conferences Calendar Slack Bot"
+                h={{ base: '88px', md: '104px' }}
+                w="auto"
+                borderRadius="20px"
+                border="1px solid"
+                borderColor="rgba(46, 95, 168, 0.22)"
+              />
             </Flex>
 
-            {/* Title with Gradient */}
             <Heading
               as="h1"
-              fontSize={{ base: '4xl', md: '5xl', lg: '6xl' }}
-              fontWeight="800"
-              mb="6"
-              bgGradient="to-r"
-              gradientFrom="brand.600"
-              gradientTo="brand.400"
-              bgClip="text"
-              lineHeight="1.2"
+              fontSize={{ base: '3xl', md: '5xl' }}
+              fontWeight="600"
+              color="brand.500"
+              letterSpacing="-0.02em"
+              lineHeight="1.1"
+              mb="5"
             >
               Conferences Calendar Bot
             </Heading>
 
-            {/* Subtitle */}
-            <Text
-              fontSize={{ base: 'xl', md: '2xl' }}
-              color="gray.700"
-              fontWeight="600"
-              mb="4"
-            >
-              Never miss an important conference deadline!
-            </Text>
-
-            {/* Description */}
             <Text
               fontSize={{ base: 'md', md: 'lg' }}
               color="gray.600"
-              maxW="3xl"
+              maxW="2xl"
               mx="auto"
+              lineHeight="1.6"
               mb="10"
             >
               Get smart reminders for upcoming deadlines, search conferences by topic,
-              and customize notifications for your research areas.
+              and customize notifications for your research areas, straight from Slack.
             </Text>
 
-            {/* Add to Slack Button */}
-            <Flex justify="center" mb="4">
+            <Flex justify="center" mb="5">
               <ChakraLink
                 href="https://conferences-calendar.vercel.app/api/slack/install"
                 display="inline-block"
-                transition="all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)"
-                _hover={{
-                  transform: 'translateY(-2px) scale(1.05)',
-                  filter: 'drop-shadow(0 8px 16px rgba(46, 95, 169, 0.3))',
-                }}
-                _active={{
-                  transform: 'scale(0.98)',
-                }}
+                transition="opacity 0.2s ease"
+                _hover={{ opacity: 0.85 }}
               >
                 <Image
                   src="https://platform.slack-edge.com/img/add_to_slack.png"
                   srcSet="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"
                   alt="Add to Slack"
-                  h="48px"
+                  h="44px"
                   w="auto"
                 />
               </ChakraLink>
             </Flex>
 
-            <Text fontSize="sm" color="gray.500">
+            <Text
+              fontSize="11px"
+              color="brand.400"
+              textTransform="uppercase"
+              letterSpacing="0.2em"
+              fontWeight="500"
+            >
               Free for all Slack workspaces
             </Text>
 
-            {/* Privacy Policy Link */}
-            <Text fontSize="sm" color="gray.500" mt="2">
+            <Text fontSize="xs" color="gray.500" mt="3">
               By installing, you agree to our{' '}
               <ChakraLink
                 as={Link}
                 href="/slack-install/privacy"
-                color="brand.600"
+                color="brand.500"
                 fontWeight="600"
-                _hover={{ textDecoration: 'underline' }}
+                borderBottom="1px solid"
+                borderColor="brand.500"
+                pb="0.5"
+                transition="all 0.2s ease"
+                _hover={{ color: 'brand.700', borderColor: 'brand.700', textDecoration: 'none' }}
               >
                 Privacy Policy
               </ChakraLink>
             </Text>
           </Box>
 
-          {/* Features Grid */}
-          <Grid
-            templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }}
-            gap="6"
-            mb="16"
+          {/* Section rule */}
+          <Flex
+            align="baseline"
+            justify="space-between"
+            mb="6"
+            pb="3"
+            borderBottom="1px solid"
+            borderColor="rgba(46, 95, 168, 0.22)"
           >
-            {[
-              {
-                icon: '🔔',
-                title: 'Smart Notifications',
-                description: 'Get reminders 30, 7, and 3 days before deadlines',
-                gradient: `linear-gradient(135deg, ${COLORS.brand[50]} 0%, ${COLORS.brand[100]} 100%)`,
-              },
-              {
-                icon: '🔍',
-                title: 'Quick Search',
-                description: 'Search conferences by name or subject area',
-                gradient: `linear-gradient(135deg, ${brandAlpha(400, 0.1)} 0%, ${brandAlpha(300, 0.15)} 100%)`,
-              },
-              {
-                icon: '⚙️',
-                title: 'Customizable',
-                description: 'Filter by subjects (ML, CV, NLP, Security, etc.)',
-                gradient: `linear-gradient(135deg, ${COLORS.brand[100]} 0%, ${COLORS.brand[50]} 100%)`,
-              },
-            ].map((feature, index) => (
+            <Text
+              fontSize="11px"
+              color="brand.500"
+              textTransform="uppercase"
+              letterSpacing="0.22em"
+              fontWeight="600"
+            >
+              What you get
+            </Text>
+            <Text
+              fontSize="11px"
+              color="brand.400"
+              textTransform="uppercase"
+              letterSpacing="0.22em"
+              fontWeight="600"
+              className="tabular"
+            >
+              01 / 02
+            </Text>
+          </Flex>
+
+          {/* Features Grid */}
+          <Grid templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }} gap="0" mb="16">
+            {features.map(({ Icon, title, description }, index) => (
               <Box
-                key={index}
-                p="8"
-                bg={feature.gradient}
-                borderRadius="16px"
-                border="1px solid"
-                borderColor="brand.200"
-                boxShadow={SHADOWS.md}
-                transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
-                _hover={{
-                  transform: 'translateY(-4px)',
-                  boxShadow: SHADOWS.xl,
-                  borderColor: 'brand.300',
-                }}
+                key={title}
+                p="6"
+                borderTop={{ base: '1px solid', md: 'none' }}
+                borderBottom={{ base: index === features.length - 1 ? '1px solid' : 'none', md: 'none' }}
+                borderRight={{ base: 'none', md: index < features.length - 1 ? '1px solid' : 'none' }}
+                borderColor="rgba(46, 95, 168, 0.18)"
               >
-                <Text fontSize="5xl" mb="4">{feature.icon}</Text>
+                <Icon size={20} strokeWidth={1.5} color="var(--chakra-colors-brand-500)" />
                 <Heading
                   as="h3"
-                  fontSize="xl"
-                  fontWeight="700"
-                  color="gray.800"
-                  mb="3"
+                  fontSize="md"
+                  fontWeight="600"
+                  color="brand.500"
+                  mt="4"
+                  mb="2"
+                  letterSpacing="-0.005em"
                 >
-                  {feature.title}
+                  {title}
                 </Heading>
-                <Text fontSize="md" color="gray.600" lineHeight="1.6">
-                  {feature.description}
+                <Text fontSize="sm" color="gray.600" lineHeight="1.55">
+                  {description}
                 </Text>
               </Box>
             ))}
           </Grid>
 
-          {/* Commands Section */}
-          <Box
-            p={{ base: '8', md: '10' }}
-            bg="white"
-            borderRadius="20px"
-            border="2px solid"
-            borderColor="brand.200"
-            boxShadow={`0 8px 24px ${brandAlpha(500, 0.12)}`}
+          {/* Section rule */}
+          <Flex
+            align="baseline"
+            justify="space-between"
+            mb="6"
+            pb="3"
+            borderBottom="1px solid"
+            borderColor="rgba(46, 95, 168, 0.22)"
           >
-            <Heading
-              as="h2"
-              fontSize={{ base: 'xl', md: '2xl' }}
-              fontWeight="700"
-              color="gray.800"
-              mb="6"
-              textAlign="center"
+            <Text
+              fontSize="11px"
+              color="brand.500"
+              textTransform="uppercase"
+              letterSpacing="0.22em"
+              fontWeight="600"
             >
-              Available Commands
-            </Heading>
+              Available commands
+            </Text>
+            <Text
+              fontSize="11px"
+              color="brand.400"
+              textTransform="uppercase"
+              letterSpacing="0.22em"
+              fontWeight="600"
+              className="tabular"
+            >
+              02 / 02
+            </Text>
+          </Flex>
 
-            <Grid
-              templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }}
-              gap="4"
-            >
-              {Object.entries(COMMAND_DESCRIPTIONS).map(([cmd, desc]) => (
+          <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap="0" mb="16">
+            {Object.entries(COMMAND_DESCRIPTIONS).map(([cmd, desc], idx, arr) => {
+              const isLastRow = idx >= arr.length - 2;
+              const isRight = idx % 2 === 1;
+              return (
                 <Flex
                   key={cmd}
                   align="center"
                   gap="4"
-                  p="4"
-                  bg={brandAlpha(500, 0.05)}
-                  borderRadius="12px"
-                  border="1px solid"
-                  borderColor="brand.100"
-                  transition="all 0.2s ease"
-                  _hover={{
-                    bg: brandAlpha(500, 0.1),
-                    borderColor: 'brand.200',
-                    transform: 'translateX(4px)',
-                  }}
+                  py="4"
+                  px={{ base: '0', md: '5' }}
+                  borderBottom={!isLastRow ? '1px solid' : 'none'}
+                  borderRight={{ base: 'none', md: !isRight ? '1px solid' : 'none' }}
+                  borderColor="rgba(46, 95, 168, 0.14)"
                 >
                   <Box
                     as="code"
-                    px="4"
-                    py="2"
-                    bg="white"
-                    borderRadius="8px"
-                    fontFamily="mono"
-                    fontSize="sm"
-                    fontWeight="600"
+                    px="3"
+                    py="1.5"
+                    fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
+                    fontSize="xs"
+                    fontWeight="500"
                     color="brand.500"
-                    boxShadow="sm"
+                    border="1px solid"
+                    borderColor="rgba(46, 95, 168, 0.3)"
+                    borderRadius="3px"
                     whiteSpace="nowrap"
+                    className="tabular"
                   >
                     /conf {cmd}
                   </Box>
-                  <Text fontSize="sm" color="gray.600" flex="1">
+                  <Text fontSize="sm" color="gray.600" flex="1" lineHeight="1.5">
                     {desc}
                   </Text>
                 </Flex>
-              ))}
-            </Grid>
-          </Box>
+              );
+            })}
+          </Grid>
 
-          {/* Footer Links */}
-          <Box textAlign="center" mt="12" pt="8" borderTop="1px solid" borderColor="gray.200">
-            <Text fontSize="sm" color="gray.600">
-              <ChakraLink
-                as={Link}
-                href="/slack-install/privacy"
-                color="brand.600"
-                fontWeight="500"
-                _hover={{ textDecoration: 'underline' }}
-              >
-                Privacy Policy
-              </ChakraLink>
-              {' • '}
-              © {new Date().getFullYear()} LiGHT Laboratory
-            </Text>
-          </Box>
         </Container>
       </Box>
       <Footer />

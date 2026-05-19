@@ -1,4 +1,5 @@
-import { Box, Input } from '@chakra-ui/react';
+import { Box, Flex, Input, Text } from '@chakra-ui/react';
+import { Search as SearchIcon } from 'lucide-react';
 
 interface SearchProps {
   value: string;
@@ -7,26 +8,36 @@ interface SearchProps {
 
 export default function Search({ value, onChange }: SearchProps): JSX.Element {
   return (
-    <Box mb="8">
-      <Input
-        type="search"
-        placeholder="Search conferences by name..."
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        size="lg"
-        fontSize="md"
-        bg="white"
-        borderColor="brand.200"
-        borderRadius="xl"
-        boxShadow="0 1px 3px rgba(46, 95, 169, 0.08)"
-        _focus={{
-          borderColor: 'brand.500',
-          boxShadow: '0 0 0 3px rgba(46, 95, 169, 0.1)',
-        }}
-        _hover={{
-          borderColor: 'brand.300',
-        }}
-      />
+    <Box mb="6">
+      <Flex
+        align="center"
+        gap="3"
+        borderBottom="1px solid"
+        borderColor={value ? 'brand.500' : 'rgba(46, 95, 168, 0.3)'}
+        transition="border-color 0.2s ease"
+        _focusWithin={{ borderColor: 'brand.500' }}
+      >
+        <SearchIcon size={16} strokeWidth={1.75} color="var(--chakra-colors-brand-400)" />
+        <Text fontSize="10px" fontWeight="700" color="brand.400" textTransform="uppercase" letterSpacing="0.22em">
+          Search
+        </Text>
+        <Input
+          type="search"
+          placeholder="conference name, organization, keyword..."
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          variant="outline"
+          border="none"
+          outline="none"
+          bg="transparent"
+          flex="1"
+          fontSize="md"
+          color="brand.500"
+          _placeholder={{ color: 'gray.400' }}
+          _focus={{ outline: 'none', boxShadow: 'none' }}
+          px="0"
+        />
+      </Flex>
     </Box>
   );
 }

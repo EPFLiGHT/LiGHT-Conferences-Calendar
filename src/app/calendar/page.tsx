@@ -6,8 +6,9 @@ import {
   Button,
   Container,
   Flex,
+  Text,
 } from '@chakra-ui/react';
-import { MapPin, Download } from 'lucide-react';
+import { Crosshair, Download } from 'lucide-react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -25,7 +26,7 @@ import { useConferenceFilters, type ConferenceFiltersState } from '@/hooks/useCo
 import { useURLSync, useInitialURLParams } from '@/utils/urlSync';
 import { getEventColorFromSubjects, toISOFormat } from '@/utils/parser';
 import { conferenceToICSEvents, createICSContent, downloadICS } from '@/utils/ics';
-import { secondaryButtonStyle, brandButtonStyle } from '@/styles/buttonStyles';
+import { secondaryButtonStyle, primaryButtonStyle } from '@/styles/buttonStyles';
 import type { Conference } from '@/types/conference';
 import { EventClickArg } from '@fullcalendar/core';
 
@@ -154,7 +155,8 @@ function CalendarContent() {
         <Container maxW="1200px" px={{ base: '4', md: '6' }} mx="auto">
           <ConferenceFiltersPanel
             title="Conference Calendar"
-            description="View all conferences and deadlines in a calendar format"
+            eyebrow="LiGHT · Calendar"
+            description="View every tracked conference and its deadlines in a calendar. Click any event for details."
             searchValue={searchQuery}
             onSearchChange={handleSearchChange}
             conferences={conferences}
@@ -162,38 +164,58 @@ function CalendarContent() {
             onFilterChange={handleFilterChange}
           />
 
-          <Flex gap="4" justify="center" mb="8" direction={{ base: 'column', md: 'row' }}>
-            <Button
-              onClick={handleToday}
-              size="md"
-              px="6"
-              {...secondaryButtonStyle}
+          <Flex
+            align="center"
+            justify="space-between"
+            mb="6"
+            pb="3"
+            borderBottom="1px solid"
+            borderColor="rgba(46, 95, 168, 0.22)"
+            gap="3"
+            flexWrap="wrap"
+          >
+            <Text
+              fontSize="11px"
+              color="brand.500"
+              textTransform="uppercase"
+              letterSpacing="0.22em"
+              fontWeight="700"
+              className="tabular"
             >
-              <Flex align="center" gap="2">
-                <MapPin size={16} />
-                <span>Today</span>
-              </Flex>
-            </Button>
-            <Button
-              onClick={handleExportAll}
-              size="md"
-              px="6"
-              {...brandButtonStyle}
-            >
-              <Flex align="center" gap="2">
-                <Download size={16} />
-                <span>Export All ({filteredConferences.length} conferences)</span>
-              </Flex>
-            </Button>
+              {String(filteredConferences.length).padStart(2, '0')} conference{filteredConferences.length === 1 ? '' : 's'} tracked
+            </Text>
+            <Flex gap="2" flexWrap="wrap">
+              <Button
+                onClick={handleToday}
+                size="sm"
+                px="4"
+                {...secondaryButtonStyle}
+              >
+                <Flex align="center" gap="2">
+                  <Crosshair size={13} strokeWidth={1.75} />
+                  <span>Today</span>
+                </Flex>
+              </Button>
+              <Button
+                onClick={handleExportAll}
+                size="sm"
+                px="4"
+                {...primaryButtonStyle}
+              >
+                <Flex align="center" gap="2">
+                  <Download size={13} strokeWidth={1.75} />
+                  <span>Export All</span>
+                </Flex>
+              </Button>
+            </Flex>
           </Flex>
 
           <Box
             bg="white"
-            borderRadius="xl"
-            border="1px"
-            borderColor="gray.200"
+            border="1px solid"
+            borderColor="rgba(46, 95, 168, 0.22)"
+            borderRadius="4px"
             p={{ base: '4', md: '6' }}
-            boxShadow="0 1px 3px rgba(0, 0, 0, 0.1)"
           >
             <style>{`
               .fc-event {

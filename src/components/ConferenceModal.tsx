@@ -59,6 +59,37 @@ export default function ConferenceModal({ conference, onClose }: ConferenceModal
 
   if (!isOpen) return null;
 
+  const SectionLabel = ({ children, num }: { children: React.ReactNode; num: string }) => (
+    <Flex
+      align="baseline"
+      justify="space-between"
+      pb="3"
+      mb="5"
+      borderBottom="1px solid"
+      borderColor="rgba(46, 95, 168, 0.22)"
+    >
+      <Text
+        fontSize="11px"
+        fontWeight="700"
+        color="brand.500"
+        textTransform="uppercase"
+        letterSpacing="0.22em"
+      >
+        {children}
+      </Text>
+      <Text
+        fontSize="11px"
+        fontWeight="600"
+        color="brand.400"
+        textTransform="uppercase"
+        letterSpacing="0.22em"
+        className="tabular"
+      >
+        § {num}
+      </Text>
+    </Flex>
+  );
+
   return (
     <Portal>
       <Box
@@ -67,138 +98,166 @@ export default function ConferenceModal({ conference, onClose }: ConferenceModal
         left="0"
         right="0"
         bottom="0"
-        bg="rgba(0, 0, 0, 0.5)"
+        bg="rgba(10, 26, 61, 0.45)"
+        backdropFilter="blur(2px)"
         display="flex"
         alignItems="center"
         justifyContent="center"
         zIndex="modal"
-        p="4"
+        p={{ base: '3', md: '6' }}
         onClick={handleBackdropClick}
       >
         <Box
           bg="white"
-          borderRadius="xl"
-          maxW="800px"
+          borderRadius="4px"
+          maxW="860px"
           w="full"
           maxH="90vh"
           overflowY="auto"
-          boxShadow="0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+          border="1px solid"
+          borderColor="brand.500"
           position="relative"
           onClick={(e) => e.stopPropagation()}
         >
+          {/* Top accent rule */}
+          <Box h="3px" bg="brand.500" />
+
           {/* Header */}
           <Box
             position="sticky"
             top="0"
             bg="white"
-            borderBottom="1px"
-            borderColor="gray.200"
-            p="6"
+            borderBottom="1px solid"
+            borderColor="rgba(46, 95, 168, 0.25)"
+            px={{ base: '6', md: '8' }}
+            py={{ base: '5', md: '6' }}
             zIndex="10"
-            borderTopRadius="xl"
           >
-            <Button
+            <Box
+              as="button"
               position="absolute"
-              top="4"
-              right="4"
-              variant="ghost"
-              size="sm"
-              color="gray.600"
-              transition="all 0.2s ease-in-out"
-              _hover={{ bg: 'gray.100', color: 'gray.800' }}
-              _active={{ transform: 'scale(0.95)' }}
+              top="5"
+              right="5"
+              w="32px"
+              h="32px"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              border="1px solid"
+              borderColor="rgba(46, 95, 168, 0.35)"
+              borderRadius="3px"
+              bg="white"
+              color="brand.500"
+              cursor="pointer"
+              transition="all 0.2s ease"
+              _hover={{ bg: 'brand.500', color: 'white', borderColor: 'brand.500' }}
               onClick={handleClose}
               aria-label="Close"
             >
-              <X size={20} />
-            </Button>
+              <X size={16} strokeWidth={2} />
+            </Box>
+
+            <Text
+              fontSize="11px"
+              color="brand.400"
+              textTransform="uppercase"
+              letterSpacing="0.22em"
+              fontWeight="700"
+              mb="3"
+            >
+              Conference Dossier
+            </Text>
             <VStack align="start" gap="2" pr="12">
-              <Heading as="h2" size="xl" color="gray.800">
-                {conference.title} {conference.year}
+              <Heading
+                as="h2"
+                fontSize={{ base: '2xl', md: '4xl' }}
+                fontWeight="600"
+                color="brand.500"
+                lineHeight="1.05"
+                letterSpacing="-0.02em"
+              >
+                {conference.title}{' '}
+                <Text as="span" color="brand.400" fontWeight="500" className="tabular">
+                  {conference.year}
+                </Text>
               </Heading>
-              <Text fontSize="md" color="gray.600">
+              <Text fontSize="sm" color="gray.600" lineHeight="1.55">
                 {conference.full_name}
               </Text>
             </VStack>
           </Box>
 
           {/* Body */}
-          <Box p="6">
-          <VStack align="stretch" gap="6">
-            {/* Conference Details */}
-            <Box>
-              <Heading as="h3" size="md" mb="4">
-                Conference Details
-              </Heading>
-              <ConferenceDetails conference={conference} variant="modal" />
-            </Box>
-
-            {/* Deadlines */}
-            {deadlines.length > 0 && (
+          <Box px={{ base: '6', md: '8' }} py={{ base: '6', md: '8' }}>
+            <VStack align="stretch" gap="10">
+              {/* Conference Details */}
               <Box>
-                <Heading as="h3" size="md" mb="4">
-                  Deadlines
-                </Heading>
-                <VStack align="stretch" gap="4">
-                  {deadlines.map((deadline, idx) => (
-                    <DeadlineCard
-                      key={idx}
-                      deadline={deadline}
-                      timezone={conference.timezone}
-                      variant="detailed"
-                    />
-                  ))}
-                </VStack>
+                <SectionLabel num="01">Details</SectionLabel>
+                <ConferenceDetails conference={conference} variant="modal" />
               </Box>
-            )}
 
-            {/* Quick Links */}
-            <Box>
-              <Heading as="h3" size="md" mb="4" color="gray.800">
-                Quick Links
-              </Heading>
-              <Flex gap="3" wrap="wrap">
-                {conference.link && (
-                  <ExternalLinkButton href={conference.link} variant="primary" size="md" px="6">
+              {/* Deadlines */}
+              {deadlines.length > 0 && (
+                <Box>
+                  <SectionLabel num="02">Deadlines</SectionLabel>
+                  <VStack align="stretch" gap="4">
+                    {deadlines.map((deadline, idx) => (
+                      <DeadlineCard
+                        key={idx}
+                        deadline={deadline}
+                        timezone={conference.timezone}
+                        variant="detailed"
+                      />
+                    ))}
+                  </VStack>
+                </Box>
+              )}
+
+              {/* Quick Links */}
+              <Box>
+                <SectionLabel num={deadlines.length > 0 ? '03' : '02'}>Resources</SectionLabel>
+                <Flex gap="3" wrap="wrap">
+                  {conference.link && (
+                    <ExternalLinkButton href={conference.link} variant="primary" size="md" px="5">
+                      <Flex align="center" gap="2">
+                        <Globe size={14} strokeWidth={1.75} />
+                        <span>Event Website</span>
+                      </Flex>
+                    </ExternalLinkButton>
+                  )}
+                  {conference.paperslink && (
+                    <ExternalLinkButton href={conference.paperslink} variant="secondary" size="md" px="5">
+                      <Flex align="center" gap="2">
+                        <FileText size={14} strokeWidth={1.75} />
+                        <span>Paper Submission</span>
+                      </Flex>
+                    </ExternalLinkButton>
+                  )}
+                  {conference.pwclink && (
+                    <ExternalLinkButton href={conference.pwclink} variant="secondary" size="md" px="5">
+                      <Flex align="center" gap="2">
+                        <Code size={14} strokeWidth={1.75} />
+                        <span>Papers with Code</span>
+                      </Flex>
+                    </ExternalLinkButton>
+                  )}
+                  <Button
+                    onClick={handleExport}
+                    size="md"
+                    px="5"
+                    {...secondaryButtonStyle}
+                  >
                     <Flex align="center" gap="2">
-                      <Globe size={16} />
-                      <span>Event Website</span>
+                      <Calendar size={14} strokeWidth={1.75} />
+                      <span>Export to Calendar</span>
                     </Flex>
-                  </ExternalLinkButton>
-                )}
-                {conference.paperslink && (
-                  <ExternalLinkButton href={conference.paperslink} variant="secondary" size="md" px="6">
-                    <Flex align="center" gap="2">
-                      <FileText size={16} />
-                      <span>Paper Submission</span>
-                    </Flex>
-                  </ExternalLinkButton>
-                )}
-                {conference.pwclink && (
-                  <ExternalLinkButton href={conference.pwclink} variant="secondary" size="md" px="6">
-                    <Flex align="center" gap="2">
-                      <Code size={16} />
-                      <span>Papers with Code</span>
-                    </Flex>
-                  </ExternalLinkButton>
-                )}
-                <Button
-                  onClick={handleExport}
-                  size="md"
-                  px="6"
-                  {...secondaryButtonStyle}
-                >
-                  <Flex align="center" gap="2">
-                    <Calendar size={16} />
-                    <span>Export to Calendar</span>
-                  </Flex>
-                </Button>
-              </Flex>
-            </Box>
-          </VStack>
+                  </Button>
+                </Flex>
+              </Box>
+            </VStack>
+          </Box>
         </Box>
       </Box>
-    </Box>
     </Portal>
   );
 }

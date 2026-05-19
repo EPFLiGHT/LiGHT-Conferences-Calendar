@@ -1,13 +1,13 @@
-import { Box, Heading, Text } from '@chakra-ui/react';
+import { Box, Flex, Heading, Text } from '@chakra-ui/react';
 import Search from './Search';
 import Filters from './Filters';
-import { whiteCardStyle } from '@/styles/containerStyles';
 import type { Conference } from '@/types/conference';
 import type { ConferenceFiltersState } from '@/hooks/useConferenceFilters';
 
 interface ConferenceFiltersPanelProps {
   title: string;
   description: string;
+  eyebrow?: string;
   searchValue: string;
   onSearchChange: (value: string) => void;
   conferences: Conference[];
@@ -18,6 +18,7 @@ interface ConferenceFiltersPanelProps {
 export default function ConferenceFiltersPanel({
   title,
   description,
+  eyebrow = 'LiGHT · Conferences',
   searchValue,
   onSearchChange,
   conferences,
@@ -25,19 +26,45 @@ export default function ConferenceFiltersPanel({
   onFilterChange,
 }: ConferenceFiltersPanelProps): JSX.Element {
   return (
-    <Box
-      {...whiteCardStyle}
-      p={{ base: '6', md: '8' }}
-      mb="8"
-    >
-      <Box mb="8" textAlign="center">
-        <Heading as="h2" size="2xl" mb="2" color="gray.800">
-          {title}
-        </Heading>
-        <Text fontSize="md" color="gray.600">
+    <Box mb="10">
+      {/* Masthead */}
+      <Text
+        fontSize="11px"
+        color="brand.400"
+        textTransform="uppercase"
+        letterSpacing="0.22em"
+        fontWeight="700"
+        mb="4"
+      >
+        {eyebrow}
+      </Text>
+
+      <Heading
+        as="h1"
+        fontSize={{ base: '3xl', md: '5xl' }}
+        fontWeight="600"
+        color="brand.500"
+        letterSpacing="-0.022em"
+        lineHeight="1.05"
+        mb="4"
+      >
+        {title}
+      </Heading>
+
+      <Flex
+        align="baseline"
+        justify="space-between"
+        gap="4"
+        flexWrap="wrap"
+        pb="4"
+        mb="8"
+        borderBottom="1px solid"
+        borderColor="brand.500"
+      >
+        <Text fontSize="sm" color="gray.600" maxW="640px" lineHeight="1.55">
           {description}
         </Text>
-      </Box>
+      </Flex>
 
       <Search value={searchValue} onChange={onSearchChange} />
 
