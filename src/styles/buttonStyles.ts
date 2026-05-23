@@ -8,7 +8,7 @@
  */
 
 import { ButtonProps } from '@chakra-ui/react';
-import { SHADOWS, TRANSITIONS } from '@/theme';
+import { TRANSITIONS } from '@/theme';
 
 export const primaryButtonStyle: Partial<ButtonProps> = {
   bg: 'brand.500',
@@ -55,18 +55,3 @@ export const secondaryButtonStyle: Partial<ButtonProps> = {
   },
 };
 
-export const brandButtonStyle: Partial<ButtonProps> = {
-  bg: 'brand.400',
-  color: 'white',
-  transition: TRANSITIONS.normal,
-  position: 'relative',
-  zIndex: 1,
-  _hover: {
-    bg: 'brand.500',
-    transform: 'translateY(-2px)',
-    boxShadow: SHADOWS.hover.brand,
-  },
-  _active: {
-    transform: 'scale(0.98)',
-  },
-};

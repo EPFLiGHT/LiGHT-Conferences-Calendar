@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { forwardRef, useMemo } from 'react';
 import { Box, Flex, Grid, Text } from '@chakra-ui/react';
 import { NativeSelectRoot, NativeSelectField } from '@chakra-ui/react';
 import InfoTooltip from './InfoTooltip';
@@ -20,35 +20,39 @@ interface ChipProps {
   cursor?: string;
 }
 
-function Chip({ selected, onClick, label, cursor = 'pointer' }: ChipProps): JSX.Element {
-  return (
-    <Box
-      as="button"
-      onClick={onClick}
-      px="3"
-      py="1.5"
-      fontSize="10px"
-      fontWeight="700"
-      textTransform="uppercase"
-      letterSpacing="0.18em"
-      borderRadius="2px"
-      border="1px solid"
-      bg={selected ? 'brand.500' : 'white'}
-      color={selected ? 'white' : 'brand.500'}
-      borderColor={selected ? 'brand.500' : 'rgba(46, 95, 168, 0.3)'}
-      cursor={cursor}
-      transition="all 0.18s ease"
-      whiteSpace="nowrap"
-      lineHeight="1"
-      _hover={{
-        borderColor: 'brand.500',
-        bg: selected ? 'brand.700' : 'brand.50',
-      }}
-    >
-      {label}
-    </Box>
-  );
-}
+const Chip = forwardRef<HTMLButtonElement, ChipProps>(
+  function Chip({ selected, onClick, label, cursor = 'pointer', ...rest }, ref) {
+    return (
+      <Box
+        ref={ref}
+        as="button"
+        onClick={onClick}
+        px="3"
+        py="1.5"
+        fontSize="10px"
+        fontWeight="700"
+        textTransform="uppercase"
+        letterSpacing="0.18em"
+        borderRadius="2px"
+        border="1px solid"
+        bg={selected ? 'brand.500' : 'white'}
+        color={selected ? 'white' : 'brand.500'}
+        borderColor={selected ? 'brand.500' : 'rgba(46, 95, 168, 0.3)'}
+        cursor={cursor}
+        transition="all 0.18s ease"
+        whiteSpace="nowrap"
+        lineHeight="1"
+        _hover={{
+          borderColor: 'brand.500',
+          bg: selected ? 'brand.700' : 'brand.50',
+        }}
+        {...rest}
+      >
+        {label}
+      </Box>
+    );
+  }
+);
 
 interface FilterGroupProps {
   label: string;

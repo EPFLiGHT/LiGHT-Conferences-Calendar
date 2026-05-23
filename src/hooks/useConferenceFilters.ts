@@ -63,25 +63,54 @@ export function useConferenceFilters(
         const aNext = getNextDeadline(a);
         const bNext = getNextDeadline(b);
         const now = DateTime.now();
+        const nowMs = now.toMillis();
 
-        const aIsActive = aNext && aNext.localDatetime > now;
-        const bIsActive = bNext && bNext.localDatetime > now;
+        // An event is "upcoming" if it hasn't ended yet (or has no end date but
+        // a future start, or only has a year >= current year).
+        const eventEndMs = (c: Conference): number => {
+          if (c.end) return DateTime.fromISO(c.end).endOf('day').toMillis();
+          if (c.start) return DateTime.fromISO(c.start).endOf('day').toMillis();
+          // Fall back to end-of-year so a 2027-only entry still counts as future.
+          return DateTime.fromObject({ year: c.year }).endOf('year').toMillis();
+        };
+        const eventStartMs = (c: Conference): number => {
+          if (c.start) return DateTime.fromISO(c.start).toMillis();
+          if (c.end) return DateTime.fromISO(c.end).toMillis();
+          return DateTime.fromObject({ year: c.year }).toMillis();
+        };
 
-        if (aIsActive && !bIsActive) return -1;
-        if (!aIsActive && bIsActive) return 1;
+        // Tier 0: upcoming deadline
+        // Tier 1: no deadline, event still upcoming
+        // Tier 2: expired deadline
+        // Tier 3: no deadline, event already passed
+        const tier = (c: Conference, next: typeof aNext): 0 | 1 | 2 | 3 => {
+          if (next) return next.localDatetime > now ? 0 : 2;
+          return eventEndMs(c) >= nowMs ? 1 : 3;
+        };
+        const aTier = tier(a, aNext);
+        const bTier = tier(b, bNext);
 
-        if (aIsActive && bIsActive) {
-          return aNext.datetime.toMillis() - bNext.datetime.toMillis();
+        if (aTier !== bTier) return aTier - bTier;
+
+        if (aTier === 0) {
+          // Both upcoming deadlines: nearest first
+          return aNext!.datetime.toMillis() - bNext!.datetime.toMillis();
         }
-
-        if (!aIsActive && !bIsActive) {
-          if (!aNext && !bNext) return 0;
-          if (!aNext) return 1;
-          if (!bNext) return -1;
-          return bNext.datetime.toMillis() - aNext.datetime.toMillis();
+        if (aTier === 1) {
+          // No deadline, both future: concrete starts first (soonest first),
+          // then year-only / TBA entries by year ascending.
+          const aTBA = !a.start && !a.end;
+          const bTBA = !b.start && !b.end;
+          if (aTBA !== bTBA) return aTBA ? 1 : -1;
+          if (aTBA && bTBA) return a.year - b.year;
+          return eventStartMs(a) - eventStartMs(b);
         }
-
-        return 0;
+        if (aTier === 2) {
+          // Both expired: most recently passed first
+          return bNext!.datetime.toMillis() - aNext!.datetime.toMillis();
+        }
+        // Both past events with no deadline: most recent first
+        return eventStartMs(b) - eventStartMs(a);
       } else if (filters.sortBy === 'hindex') {
         return (b.hindex || 0) - (a.hindex || 0);
       } else if (filters.sortBy === 'start') {

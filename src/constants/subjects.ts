@@ -115,7 +115,3 @@ export const SUBJECT_EMOJIS: Record<string, string> = Object.fromEntries(
   Object.entries(SUBJECTS).map(([k, v]) => [k, v.emoji])
 );
 
-/**
- * Get all subject codes
- */
-export const SUBJECT_CODES = Object.keys(SUBJECTS) as Array<keyof typeof SUBJECTS>;
