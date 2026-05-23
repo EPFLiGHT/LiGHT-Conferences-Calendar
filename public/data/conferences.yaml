@@ -79,12 +79,15 @@
 - title: ICML
   year: 2026
   id: icml26
-  full_name: 43th International Conference on Machine Learning
+  full_name: 43rd International Conference on Machine Learning
   link: "https://icml.cc/Conferences/2026"
-  timezone: UTC+9
+  abstract_deadline: "2026-01-23 23:59"
+  deadline: "2026-01-28 23:59"
+  timezone: UTC-12
   place: "Seoul, South Korea"
-  abstract_deadline: "2026-01-24 12:00"
-  deadline: "2026-01-29 12:00"
+  date: "July 6-11, 2026"
+  start: "2026-07-06"
+  end: "2026-07-11"
   paperslink: https://icml.cc/Conferences/2026/CallForPapers
   sub: ML
   type: conference
