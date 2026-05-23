@@ -1,3 +1,55 @@
+- title: HIMSS
+  year: 2027
+  id: himss27
+  full_name: HIMSS Global Health Conference & Exhibition
+  link: https://www.himssconference.com/
+  timezone: America/Chicago
+  place: "Chicago, Illinois, USA"
+  date: "April 5-8, 2027"
+  start: "2027-04-05"
+  end: "2027-04-08"
+  sub: Health AI
+  type: summit
+
+- title: HLTH
+  year: 2026
+  id: hlth26
+  full_name: HLTH USA
+  link: https://hlth.com/events/usa/
+  timezone: America/Los_Angeles
+  place: "Las Vegas, Nevada, USA"
+  date: "November 15-18, 2026"
+  start: "2026-11-15"
+  end: "2026-11-18"
+  sub: Health AI
+  type: summit
+
+- title: Africa HealthTech Summit
+  year: 2026
+  id: ahts26
+  full_name: 5th Africa HealthTech Summit
+  link: https://healthtechsummit.africa/
+  timezone: Africa/Kigali
+  place: "Kigali, Rwanda"
+  date: "September 30 - October 2, 2026"
+  start: "2026-09-30"
+  end: "2026-10-02"
+  sub: Global Health
+  type: summit
+
+- title: World Health Assembly
+  year: 2026
+  id: worldhealthassembly26
+  full_name: Seventy-ninth World Health Assembly (WHA79)
+  link: https://www.who.int/about/governance/world-health-assembly/seventy-ninth
+  timezone: Europe/Zurich
+  place: "Geneva, Switzerland"
+  date: "May 18-23, 2026"
+  start: "2026-05-18"
+  end: "2026-05-23"
+  sub: Global Health
+  type: summit
+
 - title: AI4Good
   year: 2026
   id: ai4good26
