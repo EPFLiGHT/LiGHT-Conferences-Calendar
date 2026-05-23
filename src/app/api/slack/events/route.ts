@@ -3,6 +3,7 @@ import { withSlackMiddleware, SlackRequestType } from '@/slack-bot/lib/middlewar
 import { acknowledgeResponse } from '@/slack-bot/lib/responses';
 import { subscribeChannel, unsubscribeChannel } from '@/slack-bot/lib/channelSubscriptions';
 import { getSlackClient } from '@/slack-bot/lib/slackClient';
+import { getTeamMetadata } from '@/slack-bot/lib/teamStorage';
 import { logger } from '@/slack-bot/utils/logger';
 import type {
   SlackEventPayload,
@@ -31,12 +32,18 @@ async function handleSlackEvent(
 
     // Handle bot being added to a channel
     if (payload.event.type === 'member_joined_channel') {
-      await handleBotJoinedChannel(payload.event as MemberJoinedChannelEvent, teamId);
+      const event = payload.event as MemberJoinedChannelEvent;
+      if (await isBotUser(event.user, teamId || event.team)) {
+        await handleBotJoinedChannel(event, teamId);
+      }
     }
 
     // Handle bot being removed from a channel
     if (payload.event.type === 'member_left_channel') {
-      await handleBotLeftChannel(payload.event as MemberLeftChannelEvent, teamId);
+      const event = payload.event as MemberLeftChannelEvent;
+      if (await isBotUser(event.user, teamId || event.team)) {
+        await handleBotLeftChannel(event, teamId);
+      }
     }
 
     // Future feature: Handle other Slack events
@@ -48,6 +55,42 @@ async function handleSlackEvent(
   }
 
   return acknowledgeResponse();
+}
+
+/**
+ * Check whether a Slack user ID refers to this app's bot user for the team.
+ * Prefers cached botUserId from team metadata, falls back to auth.test.
+ */
+const botUserIdCache = new Map<string, string>();
+
+async function isBotUser(userId: string | undefined, teamId?: string): Promise<boolean> {
+  if (!userId) return false;
+  const cacheKey = teamId || 'default';
+
+  let botUserId = botUserIdCache.get(cacheKey);
+  if (!botUserId && teamId) {
+    const metadata = await getTeamMetadata(teamId);
+    if (metadata?.botUserId) {
+      botUserId = metadata.botUserId;
+      botUserIdCache.set(cacheKey, botUserId);
+    }
+  }
+
+  if (!botUserId) {
+    try {
+      const client = await getSlackClient(teamId);
+      const auth = await client.auth.test();
+      if (auth.user_id) {
+        botUserId = auth.user_id;
+        botUserIdCache.set(cacheKey, botUserId);
+      }
+    } catch (error) {
+      logger.warn('auth.test failed while identifying bot user', { teamId, error });
+      return false;
+    }
+  }
+
+  return botUserId === userId;
 }
 
 /**
