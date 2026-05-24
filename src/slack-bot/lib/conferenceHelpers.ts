@@ -35,8 +35,8 @@ export async function findConferenceByQuery(
   const conferences = await getConferences();
   const normalizedQuery = query.toLowerCase().trim();
 
-  // Try exact ID match first
-  let conference = conferences.find((c) => c.id === normalizedQuery);
+  // Try exact ID match first (case-insensitive)
+  let conference = conferences.find((c) => c.id.toLowerCase() === normalizedQuery);
 
   // Fallback to fuzzy search by title or full name
   if (!conference) {

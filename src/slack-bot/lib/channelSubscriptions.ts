@@ -141,6 +141,25 @@ export async function getTeamChannels(teamId: string): Promise<ChannelSubscripti
 }
 
 /**
+ * Unsubscribe every channel belonging to a team.
+ * Called when the workspace uninstalls the app.
+ */
+export async function unsubscribeTeamChannels(teamId: string): Promise<number> {
+  try {
+    const channels = await getTeamChannels(teamId);
+    await Promise.all(channels.map(c => unsubscribeChannel(c.channelId)));
+    logger.info('Unsubscribed all team channels', {
+      teamId,
+      count: channels.length,
+    });
+    return channels.length;
+  } catch (error) {
+    logger.error('Failed to unsubscribe team channels', error, { teamId });
+    return 0;
+  }
+}
+
+/**
  * Get total channel subscription count
  */
 export async function getChannelCount(): Promise<number> {

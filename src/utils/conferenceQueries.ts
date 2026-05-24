@@ -73,6 +73,30 @@ export function getDaysUntilDeadline(deadline: DeadlineInfo): number {
 }
 
 /**
+ * Get conferences whose event start date falls exactly on one of the given
+ * reminder-day offsets from today (e.g. 30, 7, 3 days out). Used for
+ * "event is starting soon" reminders, separate from submission deadlines.
+ */
+export function getEventStartsOnDays(
+  conferences: Conference[],
+  reminderDays: number[]
+): Array<{ conference: Conference; start: DateTime; daysLeft: number }> {
+  const today = DateTime.now().startOf('day');
+
+  return conferences
+    .map(conf => {
+      if (!conf.start) return null;
+      const start = DateTime.fromISO(conf.start, { zone: conf.timezone || 'utc' });
+      if (!start.isValid) return null;
+      const daysLeft = Math.ceil(start.startOf('day').diff(today, 'days').days);
+      if (!reminderDays.includes(daysLeft)) return null;
+      return { conference: conf, start, daysLeft };
+    })
+    .filter((item): item is { conference: Conference; start: DateTime; daysLeft: number } => item !== null)
+    .sort((a, b) => a.daysLeft - b.daysLeft);
+}
+
+/**
  * Get conferences expiring within N days
  */
 export function getDeadlinesWithinDays(

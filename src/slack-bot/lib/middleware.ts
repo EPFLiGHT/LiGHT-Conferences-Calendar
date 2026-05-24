@@ -75,14 +75,9 @@ function extractTeamId(parsedBody: any): string | undefined {
     return parsedBody.team_id;
   }
 
-  // Event API requests (nested in team object)
+  // Interactions and Events API requests use nested team object
   if (parsedBody.team?.id) {
     return parsedBody.team.id;
-  }
-
-  // Some interactions have team object
-  if (parsedBody.team) {
-    return parsedBody.team;
   }
 
   return undefined;

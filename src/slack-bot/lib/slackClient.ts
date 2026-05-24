@@ -42,6 +42,13 @@ export function clearClientCache(): void {
 }
 
 /**
+ * Drop the cached client for a single team (call after token rotation/uninstall).
+ */
+export function clearTeamClient(teamId?: string): void {
+  clientCache.delete(teamId || 'default');
+}
+
+/**
  * Post a message to a Slack channel
  *
  * @param channelId - The channel ID to post to

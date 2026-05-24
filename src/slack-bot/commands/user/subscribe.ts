@@ -21,7 +21,7 @@ export async function handleSubscribe(
       return buildSuccessMessage(
         `🔔 *Notifications Enabled!*\n\n` +
           `You'll now receive deadline reminders ${prefs.reminderDays.join(', ')} days before deadlines.\n\n` +
-          `Use \`/conf settings\` to customize your preferences.`
+          `Use \`/conf-settings\` to customize your preferences.`
       );
     },
     'Failed to enable notifications. Please try again later.'

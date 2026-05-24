@@ -44,16 +44,18 @@ export async function verifySlackRequest(
   hmac.update(sigBasestring);
   const computedSignature = `v0=${hmac.digest('hex')}`;
 
-  // Compare signatures (timing-safe)
-  const isValid = crypto.timingSafeEqual(
-    Buffer.from(computedSignature),
-    Buffer.from(slackSignature)
-  );
+  // crypto.timingSafeEqual throws on length mismatch — short-circuit cleanly.
+  const computedBuf = Buffer.from(computedSignature);
+  const receivedBuf = Buffer.from(slackSignature);
+  if (computedBuf.length !== receivedBuf.length) {
+    logger.warn('Invalid Slack signature (length mismatch)');
+    return false;
+  }
 
+  const isValid = crypto.timingSafeEqual(computedBuf, receivedBuf);
   if (!isValid) {
     logger.warn('Invalid Slack signature');
   }
-
   return isValid;
 }
 

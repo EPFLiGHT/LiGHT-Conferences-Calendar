@@ -19,12 +19,12 @@ export const runtime = 'nodejs';
  */
 const commandHandlers: Record<
   string,
-  (userId: string, text: string) => Promise<unknown>
+  (userId: string, text: string, teamId?: string) => Promise<unknown>
 > = {
   '/conf-help': (userId) => handleHelp(userId),
   '/conf-upcoming': (userId) => handleUpcoming(userId),
   '/conf-search': (userId, text) => handleSearch(userId, text),
-  '/conf-subscribe': (userId) => handleSubscribe(userId),
+  '/conf-subscribe': (userId, _text, teamId) => handleSubscribe(userId, teamId),
   '/conf-unsubscribe': (userId) => handleUnsubscribe(userId),
   '/conf-settings': (userId) => handleSettings(userId),
   '/conf-subject': (userId, text) => handleSubject(userId, text),
@@ -54,35 +54,30 @@ async function handleSlashCommand(
 
   if (!handler) {
     return textResponse(
-      `Unknown command: ${command}. Use \`/conf-help\` to see available commands.`
+      `Unknown command: ${command}. Use \`/conf-help\` to see available commands.`,
+      'ephemeral'
     );
   }
 
   try {
-    // For subscribe/unsubscribe, we need to pass teamId to store it with preferences
-    if (command === '/conf-subscribe' && teamId) {
-      const result = await handleSubscribe(userId, teamId);
-      return NextResponse.json(result);
-    }
-
-    const result = await handler(userId, text);
+    const result = await handler(userId, text, teamId);
     return NextResponse.json(result);
   } catch (error) {
     console.error(`Error handling command ${command}:`, error);
 
-    // Provide more helpful error message
     const errorMessage = error instanceof Error ? error.message : String(error);
     const isTimeout = errorMessage.includes('timeout') || errorMessage.includes('Request timeout');
 
     if (isTimeout) {
       return textResponse(
-        '⏱️ The request timed out while fetching conference data. This usually happens when the data source is slow to respond. Please try again in a moment.'
+        '⏱️ The request timed out while fetching conference data. This usually happens when the data source is slow to respond. Please try again in a moment.',
+        'ephemeral'
       );
     }
 
     return textResponse(
-      '❌ An error occurred processing your command. Please try again or contact support if the issue persists.\n\n' +
-      `_Error: ${errorMessage}_`
+      '❌ An error occurred processing your command. Please try again or contact support if the issue persists.',
+      'ephemeral'
     );
   }
 }

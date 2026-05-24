@@ -21,16 +21,16 @@ export async function GET(request: Request) {
     );
   }
 
-  // Scopes required for the bot
+  // Scopes required for the bot. Keep in sync with the public install link.
   const scopes = [
-    'chat:write',
-    'chat:write.public',
-    'commands',
+    'channels:read',     // resolve public channel info on member_joined_channel
+    'chat:write',        // post to channels we're in
+    'chat:write.public', // post to channels we're NOT in (e.g. broadcasts)
+    'commands',          // slash commands
+    'groups:read',       // resolve private channel info on member_joined_channel
+    'mpim:read',         // multi-person DMs
     'users:read',
     'users:read.email',
-    'app_mentions:read',
-    'im:read',
-    'channels:read',
   ].join(',');
 
   // Build the Slack OAuth authorization URL

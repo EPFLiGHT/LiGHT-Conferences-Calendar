@@ -15,15 +15,14 @@ export const NOTIFICATION_CONFIG = {
 } as const;
 
 export const COMMAND_DESCRIPTIONS = {
-  upcoming: 'Show upcoming conference deadlines',
-  search: 'Search conferences by name',
-  subject: 'Filter conferences by subject (ML, CV, NLP, SEC, etc.)',
-  info: 'Get detailed information about a specific conference',
-  subscribe: 'Enable deadline notifications',
-  unsubscribe: 'Disable deadline notifications',
-  settings: 'View and update your notification preferences',
-  test: 'Send a test notification to yourself',
-  help: 'Show all available commands',
+  '/conf-upcoming': 'Show upcoming conference deadlines',
+  '/conf-search <query>': 'Search conferences by name',
+  '/conf-subject <code>': 'Filter conferences by subject (ML, CV, NLP, SEC, etc.)',
+  '/conf-info <id-or-name>': 'Get detailed information about a specific conference',
+  '/conf-subscribe': 'Enable deadline notifications (DMs)',
+  '/conf-unsubscribe': 'Disable deadline notifications',
+  '/conf-settings': 'View and update your notification preferences',
+  '/conf-help': 'Show all available commands',
 } as const;
 
 export const URGENCY_CONFIG = {

@@ -12,18 +12,25 @@ import {
   enableNotifications,
   disableNotifications,
 } from '@/slack-bot/lib/userPreferences';
+import { logger } from '@/slack-bot/utils/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 /**
- * Helper function to send response to Slack with timeout
+ * Personal button actions reply ephemerally to avoid spamming the channel —
+ * the message is only visible to the user who clicked.
  */
+type ResponsePayload = Record<string, unknown> & {
+  response_type?: 'ephemeral' | 'in_channel';
+  replace_original?: boolean;
+};
+
 async function sendToResponseUrl(
   responseUrl: string,
-  payload: unknown
+  payload: ResponsePayload
 ): Promise<void> {
-  const TIMEOUT_MS = 3000; // 3 second timeout
+  const TIMEOUT_MS = 3000;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
@@ -34,21 +41,31 @@ async function sendToResponseUrl(
       body: JSON.stringify(payload),
       signal: controller.signal,
     });
-    clearTimeout(timeoutId);
   } catch (err) {
-    clearTimeout(timeoutId);
     const isTimeout = err instanceof Error && err.name === 'AbortError';
-    console.error(
-      '[Slack] Failed to send via response_url:',
-      isTimeout ? 'Request timeout' : err
-    );
-    throw err;
+    logger.warn('Failed to send via response_url', {
+      error: isTimeout ? 'Request timeout' : err instanceof Error ? err.message : String(err),
+    });
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
 /**
- * Handle block actions (button clicks, select menus, etc.)
+ * Reply to the interaction. Prefers response_url (works for both initial and
+ * follow-up messages) and falls back to a direct JSON response.
  */
+async function reply(
+  responseUrl: string | undefined,
+  payload: ResponsePayload
+): Promise<NextResponse> {
+  if (responseUrl) {
+    await sendToResponseUrl(responseUrl, payload);
+    return new NextResponse('', { status: 200 });
+  }
+  return NextResponse.json(payload);
+}
+
 async function handleBlockActions(
   payload: SlackInteractionPayload
 ): Promise<NextResponse> {
@@ -56,269 +73,133 @@ async function handleBlockActions(
   const actionValue = payload.actions?.[0]?.value;
   const userId = payload.user.id;
   const responseUrl = payload.response_url;
-  console.log('Block action:', actionId, 'value:', actionValue, 'userId:', userId);
 
-  // Handle details button click
+  logger.debug('Block action', { actionId, actionValue, userId });
+
   if (actionId?.startsWith('details_')) {
     const conferenceId = actionValue;
-    console.log('[Details] Conference ID:', conferenceId);
-
     if (!conferenceId) {
-      console.error('[Details] Missing conference ID');
-      const errorMsg = buildErrorMessage('Invalid conference ID');
-
-      // Send error via response_url if available
-      if (responseUrl) {
-        await sendToResponseUrl(responseUrl, {
-          ...errorMsg,
-          response_type: 'in_channel',
-          replace_original: false,
-        }).catch(() => {/* Error already logged */});
-        return new NextResponse('', { status: 200 });
-      }
-
-      return NextResponse.json({
-        ...errorMsg,
-        response_type: 'in_channel',
+      return reply(responseUrl, {
+        ...buildErrorMessage('Invalid conference ID'),
+        response_type: 'ephemeral',
         replace_original: false,
       });
     }
 
     try {
-      console.log('[Details] Fetching details for:', conferenceId);
       const message = await getConferenceDetailsById(conferenceId);
-      console.log('[Details] Message generated:', JSON.stringify(message).substring(0, 200));
-
-      const responsePayload = {
+      return reply(responseUrl, {
         ...message,
-        response_type: 'in_channel',
+        response_type: 'ephemeral',
         replace_original: false,
-      };
-
-      console.log('[Details] Sending response with', responsePayload.blocks?.length || 0, 'blocks');
-
-      // Use response_url for delayed response (more reliable for ephemeral messages)
-      if (responseUrl) {
-        console.log('[Details] Using response_url:', responseUrl);
-        await sendToResponseUrl(responseUrl, responsePayload).catch(() => {/* Error already logged */});
-
-        // Acknowledge the interaction immediately
-        return new NextResponse('', { status: 200 });
-      }
-
-      // Fallback to direct response
-      return NextResponse.json(responsePayload);
+      });
     } catch (error) {
-      console.error('[Details] Error fetching conference details:', error);
-      const errorMsg = buildErrorMessage('Failed to fetch conference details. Please try again.');
-
-      if (responseUrl) {
-        await sendToResponseUrl(responseUrl, {
-          ...errorMsg,
-          response_type: 'in_channel',
-          replace_original: false,
-        }).catch(() => {/* Error already logged */});
-        return new NextResponse('', { status: 200 });
-      }
-
-      return NextResponse.json({
-        ...errorMsg,
-        response_type: 'in_channel',
+      logger.error('Failed to fetch conference details', error, { conferenceId });
+      return reply(responseUrl, {
+        ...buildErrorMessage('Failed to fetch conference details. Please try again.'),
+        response_type: 'ephemeral',
         replace_original: false,
       });
     }
   }
 
-  // Handle enable notifications button
   if (actionId === 'enable_notifications') {
     try {
       const prefs = await enableNotifications(userId);
-      const message = buildSettingsPanel(prefs);
-      const responsePayload = {
-        ...message,
-        response_type: 'in_channel',
+      return reply(responseUrl, {
+        ...buildSettingsPanel(prefs),
+        response_type: 'ephemeral',
         replace_original: true,
-      };
-
-      if (responseUrl) {
-        await sendToResponseUrl(responseUrl, responsePayload).catch(() => {/* Error already logged */});
-        return new NextResponse('', { status: 200 });
-      }
-
-      return NextResponse.json(responsePayload);
+      });
     } catch (error) {
-      console.error('Error enabling notifications:', error);
-      const errorMsg = buildErrorMessage('Failed to enable notifications. Please try again.');
-      const responsePayload = {
-        ...errorMsg,
-        response_type: 'in_channel',
+      logger.error('Failed to enable notifications', error, { userId });
+      return reply(responseUrl, {
+        ...buildErrorMessage('Failed to enable notifications. Please try again.'),
+        response_type: 'ephemeral',
         replace_original: false,
-      };
-
-      if (responseUrl) {
-        await sendToResponseUrl(responseUrl, responsePayload).catch(() => {/* Error already logged */});
-        return new NextResponse('', { status: 200 });
-      }
-
-      return NextResponse.json(responsePayload);
+      });
     }
   }
 
-  // Handle disable notifications button
   if (actionId === 'disable_notifications') {
     try {
       const prefs = await disableNotifications(userId);
-      const message = buildSettingsPanel(prefs);
-      const responsePayload = {
-        ...message,
-        response_type: 'in_channel',
+      return reply(responseUrl, {
+        ...buildSettingsPanel(prefs),
+        response_type: 'ephemeral',
         replace_original: true,
-      };
-
-      if (responseUrl) {
-        await sendToResponseUrl(responseUrl, responsePayload).catch(() => {/* Error already logged */});
-        return new NextResponse('', { status: 200 });
-      }
-
-      return NextResponse.json(responsePayload);
+      });
     } catch (error) {
-      console.error('Error disabling notifications:', error);
-      const errorMsg = buildErrorMessage('Failed to disable notifications. Please try again.');
-      const responsePayload = {
-        ...errorMsg,
-        response_type: 'in_channel',
+      logger.error('Failed to disable notifications', error, { userId });
+      return reply(responseUrl, {
+        ...buildErrorMessage('Failed to disable notifications. Please try again.'),
+        response_type: 'ephemeral',
         replace_original: false,
-      };
-
-      if (responseUrl) {
-        await sendToResponseUrl(responseUrl, responsePayload).catch(() => {/* Error already logged */});
-        return new NextResponse('', { status: 200 });
-      }
-
-      return NextResponse.json(responsePayload);
+      });
     }
   }
 
-  // Handle calendar button click
   if (actionId?.startsWith('calendar_')) {
     const conferenceId = actionValue;
-    // Use public production URL for calendar links
-    // Priority: APP_URL (custom domain) > VERCEL_PROJECT_PRODUCTION_URL (vercel.app domain) > localhost
     const baseUrl = process.env.APP_URL
       || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : null)
       || 'http://localhost:3000';
     const calendarUrl = `${baseUrl}/api/calendar/${conferenceId}`;
 
-    const message = buildSuccessMessage(
-      `To add this conference to your calendar, visit:\n${calendarUrl}\n\nThis will download an ICS file that you can import into your calendar app.`
-    );
-
-    const responsePayload = {
-      ...message,
-      response_type: 'in_channel',
+    return reply(responseUrl, {
+      ...buildSuccessMessage(
+        `To add this conference to your calendar, visit:\n${calendarUrl}\n\nThis will download an ICS file that you can import into your calendar app.`
+      ),
+      response_type: 'ephemeral',
       replace_original: false,
-    };
-
-    // Use response_url for delayed response (more reliable for ephemeral messages)
-    if (responseUrl) {
-      console.log('[Calendar] Using response_url for conference:', conferenceId);
-      await sendToResponseUrl(responseUrl, responsePayload).catch(() => {/* Error already logged */});
-
-      // Acknowledge the interaction immediately
-      return new NextResponse('', { status: 200 });
-    }
-
-    // Fallback to direct response
-    return NextResponse.json(responsePayload);
+    });
   }
 
-  // Handle edit subjects button
-  // TODO: Implement modal for editing subjects
-  // This requires opening a Slack modal (views.open API call) with checkboxes for each subject
-  // The modal submission would be handled in handleViewSubmission below
   if (actionId === 'edit_subjects') {
-    const message = buildErrorMessage(
-      'Subject editing is coming soon! For now, use the web interface to manage your subject preferences.'
-    );
-    const responsePayload = {
-      ...message,
-      response_type: 'in_channel',
+    return reply(responseUrl, {
+      ...buildErrorMessage(
+        'Subject editing is coming soon! For now, use the web interface to manage your subject preferences.'
+      ),
+      response_type: 'ephemeral',
       replace_original: false,
-    };
-
-    if (responseUrl) {
-      await sendToResponseUrl(responseUrl, responsePayload).catch(() => {/* Error already logged */});
-      return new NextResponse('', { status: 200 });
-    }
-
-    return NextResponse.json(responsePayload);
+    });
   }
 
   return acknowledgeResponse();
 }
 
-/**
- * Handle modal submissions
- */
 async function handleViewSubmission(
   payload: SlackInteractionPayload
 ): Promise<NextResponse> {
-  const callbackId = payload.view?.callback_id;
-  console.log('View submission:', callbackId);
-
-  // Future feature: Handle modal submissions
-  // Potential modals to implement:
-  // - 'edit_subjects_modal': Allow users to select/deselect subject preferences
-  //   via checkboxes in a Slack modal (triggered by edit_subjects button)
-  // - 'edit_reminder_days_modal': Customize reminder day preferences
-  // - 'edit_timezone_modal': Select timezone from a dropdown
-  //
-  // Implementation requires:
-  // 1. Creating modal views using Slack Block Kit
-  // 2. Opening modals via Slack Web API (views.open) in handleBlockActions
-  // 3. Parsing modal state values here and updating user preferences
-  // 4. Requires SLACK_BOT_TOKEN to be configured for API calls
-
+  logger.debug('View submission', { callbackId: payload.view?.callback_id });
   return acknowledgeResponse();
 }
 
-/**
- * Handle modal closures
- */
 async function handleViewClosed(
   payload: SlackInteractionPayload
 ): Promise<NextResponse> {
-  console.log('View closed:', payload.view?.callback_id);
+  logger.debug('View closed', { callbackId: payload.view?.callback_id });
   return acknowledgeResponse();
 }
 
-/**
- * Main interaction handler - routes to specific handlers based on type
- */
 async function handleInteraction(
   payload: SlackInteractionPayload,
   _request: unknown,
   teamId?: string
 ): Promise<NextResponse> {
-  if (teamId) {
-    console.log(`[Interactions] Request from team: ${teamId}`);
-  }
+  logger.debug('Interaction received', { type: payload.type, teamId });
   switch (payload.type) {
     case 'block_actions':
       return handleBlockActions(payload);
-
     case 'view_submission':
       return handleViewSubmission(payload);
-
     case 'view_closed':
       return handleViewClosed(payload);
-
     case 'shortcut':
-      console.log('Shortcut triggered:', payload);
+      logger.debug('Shortcut triggered');
       return acknowledgeResponse();
-
     default:
-      console.log('Unknown interaction type:', payload.type);
+      logger.debug('Unknown interaction type', { type: payload.type });
       return acknowledgeResponse();
   }
 }

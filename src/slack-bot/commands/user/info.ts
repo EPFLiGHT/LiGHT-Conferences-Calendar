@@ -11,7 +11,7 @@ import { findConferenceByQuery, buildConferenceDetailsCard } from '../../lib/con
 export async function handleInfo(userId: string, conferenceQuery: string): Promise<BlockKitMessage> {
   if (!conferenceQuery || conferenceQuery.trim() === '') {
     return buildErrorMessage(
-      'Please provide a conference ID or name. Example: `/conf info cvpr25` or `/conf info CVPR`\n\nYou can find conference IDs in the deadline lists.'
+      'Please provide a conference ID or name. Example: `/conf-info cvpr25` or `/conf-info CVPR`\n\nYou can find conference IDs in the deadline lists.'
     );
   }
 
@@ -23,7 +23,7 @@ export async function handleInfo(userId: string, conferenceQuery: string): Promi
 
       if (!conference) {
         return buildErrorMessage(
-          `Conference "${conferenceQuery}" not found.\n\nUse \`/conf search ${conferenceQuery}\` to find similar conferences.`
+          `Conference "${conferenceQuery}" not found.\n\nUse \`/conf-search ${conferenceQuery}\` to find similar conferences.`
         );
       }
 

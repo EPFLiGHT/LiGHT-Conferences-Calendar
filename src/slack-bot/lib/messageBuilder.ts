@@ -40,7 +40,7 @@ export function buildConferenceCard(
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `*${conference.full_name}*\n📍 ${conference.place}\n📆 ${conference.date}`,
+        text: `*${conference.full_name}*${formatTypeTag(conference.type)}\n📍 ${conference.place}\n📆 ${conference.date}`,
       },
     },
     {
@@ -173,7 +173,7 @@ export function buildDeadlineList(
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `${urgencyEmoji} *${conference.title} ${conference.year}* ${subjectEmojis}\n${deadline.label}: ${deadline.localDatetime.toFormat('MMM dd, HH:mm')} • ⏰ ${formatTimeRemaining(daysLeft)}`,
+        text: `${urgencyEmoji} *${conference.title} ${conference.year}*${formatTypeTag(conference.type)} ${subjectEmojis}\n${deadline.label}: ${deadline.localDatetime.toFormat('MMM dd, HH:mm')} • ⏰ ${formatTimeRemaining(daysLeft)}`,
       },
       accessory: {
         type: 'button',
@@ -234,7 +234,7 @@ export function buildHelpMessage(): BlockKitMessage {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `• \`/conf ${cmd}\`\n  ${desc}`,
+        text: `• \`${cmd}\`\n  ${desc}`,
       },
     });
   });
@@ -245,7 +245,7 @@ export function buildHelpMessage(): BlockKitMessage {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: '*Examples:*\n• `/conf upcoming` - See next 5 deadlines\n• `/conf search CVPR` - Find CVPR conferences\n• `/conf subject ML` - Filter by Machine Learning\n• `/conf subscribe` - Start receiving notifications',
+        text: '*Examples:*\n• `/conf-upcoming` — See next 5 deadlines\n• `/conf-search CVPR` — Find CVPR conferences\n• `/conf-subject ML` — Filter by Machine Learning\n• `/conf-subscribe` — Start receiving notifications',
       },
     }
   );
@@ -288,7 +288,7 @@ export function buildSettingsPanel(prefs: UserPreferences): BlockKitMessage {
           type: 'mrkdwn',
           text: `*Subscribed Subjects:*\n${
             prefs.subjects.length > 0
-              ? prefs.subjects.map((s) => `${SUBJECT_EMOJIS[s] || '📌'} ${s}`).join(', ')
+              ? prefs.subjects.map((s) => `${SUBJECT_EMOJIS[s] || '📌'} ${SUBJECT_LABELS[s] || s}`).join(', ')
               : 'All subjects'
           }`,
         },
@@ -364,6 +364,18 @@ export function buildSuccessMessage(message: string): BlockKitMessage {
 }
 
 /**
+ * Render an event-type tag (e.g. " · _workshop_") for non-conference items.
+ * Returns empty string for plain conferences to keep their lines uncluttered.
+ */
+function formatTypeTag(type: string | undefined): string {
+  if (!type) return '';
+  const t = type.toLowerCase();
+  if (t === 'workshop') return ' · 🛠️ _workshop_';
+  if (t === 'summit') return ' · 🏛️ _summit_';
+  return '';
+}
+
+/**
  * Get urgency emoji based on days left
  */
 function getUrgencyEmoji(daysLeft: number): string {
@@ -411,7 +423,7 @@ export function buildUserDeadlineNotification(
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `${urgencyEmoji} *${conference.title} ${conference.year}* ${subjectEmojis}\n` +
+        text: `${urgencyEmoji} *${conference.title} ${conference.year}*${formatTypeTag(conference.type)} ${subjectEmojis}\n` +
               `${deadline.label}: ${deadline.localDatetime.toFormat('MMM dd, HH:mm')} (${deadline.datetime.zoneName})\n` +
               `⏰ ${formatTimeRemaining(daysLeft)} remaining`,
       },
@@ -463,7 +475,7 @@ export function buildUserDeadlineNotification(
       elements: [
         {
           type: 'mrkdwn',
-          text: `💡 Use \`/conf settings\` to manage your notification preferences or \`/conf unsubscribe\` to stop receiving these reminders.`,
+          text: `💡 Use \`/conf-settings\` to manage your notification preferences or \`/conf-unsubscribe\` to stop receiving these reminders.`,
         },
       ],
     }
@@ -474,6 +486,68 @@ export function buildUserDeadlineNotification(
     text: `Deadline Reminder: ${deadlines.length} upcoming ${
       deadlines.length === 1 ? 'deadline' : 'deadlines'
     }`,
+  };
+}
+
+/**
+ * Build a notification listing conferences whose event start is approaching.
+ * Distinct from deadline reminders — this is "the event itself is in N days".
+ */
+export function buildEventStartNotification(
+  events: Array<{ conference: Conference; start: { toFormat: (fmt: string) => string }; daysLeft: number }>
+): BlockKitMessage {
+  const blocks: any[] = [
+    {
+      type: 'header',
+      text: {
+        type: 'plain_text',
+        text: '🎟️ Conferences Starting Soon',
+        emoji: true,
+      },
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `*${events.length}* ${events.length === 1 ? 'conference is' : 'conferences are'} starting in the coming days:`,
+      },
+    },
+    { type: 'divider' },
+  ];
+
+  events.forEach(({ conference, start, daysLeft }, index) => {
+    const subjects = Array.isArray(conference.sub) ? conference.sub : [conference.sub];
+    const subjectEmojis = subjects.map((s) => SUBJECT_EMOJIS[s] || '📌').join(' ');
+    const urgencyEmoji = getUrgencyEmoji(daysLeft);
+
+    blocks.push({
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text:
+          `${urgencyEmoji} *${conference.title} ${conference.year}*${formatTypeTag(conference.type)} ${subjectEmojis}\n` +
+          `📍 ${conference.place}\n` +
+          `📆 Starts ${start.toFormat('MMM dd, yyyy')} • ⏰ ${formatTimeRemaining(daysLeft)}`,
+      },
+      ...(conference.link
+        ? {
+            accessory: {
+              type: 'button',
+              text: { type: 'plain_text', text: 'Website', emoji: true },
+              url: conference.link,
+            },
+          }
+        : {}),
+    });
+
+    if (index < events.length - 1) {
+      blocks.push({ type: 'divider' });
+    }
+  });
+
+  return {
+    blocks,
+    text: `${events.length} conference${events.length === 1 ? '' : 's'} starting soon`,
   };
 }
 

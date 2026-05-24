@@ -11,7 +11,7 @@ import { withCommandHandler } from '../../lib/commandWrapper';
 
 export async function handleSearch(userId: string, query: string): Promise<BlockKitMessage> {
   if (!query || query.trim() === '') {
-    return buildErrorMessage('Please provide a search query. Example: `/conf search CVPR`');
+    return buildErrorMessage('Please provide a search query. Example: `/conf-search CVPR`');
   }
 
   return withCommandHandler(
@@ -28,7 +28,7 @@ export async function handleSearch(userId: string, query: string): Promise<Block
               type: 'section',
               text: {
                 type: 'mrkdwn',
-                text: `🔍 No conferences found matching "*${query}*"\n\nTry a different search term or use \`/conf upcoming\` to see all upcoming deadlines.`,
+                text: `🔍 No conferences found matching "*${query}*"\n\nTry a different search term or use \`/conf-upcoming\` to see all upcoming deadlines.`,
               },
             },
           ],

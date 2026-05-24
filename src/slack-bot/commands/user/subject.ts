@@ -22,7 +22,7 @@ export async function handleSubject(userId: string, subjectCode: string): Promis
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `📚 *Available Subjects:*\n${availableSubjects}\n\n*Usage:* \`/conf subject ML\``,
+            text: `📚 *Available Subjects:*\n${availableSubjects}\n\n*Usage:* \`/conf-subject ML\``,
           },
         },
       ],
@@ -47,7 +47,7 @@ export async function handleSubject(userId: string, subjectCode: string): Promis
               type: 'section',
               text: {
                 type: 'mrkdwn',
-                text: `❌ No conferences found for subject "*${subject}*"\n\nUse \`/conf subject\` without arguments to see available subjects.`,
+                text: `❌ No conferences found for subject "*${subject}*"\n\nUse \`/conf-subject\` without arguments to see available subjects.`,
               },
             },
           ],

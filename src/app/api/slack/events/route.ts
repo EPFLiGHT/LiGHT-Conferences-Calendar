@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
 import { withSlackMiddleware, SlackRequestType } from '@/slack-bot/lib/middleware';
 import { acknowledgeResponse } from '@/slack-bot/lib/responses';
-import { subscribeChannel, unsubscribeChannel } from '@/slack-bot/lib/channelSubscriptions';
-import { getSlackClient } from '@/slack-bot/lib/slackClient';
-import { getTeamMetadata } from '@/slack-bot/lib/teamStorage';
+import {
+  subscribeChannel,
+  unsubscribeChannel,
+  unsubscribeTeamChannels,
+} from '@/slack-bot/lib/channelSubscriptions';
+import { getSlackClient, clearTeamClient } from '@/slack-bot/lib/slackClient';
+import { getTeamMetadata, removeTeamData } from '@/slack-bot/lib/teamStorage';
 import { logger } from '@/slack-bot/utils/logger';
 import type {
   SlackEventPayload,
@@ -46,10 +50,10 @@ async function handleSlackEvent(
       }
     }
 
-    // Future feature: Handle other Slack events
-    // - app_mention: Respond when bot is @mentioned in a channel
-    // - message: Respond to DMs or specific message patterns
-    // - app_home_opened: Show custom home tab with personalized deadlines
+    // Workspace uninstalled the app — purge tokens and subscriptions
+    if (payload.event.type === 'app_uninstalled' || payload.event.type === 'tokens_revoked') {
+      await handleAppUninstalled(teamId || payload.team_id);
+    }
 
     return acknowledgeResponse();
   }
@@ -137,7 +141,7 @@ async function handleBotJoinedChannel(
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: '👋 *Thanks for adding me!*\n\nI\'ll automatically post conference deadline reminders to this channel. Use `/conf help` to see all available commands.',
+              text: '👋 *Thanks for adding me!*\n\nI\'ll automatically post conference deadline reminders to this channel. Use `/conf-help` to see all available commands.',
             },
           },
         ],
@@ -182,6 +186,25 @@ async function handleBotLeftChannel(
     logger.error('Failed to handle bot left channel event', error, {
       event,
     });
+  }
+}
+
+/**
+ * Workspace removed the app or its tokens were revoked.
+ * Purge stored token, metadata, channel subscriptions, and cached client.
+ */
+async function handleAppUninstalled(teamId: string | undefined): Promise<void> {
+  if (!teamId) {
+    logger.warn('app_uninstalled received without teamId');
+    return;
+  }
+  try {
+    logger.info('App uninstalled — cleaning up team data', { teamId });
+    await unsubscribeTeamChannels(teamId);
+    await removeTeamData(teamId);
+    clearTeamClient(teamId);
+  } catch (error) {
+    logger.error('Failed to clean up after app uninstall', error, { teamId });
   }
 }
 

@@ -4,8 +4,15 @@ import { successResponse, errorResponse } from '@/slack-bot/lib/responses';
 import { getConferences } from '@/slack-bot/utils/conferenceCache';
 import { getAllUsersWithNotifications } from '@/slack-bot/lib/userPreferences';
 import { sendDM } from '@/slack-bot/lib/slackClient';
-import { buildUserDeadlineNotification } from '@/slack-bot/lib/messageBuilder';
-import { getDeadlinesWithinDays, filterBySubject } from '@/utils/conferenceQueries';
+import {
+  buildUserDeadlineNotification,
+  buildEventStartNotification,
+} from '@/slack-bot/lib/messageBuilder';
+import {
+  getDeadlinesWithinDays,
+  filterBySubject,
+  getEventStartsOnDays,
+} from '@/utils/conferenceQueries';
 import { logger } from '@/slack-bot/utils/logger';
 
 export const dynamic = 'force-dynamic';
@@ -63,31 +70,48 @@ async function handleDailyCheck(): Promise<NextResponse> {
           maxReminderDays
         );
 
-        // Filter to only include deadlines matching user's specific reminder days
+        // Fire exactly on each of the user's reminder days
+        // (e.g. 30, 7, 3 days out) — no day-by-day repeats.
         const relevantDeadlines = upcomingDeadlines.filter(item =>
-          user.reminderDays.some(reminderDay => {
-            // Notify if deadline is exactly N days away (within a margin)
-            // or if it's the last reminder before the deadline
-            const isReminderDay = Math.abs(item.daysLeft - reminderDay) <= 1;
-            return isReminderDay || item.daysLeft <= Math.min(...user.reminderDays);
-          })
+          user.reminderDays.includes(item.daysLeft)
+        );
+        const upcomingEventStarts = getEventStartsOnDays(
+          userConferences,
+          user.reminderDays
         );
 
-        if (relevantDeadlines.length === 0) {
-          logger.debug('No relevant deadlines for user', { userId });
+        if (relevantDeadlines.length === 0 && upcomingEventStarts.length === 0) {
+          logger.debug('Nothing relevant for user today', { userId });
           continue;
         }
 
-        // Build and send notification
-        // Note: In multi-workspace mode, user.teamId should be stored with preferences
-        // For now, this will use the token fallback mechanism
-        const message = buildUserDeadlineNotification(relevantDeadlines);
-        await sendDM(userId, message.blocks, message.text, user.teamId);
+        // Compose a single DM combining deadline reminders and event-start
+        // reminders so users get at most one message per day.
+        const combinedBlocks: any[] = [];
+        const fallbackParts: string[] = [];
+
+        if (relevantDeadlines.length > 0) {
+          const deadlineMsg = buildUserDeadlineNotification(relevantDeadlines);
+          combinedBlocks.push(...deadlineMsg.blocks);
+          if (deadlineMsg.text) fallbackParts.push(deadlineMsg.text);
+        }
+
+        if (upcomingEventStarts.length > 0) {
+          if (combinedBlocks.length > 0) {
+            combinedBlocks.push({ type: 'divider' });
+          }
+          const eventMsg = buildEventStartNotification(upcomingEventStarts);
+          combinedBlocks.push(...eventMsg.blocks);
+          if (eventMsg.text) fallbackParts.push(eventMsg.text);
+        }
+
+        await sendDM(userId, combinedBlocks, fallbackParts.join(' • '), user.teamId);
 
         notificationsSent++;
         logger.info('Sent notification to user', {
           userId,
-          deadlineCount: relevantDeadlines.length
+          deadlineCount: relevantDeadlines.length,
+          eventStartCount: upcomingEventStarts.length,
         });
 
       } catch (error) {

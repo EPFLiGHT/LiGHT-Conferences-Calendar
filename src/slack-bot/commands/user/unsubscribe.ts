@@ -18,7 +18,7 @@ export async function handleUnsubscribe(userId: string): Promise<BlockKitMessage
       return buildSuccessMessage(
         `🔕 *Notifications Disabled*\n\n` +
           `You will no longer receive deadline reminders.\n\n` +
-          `You can re-enable them anytime with \`/conf subscribe\`.`
+          `You can re-enable them anytime with \`/conf-subscribe\`.`
       );
     },
     'Failed to disable notifications. Please try again later.'
