@@ -71,7 +71,7 @@ async function handleDailyCheck(): Promise<NextResponse> {
         );
 
         // Fire exactly on each of the user's reminder days
-        // (e.g. 30, 7, 3 days out) — no day-by-day repeats.
+        // (e.g. 30, 7, 3 days out) - no day-by-day repeats.
         const relevantDeadlines = upcomingDeadlines.filter(item =>
           user.reminderDays.includes(item.daysLeft)
         );

@@ -18,7 +18,7 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 /**
- * Personal button actions reply ephemerally to avoid spamming the channel —
+ * Personal button actions reply ephemerally to avoid spamming the channel -
  * the message is only visible to the user who clicked.
  */
 type ResponsePayload = Record<string, unknown> & {

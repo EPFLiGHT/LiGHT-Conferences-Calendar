@@ -1,241 +1,127 @@
-# Conference Slack Bot Setup Guide
+# Slack bot
 
-A Slack bot that tracks academic conference deadlines and sends timely notifications to team members.
+A Slack bot that tracks academic conference deadlines and sends reminders.
 
-**Workspace:** https://light-laboratory.slack.com/
-**Production Site:** https://conferences.light-laboratory.org/
+- Workspace: [light-laboratory.slack.com](https://light-laboratory.slack.com/)
+- Production: [conferences.light-laboratory.org](https://conferences.light-laboratory.org/)
 
-## Features
+## What it does
 
-- **Slash Commands**: Search conferences, view deadlines, subscribe to notifications
-- **Smart Notifications**: Customizable reminders (30, 7, 3 days before deadlines)
-- **Subject Filtering**: Subscribe to specific research areas (ML, CV, NLP, SEC, etc.)
-- **Interactive Messages**: Rich cards with conference details and action buttons
-- **Timezone-Aware**: Deadlines displayed in user's local timezone
-- **Multi-Workspace**: Install to any Slack workspace via OAuth (NEW!)
+- Slash commands to search conferences and view upcoming deadlines
+- Per-user reminders (default: 30, 7, 3 days before each deadline)
+- Subject filters (ML, CV, NLP, SEC, etc.)
+- Reminders shown in the user's local timezone
+- Multi-workspace install via OAuth
 
-## Installation Options
+## Installing
 
-You have two options for installing this bot:
+Two options:
 
-### Option 1: OAuth Installation (Recommended for Multiple Workspaces)
+- **OAuth** (recommended): lets anyone install the bot to their workspace via an "Add to Slack" button. See [OAUTH_SETUP.md](./OAUTH_SETUP.md).
+- **Manual single-workspace install**: quicker, no OAuth setup. Steps below.
 
-**Use this if you want:**
-- Anyone to install your bot to their workspace
-- Support for multiple Slack workspaces
-- Easy distribution via "Add to Slack" button
+## Manual setup
 
-👉 **See [OAUTH_SETUP.md](./OAUTH_SETUP.md) for complete OAuth setup instructions**
+### 1. Create the Slack app
 
-**Quick Link:** Visit `https://your-app.vercel.app/slack-install` for the installation page
+At [api.slack.com/apps](https://api.slack.com/apps), create a new app from scratch. Name it `LiGHT Conferences` and pick your workspace.
 
-### Option 2: Manual Installation (Single Workspace)
+### 2. Bot scopes
 
-**Use this if you want:**
-- A quick setup for one workspace only
-- Simple configuration without OAuth complexity
-
-👉 **Follow the "Quick Start" section below**
-
----
-
-## Quick Start (Manual Installation)
-
-### 1. Create Slack App
-
-1. Go to [https://api.slack.com/apps](https://api.slack.com/apps) → "Create New App" → "From scratch"
-2. Name: `LiGHT Conferences` (recommended) or your choice
-3. Select workspace: `light-laboratory` (https://light-laboratory.slack.com/)
-
-### 2. Configure Bot Permissions
-
-Go to **OAuth & Permissions** → **Bot Token Scopes**, add:
+Under **OAuth & Permissions → Bot Token Scopes**, add:
 
 ```
-chat:write           # Send messages
-chat:write.public    # Send messages to channels bot isn't in
-commands             # Receive slash commands
-users:read           # View user information
-users:read.email     # View user email (optional)
+chat:write
+chat:write.public
+commands
+users:read
+users:read.email   # optional
 ```
 
-### 3. Install App to Workspace
+### 3. Install to the workspace
 
-1. Go to **OAuth & Permissions** → Click "Install to Workspace"
-2. Authorize the app
-3. Copy the **Bot User OAuth Token** (starts with `xoxb-`)
+In **OAuth & Permissions**, click "Install to Workspace" and copy the bot token (`xoxb-...`).
 
-### 4. Get Signing Secret
+### 4. Signing secret
 
-1. Go to **Basic Information** → **App Credentials**
-2. Copy the **Signing Secret**
+Under **Basic Information → App Credentials**, copy the signing secret.
 
-### 5. Configure Slash Commands
+### 5. Slash command
 
-Go to **Slash Commands** → **Create New Command**:
+Under **Slash Commands**, create `/conf`:
 
-- **Command**: `/conf`
-- **Request URL**: `https://your-project.vercel.app/api/slack/commands`
-- **Short Description**: Track conference deadlines
-- **Usage Hint**: `upcoming | search <query> | subscribe`
+- Request URL: `https://your-project.vercel.app/api/slack/commands`
+- Description: Track conference deadlines
+- Usage hint: `upcoming | search <query> | subscribe`
 
-### 6. Configure Interactivity
+### 6. Interactivity
 
-Go to **Interactivity & Shortcuts**:
+Under **Interactivity & Shortcuts**, turn it on and set the request URL to `https://your-project.vercel.app/api/slack/interactions`.
 
-- Enable Interactivity: **ON**
-- **Request URL**: `https://your-project.vercel.app/api/slack/interactions`
+### 7. Events (optional)
 
-### 7. Configure Event Subscriptions (Optional)
+Under **Event Subscriptions**, enable events with request URL `https://your-project.vercel.app/api/slack/events` and subscribe to `app_mention` and `message.im`.
 
-Go to **Event Subscriptions**:
+## Deploying
 
-- Enable Events: **ON**
-- **Request URL**: `https://your-project.vercel.app/api/slack/events`
-- Subscribe to bot events:
-  - `app_mention` - When users @mention the bot
-  - `message.im` - Direct messages to bot
+Import the repo into Vercel and set these environment variables:
 
-## Deployment
+```
+SLACK_BOT_TOKEN=xoxb-...
+SLACK_SIGNING_SECRET=...
+CONFERENCES_DATA_URL=https://conferences.light-laboratory.org
+APP_URL=https://your-project.vercel.app
+CRON_SECRET=<random string>
+```
 
-### Setup Vercel Project
+Notes:
 
-1. **Import Repository to Vercel**
-   - Go to [vercel.com/dashboard](https://vercel.com/dashboard)
-   - Click "Add New Project"
-   - Import your GitHub repository
+- `CONFERENCES_DATA_URL` is the base URL serving the YAML files. The bot appends `/data/conferences.yaml`, `/data/summits.yaml`, and `/data/workshops.yaml`.
+- `APP_URL` is used to build the ICS download links sent in messages.
+- `CRON_SECRET` authenticates the daily cron job.
 
-2. **Add Environment Variables**
+Then create a Vercel KV (Redis) database, name it `conferences-slack-bot-kv`, and link it to the project. Credentials are injected automatically.
 
-   In Vercel Dashboard → Your Project → Settings → Environment Variables:
+After the first deploy, update the request URLs in the Slack app config to point at your Vercel URL.
 
-   ```
-   SLACK_BOT_TOKEN=xoxb-your-token-here
-   SLACK_SIGNING_SECRET=your-secret-here
-   CONFERENCES_DATA_URL=https://conferences.light-laboratory.org
-   APP_URL=https://your-project.vercel.app
-   CRON_SECRET=your-random-secret (optional but recommended)
-   ```
+## Commands
 
-   **Important Notes:**
-   - `CONFERENCES_DATA_URL` - Base URL where your YAML files are hosted (code appends `/data/conferences.yaml`, `/data/summits.yaml`, `/data/workshops.yaml`)
-   - `APP_URL` - Your public Vercel deployment URL (used for generating calendar download links)
-   - `CRON_SECRET` - Random string for authenticating cron jobs
+- `/conf upcoming`: next 5 deadlines
+- `/conf search <query>`: search by name (e.g. `/conf search CVPR`)
+- `/conf subject <code>`: filter by subject (e.g. `/conf subject ML`)
+- `/conf info <id>`: details for one conference
+- `/conf subscribe`: turn reminders on
+- `/conf unsubscribe`: turn them off
+- `/conf settings`: change preferences
+- `/conf help`: list commands
 
-3. **Create Vercel KV Database**
+Subject codes include ML, CV, NLP, SEC, DM, HCI, RO, PRIV, and more. Run `/conf subject` with no argument to see all of them.
 
-   - In Vercel Dashboard → Storage → Create Database
-   - Choose "KV" (Redis)
-   - Name it `conferences-slack-bot-kv`
-   - Link to your project (Vercel auto-injects credentials)
+## Reminders
 
-4. **Deploy**
+Subscribed users get a DM each morning (9 AM, configured in `vercel.json`). They get pinged on the days they selected (default 30 / 7 / 3 days out), filtered by their subscribed subjects if they set any, and in their Slack timezone.
 
-   - Vercel will auto-deploy on git push
-   - API routes will be available at: `https://your-project.vercel.app/api/slack/*`
+Channel reminders are sent to any channel the bot is added to.
 
-### Update Slack App URLs
+## Local development
 
-After deployment, update these URLs in your Slack app config:
+```bash
+pnpm install
+cp .env.example .env.local   # fill in credentials
+pnpm dev
+```
 
-1. **Slash Commands** → `/conf` → Request URL:
-   ```
-   https://your-project.vercel.app/api/slack/commands
-   ```
+For `.env.local` you'll need the same variables as production. For `CONFERENCES_DATA_URL` and `APP_URL`, use `http://localhost:3000`. You'll also need Vercel KV credentials (pull them from the Vercel dashboard or Upstash).
 
-2. **Interactivity** → Request URL:
-   ```
-   https://your-project.vercel.app/api/slack/interactions
-   ```
+To let Slack reach your local server:
 
-3. **Event Subscriptions** → Request URL (optional):
-   ```
-   https://your-project.vercel.app/api/slack/events
-   ```
+```bash
+ngrok http 3000
+```
 
-## Available Commands
+Then point the Slack app URLs at the ngrok URL.
 
-### User Commands
-
-- `/conf upcoming` - Show next 5 upcoming deadlines
-- `/conf search <query>` - Search conferences by name (e.g., `/conf search CVPR`)
-- `/conf subject <code>` - Filter by subject (e.g., `/conf subject ML`)
-- `/conf info <id>` - Get detailed info about specific conference
-- `/conf subscribe` - Enable deadline notifications
-- `/conf unsubscribe` - Disable notifications
-- `/conf settings` - View/edit your preferences
-- `/conf help` - Show all commands
-
-### Subject Codes
-
-- `ML` - Machine Learning
-- `CV` - Computer Vision
-- `NLP` - Natural Language Processing
-- `SEC` - Security
-- `DM` - Data Mining
-- `HCI` - Human-Computer Interaction
-- `RO` - Robotics
-- `PRIV` - Privacy
-- And more... (use `/conf subject` to see all)
-
-## Notification System
-
-### How It Works
-
-1. Users run `/conf subscribe` to enable notifications
-2. Bot sends DMs at 9 AM daily (configurable in `vercel.json`)
-3. Notifications sent based on user preferences:
-   - Default: 30, 7, 3 days before deadlines
-   - Filtered by subscribed subjects (if configured)
-   - Timezone-aware (uses Slack user timezone)
-
-### Customizing Notifications
-
-Users can customize via `/conf settings`:
-- Enable/disable notifications
-- Choose reminder days (3, 7, 14, 30, etc.)
-- Subscribe to specific subjects only
-
-## Development
-
-### Local Development
-
-1. **Install dependencies:**
-
-   ```bash
-   pnpm install
-   ```
-
-2. **Create `.env.local`:**
-
-   ```bash
-   cp .env.example .env.local
-   # Fill in your Slack credentials and configuration
-   ```
-
-   Required variables for local development:
-   - `SLACK_BOT_TOKEN` - Your bot token from Slack
-   - `SLACK_SIGNING_SECRET` - Your signing secret from Slack
-   - `CONFERENCES_DATA_URL` - URL to fetch conference data (can use `http://localhost:3000` for local testing)
-     - Bot will fetch from `/data/conferences.yaml`, `/data/summits.yaml`, and `/data/workshops.yaml`
-   - `APP_URL` - Your app URL (use `http://localhost:3000` for local, change to Vercel URL for production)
-   - `CRON_SECRET` - Random string for cron authentication
-   - Vercel KV credentials (get from Vercel dashboard or Upstash)
-
-3. **Run development server:**
-   ```bash
-   pnpm dev
-   ```
-
-4. **Expose local server to Slack (using ngrok):**
-   ```bash
-   ngrok http 3000
-   ```
-   Update Slack app URLs to use ngrok URL: `https://abc123.ngrok.io/api/slack/commands`
-
-### Testing Commands
-
-Test commands locally by sending POST requests:
+To hit a command directly:
 
 ```bash
 curl -X POST http://localhost:3000/api/slack/commands \
@@ -243,142 +129,43 @@ curl -X POST http://localhost:3000/api/slack/commands \
   -d "command=/conf&text=upcoming&user_id=U123456"
 ```
 
-## Architecture
-
-### Tech Stack
-
-- **Framework**: Next.js 13+ (App Router)
-- **Runtime**: Node.js 20 (Vercel Serverless Functions)
-- **Database**: Vercel KV (Redis) for user preferences
-- **Deployment**: Vercel
-- **Data Source**: YAML file from GitHub Pages
-
-### File Structure
+## Layout
 
 ```
-app/api/slack/              # API Routes (Next.js 13+)
-├── commands/route.ts       # Slash command handler
-├── interactions/route.ts   # Button/menu handler
-├── events/route.ts         # Event handler (mentions, DMs)
-└── cron/
-    └── daily-check/route.ts  # Daily notification job
+app/api/slack/
+├── commands/route.ts        # slash commands
+├── interactions/route.ts    # buttons / menus
+├── events/route.ts          # mentions, DMs
+└── cron/daily-check/route.ts
 
-src/slack-bot/              # Bot logic
-├── commands/user/          # Command implementations
-│   ├── upcoming.ts
-│   ├── search.ts
-│   ├── subscribe.ts
-│   └── ...
-├── lib/
-│   ├── middleware.ts       # Centralized request handling
-│   ├── responses.ts        # Standard response builders
-│   ├── messageBuilder.ts   # Block Kit message formatter
-│   ├── userPreferences.ts  # KV database wrapper
-│   └── slackVerify.ts      # Request verification
-├── utils/
-│   ├── logger.ts           # Structured logging
-│   └── conferenceCache.ts  # Conference data caching
-└── config/
-    └── constants.ts        # Configuration constants
+src/slack-bot/
+├── commands/user/           # one file per command
+├── lib/                     # middleware, responses, message builder, KV wrapper, signature check
+├── utils/                   # logger, conference cache
+└── config/constants.ts
 
-src/utils/                  # Shared utilities
-├── parser.ts               # YAML parsing (shared with frontend)
-├── conferenceQueries.ts    # Conference filtering/searching
-└── subjects.ts             # Subject labels
-
-src/types/
-├── conference.ts           # Conference types (shared)
-├── slack.ts                # Slack-specific types
-└── slack-payloads.ts       # Type-safe Slack API payloads
-```
-
-### How It Works
-
-1. **User runs `/conf upcoming`** in Slack
-2. Slack sends POST to `/api/slack/commands`
-3. API route verifies signature and parses command
-4. Routes to appropriate handler (`handleUpcoming`)
-5. Handler fetches conferences from cache/YAML
-6. Filters and formats data using shared utilities
-7. Builds Block Kit message with rich formatting
-8. Returns JSON response to Slack
-9. Slack displays formatted message to user
-
-### Data Flow
-
-```
-User → Slack → Vercel API Route → Command Handler
-                                         ↓
-                                   Fetch Conferences
-                                   (Cache or YAML)
-                                         ↓
-                                   Filter & Format
-                                   (Shared utilities)
-                                         ↓
-                                   Build Message
-                                   (Block Kit)
-                                         ↓
-                         ← JSON Response ←
-     Slack ← Display Message ←
+src/utils/                   # shared with the frontend (YAML parsing, queries, subject labels)
+src/types/                   # conference + Slack types
 ```
 
 ## Troubleshooting
 
-### Common Issues
+**"Invalid signature"**: `SLACK_SIGNING_SECRET` is wrong or missing in Vercel.
 
-**1. "Invalid signature" error**
-- Verify `SLACK_SIGNING_SECRET` is correct
-- Ensure environment variables are set in Vercel
+**Commands don't respond**: check `vercel logs`, confirm the Slack request URLs match the deployment, and curl the endpoint to make sure it's reachable.
 
-**2. Commands not responding**
-- Check Vercel logs: `vercel logs`
-- Verify Request URLs in Slack app config match deployment URL
-- Test endpoint: `curl https://your-project.vercel.app/api/slack/commands`
+**Reminders not sending**: check the cron job ran (Vercel logs), make sure the bot token has `chat:write`, and confirm the user is subscribed.
 
-**3. Notifications not sending**
-- Check cron job execution in Vercel logs
-- Verify `SLACK_BOT_TOKEN` has `chat:write` permission
-- Ensure users have subscribed: `/conf subscribe`
+**"Failed to fetch conferences"**: `CONFERENCES_DATA_URL` is wrong, or the YAML files aren't accessible. Curl all three to confirm.
 
-**4. "Failed to fetch conferences" error**
-- Verify `CONFERENCES_DATA_URL` is set correctly
-- Check all three YAML files are accessible at the URLs:
-  - `curl https://your-domain.com/data/conferences.yaml`
-  - `curl https://your-domain.com/data/summits.yaml`
-  - `curl https://your-domain.com/data/workshops.yaml`
+**Calendar links broken**: `APP_URL` should be the public Vercel URL with no trailing slash, not localhost.
 
-**5. Calendar links not working**
-- Verify `APP_URL` is set to your public Vercel URL (not localhost)
-- Ensure it doesn't have a trailing slash
-- Example: `https://your-project.vercel.app`
-
-### Viewing Logs
-
-Vercel logs (production):
-```bash
-vercel logs --follow
-```
-
-Slack app event logs:
-- Go to [api.slack.com/apps](https://api.slack.com/apps)
-- Select your app → Event Subscriptions → View Logs
+Vercel logs: `vercel logs --follow`. Slack event logs are under your app at api.slack.com/apps.
 
 ## Cost
 
-**Free tier includes:**
-- Vercel: 100 GB bandwidth, 100 serverless executions/day, 1 cron job
-- Vercel KV: 256MB storage, 30K commands/month
-- Slack: Free for standard workspace features
-
-**Perfect for small to medium teams (<100 users)**
-
-## Support
-
-For issues or questions:
-1. Check Vercel logs: `vercel logs`
-2. Check Slack app logs: api.slack.com/apps → Your App → Logs
-3. Review this README and troubleshooting section
+Fits in the free tiers for Vercel, Vercel KV, and Slack. Fine for small to medium teams.
 
 ## License
 
-See main project LICENSE file.
+See the main project's LICENSE.

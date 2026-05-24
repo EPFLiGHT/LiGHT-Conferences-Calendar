@@ -245,7 +245,7 @@ export function buildHelpMessage(): BlockKitMessage {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: '*Examples:*\n• `/conf-upcoming` — See next 5 deadlines\n• `/conf-search CVPR` — Find CVPR conferences\n• `/conf-subject ML` — Filter by Machine Learning\n• `/conf-subscribe` — Start receiving notifications',
+        text: '*Examples:*\n• `/conf-upcoming` - See next 5 deadlines\n• `/conf-search CVPR` - Find CVPR conferences\n• `/conf-subject ML` - Filter by Machine Learning\n• `/conf-subscribe` - Start receiving notifications',
       },
     }
   );
@@ -491,7 +491,7 @@ export function buildUserDeadlineNotification(
 
 /**
  * Build a notification listing conferences whose event start is approaching.
- * Distinct from deadline reminders — this is "the event itself is in N days".
+ * Distinct from deadline reminders - this is "the event itself is in N days".
  */
 export function buildEventStartNotification(
   events: Array<{ conference: Conference; start: { toFormat: (fmt: string) => string }; daysLeft: number }>

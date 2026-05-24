@@ -50,7 +50,7 @@ async function handleSlackEvent(
       }
     }
 
-    // Workspace uninstalled the app — purge tokens and subscriptions
+    // Workspace uninstalled the app - purge tokens and subscriptions
     if (payload.event.type === 'app_uninstalled' || payload.event.type === 'tokens_revoked') {
       await handleAppUninstalled(teamId || payload.team_id);
     }
@@ -199,7 +199,7 @@ async function handleAppUninstalled(teamId: string | undefined): Promise<void> {
     return;
   }
   try {
-    logger.info('App uninstalled — cleaning up team data', { teamId });
+    logger.info('App uninstalled - cleaning up team data', { teamId });
     await unsubscribeTeamChannels(teamId);
     await removeTeamData(teamId);
     clearTeamClient(teamId);

@@ -1,119 +1,84 @@
 # Conference Deadlines
 
-A website for tracking research conference deadlines and important dates. Built with Next.js and designed for the academic community.
+A site for tracking research conference deadlines. Built with Next.js.
 
-A project by [Omar Ziyad Azgaoui](https://github.com/AZOGOAT) from [LiGHT Lab](https://github.com/EPFLiGHT)
+Made by [Omar Ziyad Azgaoui](https://github.com/AZOGOAT) at [LiGHT Lab](https://github.com/EPFLiGHT).
 
-## Features
+## What it does
 
-- 📅 Interactive calendar with multiple views
-- ⏱️ Live countdown timers with timezone awareness
-- 🔍 Search and filtering by year, subject, and type
-- 📥 Export events to your calendar (ICS format)
-- 🤖 Slack bot for deadline notifications
+- Calendar with multiple views
+- Countdown timers (timezone-aware)
+- Search and filter by year, subject, type
+- ICS export
+- Slack bot for deadline reminders
 
-## Quick Start
+## Running it
 
-We use **pnpm** for package management.
+The project uses pnpm.
 
 ```bash
-# Install pnpm globally (if not already installed)
-npm install -g pnpm
-
-# Install dependencies
 pnpm install
-
-# Start development server
-pnpm dev
-
-# Validate YAML data
-pnpm validate
-
-# Build for production
-pnpm build
+pnpm dev        # dev server
+pnpm validate   # check the YAML data
+pnpm build      # production build
 ```
 
-## Conference Data
+## Conference data
 
-Conference information is stored in three YAML files:
-- `public/data/conferences.yaml` - Academic conferences
-- `public/data/summits.yaml` - Industry summits
-- `public/data/workshops.yaml` - Workshops and smaller events
+All conferences live in three YAML files under `public/data/`:
 
-### Basic Schema
+- `conferences.yaml`: academic conferences
+- `summits.yaml`: industry summits
+- `workshops.yaml`: workshops and smaller events
+
+### Schema
 
 ```yaml
-- title: ShortName              # e.g., NeurIPS, CVPR
+- title: ShortName              # e.g. NeurIPS, CVPR
   year: 2025
   id: shortname25               # lowercase title + 2-digit year
   full_name: Full Conference Name
   link: https://conference-website.com
   deadline: 2025-05-21 20:00    # YYYY-MM-DD HH:MM
-  abstract_deadline: 2025-05-14 20:00  # Optional
+  abstract_deadline: 2025-05-14 20:00  # optional
   timezone: America/Los_Angeles # IANA timezone
   place: City, Country
   date: May 21-25, 2025
-  start: 2025-05-21             # YYYY-MM-DD
+  start: 2025-05-21
   end: 2025-05-25
-  paperslink: https://...       # Link to submit papers
-  hindex: 150.0                 # h5-index from Google Scholar
-  sub: ML                       # Subject tag
-  note: Additional information  # Optional notes
-  type: conference              # conference, summit, or workshop
+  paperslink: https://...
+  hindex: 150.0                 # Google Scholar h5-index
+  sub: ML                       # subject tag
+  note: Additional information  # optional
+  type: conference              # conference | summit | workshop
 ```
 
-### Required Fields
-- `title`, `year`, `id`, `type`, `timezone`
+Only `title`, `year`, `id`, `type`, and `timezone` are required. Missing fields show as "TBA".
 
-All other fields are optional and will display as "TBA" if omitted.
+See the [list of IANA timezones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
-**Note:** Find valid IANA timezones [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
+## Stack
 
-## Tech Stack
+Next.js 16, React 19, Chakra UI v3, FullCalendar, Luxon, js-yaml. Deployed to GitHub Pages (static site) with API routes on Vercel. Vercel KV (Redis) backs the Slack bot.
 
-- **Framework:** Next.js 16 + React 19
-- **UI Library:** Chakra UI v3
-- **Icons:** Lucide React
-- **Calendar:** FullCalendar
-- **Timezone:** Luxon
-- **YAML Parsing:** js-yaml
-- **Package Manager:** pnpm
-- **Deployment:** Github Page + Vercel (API calls)
-- **Database:** Vercel KV (Redis) for Slack bot
-- **Integrations:** Slack API
+## Slack bot
 
-## Slack Bot
-
-Get conference deadline notifications directly in Slack. See [SLACK_BOT_README.md](SLACK_BOT_README.md) for setup instructions.
+See [SLACK_BOT_README.md](SLACK_BOT_README.md).
 
 ## Contributing
 
-### Adding Conferences
+To add a conference, either [open an issue](https://github.com/EPFLiGHT/Conferences-Calendar/issues/new/choose) with the details, or send a PR:
 
-**Option 1: Submit an Issue**
-[Open an issue](https://github.com/EPFLiGHT/Conferences-Calendar/issues/new/choose) with conference details.
+1. Edit the right YAML file in `public/data/`
+2. Run `pnpm validate`
+3. Open a PR
 
-**Option 2: Pull Request**
-1. Fork and create a new branch
-2. Edit the appropriate YAML file (`conferences.yaml`, `summits.yaml`, or `workshops.yaml`)
-3. Run `pnpm validate`
-4. Submit PR
-
-### Guidelines
-- Only modify YAML files in `public/data/`
-- Include all required fields
-- Use valid IANA timezones
-- Follow ID naming: lowercase title + 2-digit year (e.g., `neurips25`)
+Keep IDs lowercase (title + 2-digit year, e.g. `neurips25`) and use a valid IANA timezone.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT: see [LICENSE](LICENSE).
 
-## Maintainer
+## Contact
 
-Maintained by [Omar Ziyad Azgaoui](https://github.com/AZOGOAT)
-Contact: [omar.azgaoui@epfl.ch](mailto:omar.azgaoui@epfl.ch)
-
----
-
-Made with ❤️ by [LiGHT Lab](https://github.com/EPFLiGHT)
+[omar.azgaoui@epfl.ch](mailto:omar.azgaoui@epfl.ch)
