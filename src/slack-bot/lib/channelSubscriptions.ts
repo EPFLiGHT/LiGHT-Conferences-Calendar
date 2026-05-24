@@ -7,9 +7,9 @@
 import { kv } from '@vercel/kv';
 import type { ChannelSubscription } from '@/types/slack';
 import { logger } from '../utils/logger';
+import { kvKeys } from './kvKeys';
 
-const CHANNEL_KEY_PREFIX = 'channel:';
-const CHANNELS_LIST_KEY = 'channels:all';
+const CHANNELS_LIST_KEY = kvKeys.idx.channel;
 
 /**
  * Get channel subscription info
@@ -18,7 +18,7 @@ export async function getChannelSubscription(
   channelId: string
 ): Promise<ChannelSubscription | null> {
   try {
-    const key = `${CHANNEL_KEY_PREFIX}${channelId}`;
+    const key = kvKeys.channel.record(channelId);
     const subscription = await kv.get<ChannelSubscription>(key);
     return subscription;
   } catch (error) {
@@ -37,7 +37,7 @@ export async function subscribeChannel(
   addedBy?: string
 ): Promise<ChannelSubscription> {
   try {
-    const key = `${CHANNEL_KEY_PREFIX}${channelId}`;
+    const key = kvKeys.channel.record(channelId);
     const now = new Date().toISOString();
 
     const subscription: ChannelSubscription = {
@@ -68,7 +68,7 @@ export async function subscribeChannel(
  */
 export async function unsubscribeChannel(channelId: string): Promise<void> {
   try {
-    const key = `${CHANNEL_KEY_PREFIX}${channelId}`;
+    const key = kvKeys.channel.record(channelId);
     await kv.del(key);
     await kv.srem(CHANNELS_LIST_KEY, channelId);
     logger.info('Channel unsubscribed', { channelId });
@@ -91,7 +91,7 @@ export async function updateChannelLastPosted(
       return;
     }
 
-    const key = `${CHANNEL_KEY_PREFIX}${channelId}`;
+    const key = kvKeys.channel.record(channelId);
     subscription.lastPostedAt = new Date().toISOString();
     await kv.set(key, subscription);
   } catch (error) {
@@ -112,8 +112,7 @@ export async function getAllActiveChannels(): Promise<ChannelSubscription[]> {
 
     const channels = await Promise.all(
       channelIds.map(async (channelId: string) => {
-        const key = `${CHANNEL_KEY_PREFIX}${channelId}`;
-        return kv.get<ChannelSubscription>(key);
+        return kv.get<ChannelSubscription>(kvKeys.channel.record(channelId));
       })
     );
 

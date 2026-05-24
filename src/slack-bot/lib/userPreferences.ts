@@ -8,9 +8,9 @@ import { kv } from '@vercel/kv';
 import type { UserPreferences } from '@/types/slack';
 import { logger } from '../utils/logger';
 import { NOTIFICATION_CONFIG } from '../config/constants';
+import { kvKeys } from './kvKeys';
 
-const USER_KEY_PREFIX = 'user:';
-const USERS_LIST_KEY = 'users:all';
+const USERS_LIST_KEY = kvKeys.idx.user;
 
 /**
  * Get user preferences
@@ -19,7 +19,7 @@ export async function getUserPreferences(
   userId: string
 ): Promise<UserPreferences | null> {
   try {
-    const key = `${USER_KEY_PREFIX}${userId}`;
+    const key = kvKeys.user.record(userId);
     const prefs = await kv.get<UserPreferences>(key);
     return prefs;
   } catch (error) {
@@ -53,7 +53,7 @@ export async function updateUserPreferences(
   updates: Partial<Omit<UserPreferences, 'slackUserId' | 'createdAt'>>
 ): Promise<UserPreferences> {
   try {
-    const key = `${USER_KEY_PREFIX}${userId}`;
+    const key = kvKeys.user.record(userId);
     const existing = await getUserPreferences(userId);
 
     const prefs: UserPreferences = existing
@@ -155,8 +155,7 @@ export async function getAllUsersWithNotifications(): Promise<UserPreferences[]>
 
     const users = await Promise.all(
       userIds.map(async (userId: string) => {
-        const key = `${USER_KEY_PREFIX}${userId}`;
-        return kv.get<UserPreferences>(key);
+        return kv.get<UserPreferences>(kvKeys.user.record(userId));
       })
     );
 
@@ -175,7 +174,7 @@ export async function getAllUsersWithNotifications(): Promise<UserPreferences[]>
  */
 export async function deleteUserPreferences(userId: string): Promise<void> {
   try {
-    const key = `${USER_KEY_PREFIX}${userId}`;
+    const key = kvKeys.user.record(userId);
     await kv.del(key);
     await kv.srem(USERS_LIST_KEY, userId);
     logger.info('User preferences deleted', { userId });

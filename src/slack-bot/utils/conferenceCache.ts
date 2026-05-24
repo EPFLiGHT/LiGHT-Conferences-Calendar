@@ -8,9 +8,10 @@ import type { Conference } from '@/types/conference';
 import { parseConferences } from '@/utils/parser';
 import { logger } from './logger';
 import { NOTIFICATION_CONFIG } from '../config/constants';
+import { kvKeys } from '../lib/kvKeys';
 
-const CACHE_KEY = 'conferences:data';
-const CACHE_TIMESTAMP_KEY = 'conferences:timestamp';
+const CACHE_KEY = kvKeys.cache.conferences;
+const CACHE_TIMESTAMP_KEY = kvKeys.cache.conferencesTimestamp;
 
 /**
  * Fetch conferences from cache or parse from YAML
