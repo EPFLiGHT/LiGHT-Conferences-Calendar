@@ -250,7 +250,7 @@ export default function SlackInstallPage() {
                     whiteSpace="nowrap"
                     className="tabular"
                   >
-                    /conf {cmd}
+                    {cmd}
                   </Box>
                   <Text fontSize="sm" color="gray.600" flex="1" lineHeight="1.5">
                     {desc}
