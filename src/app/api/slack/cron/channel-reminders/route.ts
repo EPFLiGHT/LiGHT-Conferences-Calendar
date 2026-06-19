@@ -13,10 +13,7 @@ import { withSlackMiddleware, SlackRequestType } from '@/slack-bot/lib/middlewar
 import { getConferences } from '@/slack-bot/utils/conferenceCache';
 import { getDeadlinesWithinDays, getEventStartsOnDays } from '@/utils/conferenceQueries';
 import { postToChannel } from '@/slack-bot/lib/slackClient';
-import {
-  buildUserDeadlineNotification,
-  buildEventStartNotification,
-} from '@/slack-bot/lib/messageBuilder';
+import { buildChannelDigest } from '@/slack-bot/lib/messageBuilder';
 import {
   getAllActiveChannels,
   updateChannelLastPosted,
@@ -98,69 +95,11 @@ async function handleChannelReminders(): Promise<NextResponse> {
       });
     }
 
-    const headerDate = new Date().toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    const digest = buildChannelDigest({
+      deadlines: relevantDeadlines,
+      eventStarts: upcomingEventStarts,
+      date: new Date(),
     });
-
-    const blocks: any[] = [
-      {
-        type: 'header',
-        text: {
-          type: 'plain_text',
-          text: '📅 Conference Reminders',
-          emoji: true,
-        },
-      },
-      {
-        type: 'context',
-        elements: [
-          { type: 'mrkdwn', text: `Automated daily reminder • ${headerDate}` },
-        ],
-      },
-      { type: 'divider' },
-    ];
-
-    if (relevantDeadlines.length > 0) {
-      const deadlineMsg = buildUserDeadlineNotification(relevantDeadlines);
-      // Strip the inner builder's outer chrome:
-      //   first 3 blocks = header + intro + divider
-      //   last 2 blocks  = divider + DM-style footer (replaced with our own)
-      blocks.push(...deadlineMsg.blocks.slice(3, -2));
-    }
-
-    if (upcomingEventStarts.length > 0) {
-      if (relevantDeadlines.length > 0) {
-        blocks.push({ type: 'divider' });
-      }
-      const eventMsg = buildEventStartNotification(upcomingEventStarts);
-      // Keep the event-start builder's header + intro + items.
-      blocks.push(...eventMsg.blocks);
-    }
-
-    blocks.push(
-      { type: 'divider' },
-      {
-        type: 'context',
-        elements: [
-          {
-            type: 'mrkdwn',
-            text: `💡 Use \`/conf-info <conference-id>\` for more information or \`/conf-subscribe\` to receive personalized DM notifications.`,
-          },
-        ],
-      }
-    );
-
-    const parts: string[] = [];
-    if (relevantDeadlines.length > 0) {
-      parts.push(`${relevantDeadlines.length} upcoming ${relevantDeadlines.length === 1 ? 'deadline' : 'deadlines'}`);
-    }
-    if (upcomingEventStarts.length > 0) {
-      parts.push(`${upcomingEventStarts.length} ${upcomingEventStarts.length === 1 ? 'event' : 'events'} starting soon`);
-    }
-    const fallbackText = `Conference Reminder: ${parts.join(' • ')}`;
 
     // Post to all subscribed channels
     let successCount = 0;
@@ -171,8 +110,8 @@ async function handleChannelReminders(): Promise<NextResponse> {
       try {
         await postToChannel(
           channel.channelId,
-          blocks,
-          fallbackText,
+          digest.blocks,
+          digest.text ?? 'Conference Reminders',
           channel.teamId
         );
 

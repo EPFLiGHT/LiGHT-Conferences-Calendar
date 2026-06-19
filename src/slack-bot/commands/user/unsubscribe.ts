@@ -1,5 +1,5 @@
 /**
- * /conf unsubscribe command
+ * /conf-unsubscribe command
  * Disable deadline notifications for user
  */
 

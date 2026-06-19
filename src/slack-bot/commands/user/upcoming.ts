@@ -1,5 +1,5 @@
 /**
- * /conf upcoming command
+ * /conf-upcoming command
  * Shows the next 5 upcoming conference deadlines
  */
 

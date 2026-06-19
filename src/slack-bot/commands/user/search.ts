@@ -1,5 +1,5 @@
 /**
- * /conf search <query> command
+ * /conf-search <query> command
  * Search conferences by name
  */
 
@@ -33,7 +33,6 @@ export async function handleSearch(userId: string, query: string): Promise<Block
             },
           ],
           text: `No results found for: ${query}`,
-          response_type: 'in_channel',
         };
       }
 
@@ -53,7 +52,6 @@ export async function handleSearch(userId: string, query: string): Promise<Block
           { type: 'divider' },
           ...message.blocks.slice(1), // skip the default header
         ],
-        response_type: 'in_channel',
       };
     },
     'Failed to search conferences. Please try again later.',

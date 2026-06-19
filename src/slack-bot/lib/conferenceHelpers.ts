@@ -6,9 +6,9 @@
 import type { Conference } from '@/types/conference';
 import type { BlockKitMessage } from '@/types/slack';
 import { getConferences } from '../utils/conferenceCache';
-import { getUpcomingDeadlines } from '@/utils/conferenceQueries';
+import { getUpcomingDeadlines, getUpcomingEvents, getDaysUntilDeadline } from '@/utils/conferenceQueries';
 import { getNextDeadline } from '@/utils/parser';
-import { buildConferenceCard, buildErrorMessage, buildDeadlineList } from './messageBuilder';
+import { buildConferenceItemBlocks, buildErrorMessage, buildChannelDigest } from './messageBuilder';
 
 /**
  * Get conference details by ID and build a card message
@@ -60,6 +60,15 @@ export function buildConferenceDetailsCard(
 ): BlockKitMessage {
   const deadline = getNextDeadline(conference);
 
+  // Extra detail shown beneath the unified card: full name, location, and note.
+  const detail: string[] = [conference.full_name];
+  if (conference.place) detail.push(`📍 ${conference.place}`);
+  if (conference.note) detail.push(`ℹ️ ${conference.note}`);
+  const detailBlock: any = {
+    type: 'context',
+    elements: [{ type: 'mrkdwn', text: detail.join('  ·  ') }],
+  };
+
   if (!deadline) {
     return {
       blocks: [
@@ -67,30 +76,52 @@ export function buildConferenceDetailsCard(
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `📅 *${conference.title} ${conference.year}*\n\n${conference.full_name}\n\n❌ No upcoming deadlines available for this conference.`,
+            text: `📅 *${conference.title} ${conference.year}*\n_No upcoming deadline announced yet._`,
           },
         },
+        detailBlock,
       ],
       text: `${conference.title} ${conference.year} - No deadlines`,
     };
   }
 
-  return buildConferenceCard(conference, deadline);
+  return {
+    blocks: [
+      ...buildConferenceItemBlocks({
+        kind: 'deadline',
+        conference,
+        deadline,
+        daysLeft: getDaysUntilDeadline(deadline),
+      }),
+      detailBlock,
+    ],
+    text: `${conference.title} ${conference.year} - ${deadline.label}`,
+  };
 }
 
 /**
- * Get upcoming conference deadlines
- * Shared function used by both /conf-upcoming command and channel reminders cron
+ * Build the /conf-upcoming message: the next `count` submission deadlines AND
+ * the next `count` conferences whose event start is approaching, rendered with
+ * the same unified digest layout used for the daily channel post.
  */
 export async function getUpcomingConferencesMessage(
   count: number = 5
 ): Promise<BlockKitMessage> {
   const conferences = await getConferences();
-  const upcoming = getUpcomingDeadlines(conferences, count);
-  const message = buildDeadlineList(upcoming);
 
-  return {
-    ...message,
-    response_type: 'in_channel',
-  };
+  const deadlines = getUpcomingDeadlines(conferences, count).map(
+    ({ conference, deadline }) => ({
+      conference,
+      deadline,
+      daysLeft: getDaysUntilDeadline(deadline),
+    })
+  );
+  const eventStarts = getUpcomingEvents(conferences, count);
+
+  return buildChannelDigest({
+    deadlines,
+    eventStarts,
+    date: new Date(),
+    maxItems: count,
+  });
 }

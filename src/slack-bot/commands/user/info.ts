@@ -1,5 +1,5 @@
 /**
- * /conf info <conference-id> command
+ * /conf-info <conference-id> command
  * Get detailed information about a specific conference
  */
 

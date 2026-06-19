@@ -1,5 +1,5 @@
 /**
- * /conf settings command
+ * /conf-settings command
  * View and manage notification preferences
  */
 

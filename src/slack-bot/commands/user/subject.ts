@@ -1,5 +1,5 @@
 /**
- * /conf subject <code> command
+ * /conf-subject <code> command
  * Filter conferences by subject (ML, CV, NLP, SEC, etc.)
  */
 
@@ -27,7 +27,6 @@ export async function handleSubject(userId: string, subjectCode: string): Promis
         },
       ],
       text: 'Please specify a subject code',
-      response_type: 'in_channel',
     };
   }
 
@@ -52,7 +51,6 @@ export async function handleSubject(userId: string, subjectCode: string): Promis
             },
           ],
           text: `No conferences found for subject: ${subject}`,
-          response_type: 'in_channel',
         };
       }
 
@@ -73,7 +71,6 @@ export async function handleSubject(userId: string, subjectCode: string): Promis
           { type: 'divider' },
           ...message.blocks.slice(1),
         ],
-        response_type: 'in_channel',
       };
     },
     'Failed to filter conferences. Please try again later.',

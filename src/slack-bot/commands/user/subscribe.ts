@@ -1,5 +1,5 @@
 /**
- * /conf subscribe command
+ * /conf-subscribe command
  * Enable deadline notifications for user
  */
 

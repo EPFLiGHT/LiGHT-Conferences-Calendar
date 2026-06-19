@@ -1,5 +1,5 @@
 /**
- * /conf help command
+ * /conf-help command
  * Show all available commands
  */
 

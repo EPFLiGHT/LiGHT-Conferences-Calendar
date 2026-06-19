@@ -8,7 +8,9 @@
     "build": "next build",
     "build:vercel": "cp next.config.vercel.mjs next.config.mjs && next build",
     "start": "next start",
-    "validate": "node scripts/validate.js"
+    "validate": "node scripts/validate.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.0.0-next.32",
@@ -37,6 +39,7 @@
     "@types/node": "^24.6.2",
     "@types/react": "^18.3.25",
     "@types/react-dom": "^18.3.7",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.9"
   }
 }

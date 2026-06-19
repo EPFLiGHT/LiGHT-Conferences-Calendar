@@ -64,6 +64,34 @@ export function getUpcomingDeadlines(
 }
 
 /**
+ * Get conferences whose event start date is today or in the future.
+ * Sorted by soonest start, optionally limited. Mirrors getUpcomingDeadlines
+ * but for the event start (conf.start) rather than the submission deadline.
+ */
+export function getUpcomingEvents(
+  conferences: Conference[],
+  limit?: number
+): Array<{ conference: Conference; start: DateTime; daysLeft: number }> {
+  const today = DateTime.now().startOf('day');
+
+  const upcoming = conferences
+    .map(conf => {
+      if (!conf.start) return null;
+      const start = DateTime.fromISO(conf.start, { zone: conf.timezone || 'utc' });
+      if (!start.isValid) return null;
+      const daysLeft = Math.ceil(start.startOf('day').diff(today, 'days').days);
+      if (daysLeft < 0) return null;
+      return { conference: conf, start, daysLeft };
+    })
+    .filter((item): item is { conference: Conference; start: DateTime; daysLeft: number } =>
+      item !== null
+    )
+    .sort((a, b) => a.start.toMillis() - b.start.toMillis());
+
+  return limit ? upcoming.slice(0, limit) : upcoming;
+}
+
+/**
  * Calculate days until deadline
  * Returns positive number for future deadlines, negative for past
  */

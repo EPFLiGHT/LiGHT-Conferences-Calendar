@@ -7,131 +7,69 @@ import type { Conference, DeadlineInfo } from '@/types/conference';
 import type { BlockKitMessage, UserPreferences } from '@/types/slack';
 import { getDaysUntilDeadline } from '@/utils/conferenceQueries';
 import { SUBJECT_LABELS, SUBJECT_EMOJIS } from '@/constants/subjects';
+import { DateTime } from 'luxon';
 import {
   URGENCY_EMOJIS,
   URGENCY_CONFIG,
   COMMAND_DESCRIPTIONS,
+  NOTIFICATION_CONFIG,
 } from '../config/constants';
 
+export type ConferenceCardItem =
+  | { kind: 'deadline'; conference: Conference; deadline: DeadlineInfo; daysLeft: number }
+  | { kind: 'event'; conference: Conference; start: DateTime; daysLeft: number };
+
 /**
- * Build a conference card with deadline information
+ * Single source of truth for a conference "card". Used by channel digests and DMs
+ * so the layout can never drift between them.
  */
-export function buildConferenceCard(
-  conference: Conference,
-  deadline: DeadlineInfo
-): BlockKitMessage {
-  const daysLeft = getDaysUntilDeadline(deadline);
-  const urgencyEmoji = getUrgencyEmoji(daysLeft);
+export function buildConferenceItemBlocks(item: ConferenceCardItem): any[] {
+  const { conference } = item;
+  const urgencyEmoji = getUrgencyEmoji(item.daysLeft);
   const subjects = Array.isArray(conference.sub) ? conference.sub : [conference.sub];
-  const subjectText = subjects
+  const subjectTag = subjects
     .map((s) => `${SUBJECT_EMOJIS[s] || '📌'} ${SUBJECT_LABELS[s] || s}`)
     .join(', ');
 
-  const blocks: any[] = [
-    {
-      type: 'header',
-      text: {
-        type: 'plain_text',
-        text: `${urgencyEmoji} ${conference.title} ${conference.year}`,
-        emoji: true,
-      },
-    },
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `*${conference.full_name}*${formatTypeTag(conference.type)}\n📍 ${conference.place}\n📆 ${conference.date}`,
-      },
-    },
-    {
-      type: 'section',
-      fields: [
-        {
-          type: 'mrkdwn',
-          text: `*${deadline.label}*\n${deadline.localDatetime.toFormat(
-            'MMM dd, yyyy HH:mm'
-          )} (${deadline.datetime.zoneName})`,
-        },
-        {
-          type: 'mrkdwn',
-          text: `*Time Remaining*\n⏰ ${formatTimeRemaining(daysLeft)}`,
-        },
-        {
-          type: 'mrkdwn',
-          text: `*Subject(s)*\n${subjectText}`,
-        },
-        ...(conference.hindex
-          ? [
-              {
-                type: 'mrkdwn',
-                text: `*H-Index*\n📊 ${conference.hindex}`,
-              },
-            ]
-          : []),
-      ],
-    },
-  ];
+  const lines: string[] = [`${urgencyEmoji} *${conference.title} ${conference.year}*  ${subjectTag}`];
 
-  if (conference.note) {
-    blocks.push({
-      type: 'context',
-      elements: [
-        {
-          type: 'mrkdwn',
-          text: `ℹ️ ${conference.note}`,
-        },
-      ],
-    });
+  if (item.kind === 'deadline') {
+    lines.push(`📝 ${item.deadline.label}: *${item.deadline.localDatetime.toFormat('MMM d, yyyy')}*`);
+    lines.push(`⏰ ${formatDeadlineUrgency(item.daysLeft)}`);
+  } else {
+    if (conference.place) lines.push(`📍 ${conference.place}`);
+    lines.push(`📆 Starts *${item.start.toFormat('MMM d, yyyy')}* · ${formatEventCountdown(item.daysLeft)}`);
   }
 
-  const actionElements: any[] = [];
+  const blocks: any[] = [
+    { type: 'section', text: { type: 'mrkdwn', text: lines.join('\n') } },
+  ];
 
+  const actionElements: any[] = [];
   if (conference.link) {
     actionElements.push({
       type: 'button',
-      text: {
-        type: 'plain_text',
-        text: '🌐 View Website',
-        emoji: true,
-      },
+      text: { type: 'plain_text', text: '🌐 Website', emoji: true },
       url: conference.link,
+      style: 'primary',
     });
   }
-
   actionElements.push({
     type: 'button',
-    text: {
-      type: 'plain_text',
-      text: '📅 Add to Calendar',
-      emoji: true,
-    },
+    text: { type: 'plain_text', text: '📅 Add to Calendar', emoji: true },
     action_id: `calendar_${conference.id}`,
     value: conference.id,
   });
-
   if (conference.paperslink) {
     actionElements.push({
       type: 'button',
-      text: {
-        type: 'plain_text',
-        text: '📄 Papers',
-        emoji: true,
-      },
+      text: { type: 'plain_text', text: '📄 Papers', emoji: true },
       url: conference.paperslink,
     });
   }
+  blocks.push({ type: 'actions', elements: actionElements });
 
-  if (actionElements.length > 0) {
-    blocks.push({
-      type: 'actions',
-      elements: actionElements,
-    });
-  }
-
-  return {
-    blocks,
-    text: `${conference.title} ${conference.year} - ${deadline.label}: ${daysLeft} days left`,
-  };
+  return blocks;
 }
 
 /**
@@ -164,28 +102,14 @@ export function buildDeadlineList(
   }
 
   deadlines.forEach(({ conference, deadline }, index) => {
-    const daysLeft = getDaysUntilDeadline(deadline);
-    const urgencyEmoji = getUrgencyEmoji(daysLeft);
-    const subjects = Array.isArray(conference.sub) ? conference.sub : [conference.sub];
-    const subjectEmojis = subjects.map((s) => SUBJECT_EMOJIS[s] || '📌').join(' ');
-
-    blocks.push({
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `${urgencyEmoji} *${conference.title} ${conference.year}*${formatTypeTag(conference.type)} ${subjectEmojis}\n${deadline.label}: ${deadline.localDatetime.toFormat('MMM dd, HH:mm')} • ⏰ ${formatTimeRemaining(daysLeft)}`,
-      },
-      accessory: {
-        type: 'button',
-        text: {
-          type: 'plain_text',
-          text: 'Details',
-          emoji: true,
-        },
-        action_id: `details_${conference.id}`,
-        value: conference.id,
-      },
-    });
+    blocks.push(
+      ...buildConferenceItemBlocks({
+        kind: 'deadline',
+        conference,
+        deadline,
+        daysLeft: getDaysUntilDeadline(deadline),
+      })
+    );
 
     if (index < deadlines.length - 1) {
       blocks.push({ type: 'divider' });
@@ -364,18 +288,6 @@ export function buildSuccessMessage(message: string): BlockKitMessage {
 }
 
 /**
- * Render an event-type tag (e.g. " · _workshop_") for non-conference items.
- * Returns empty string for plain conferences to keep their lines uncluttered.
- */
-function formatTypeTag(type: string | undefined): string {
-  if (!type) return '';
-  const t = type.toLowerCase();
-  if (t === 'workshop') return ' · 🛠️ _workshop_';
-  if (t === 'summit') return ' · 🏛️ _summit_';
-  return '';
-}
-
-/**
  * Get urgency emoji based on days left
  */
 function getUrgencyEmoji(daysLeft: number): string {
@@ -393,99 +305,36 @@ export function buildUserDeadlineNotification(
   deadlines: Array<{ conference: Conference; deadline: DeadlineInfo }>
 ): BlockKitMessage {
   const blocks: any[] = [
-    {
-      type: 'header',
-      text: {
-        type: 'plain_text',
-        text: '🔔 Deadline Reminder',
-        emoji: true,
-      },
-    },
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `You have *${deadlines.length}* upcoming conference ${
-          deadlines.length === 1 ? 'deadline' : 'deadlines'
-        }:`,
-      },
-    },
+    { type: 'header', text: { type: 'plain_text', text: '🔔 Your deadline reminder', emoji: true } },
+    { type: 'context', elements: [{ type: 'mrkdwn', text: 'You asked to be reminded about these' }] },
     { type: 'divider' },
   ];
 
   deadlines.forEach(({ conference, deadline }, index) => {
-    const daysLeft = getDaysUntilDeadline(deadline);
-    const urgencyEmoji = getUrgencyEmoji(daysLeft);
-    const subjects = Array.isArray(conference.sub) ? conference.sub : [conference.sub];
-    const subjectEmojis = subjects.map((s) => SUBJECT_EMOJIS[s] || '📌').join(' ');
-
-    blocks.push({
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `${urgencyEmoji} *${conference.title} ${conference.year}*${formatTypeTag(conference.type)} ${subjectEmojis}\n` +
-              `${deadline.label}: ${deadline.localDatetime.toFormat('MMM dd, HH:mm')} (${deadline.datetime.zoneName})\n` +
-              `⏰ ${formatTimeRemaining(daysLeft)} remaining`,
-      },
-    });
-
-    // Add action buttons for each conference
-    const actionElements: any[] = [];
-
-    if (conference.link) {
-      actionElements.push({
-        type: 'button',
-        text: {
-          type: 'plain_text',
-          text: '🌐 View Website',
-          emoji: true,
-        },
-        url: conference.link,
-      });
-    }
-
-    actionElements.push({
-      type: 'button',
-      text: {
-        type: 'plain_text',
-        text: '📅 Add to Calendar',
-        emoji: true,
-      },
-      action_id: `calendar_${conference.id}`,
-      value: conference.id,
-    });
-
-    if (actionElements.length > 0) {
-      blocks.push({
-        type: 'actions',
-        elements: actionElements,
-      });
-    }
-
-    if (index < deadlines.length - 1) {
-      blocks.push({ type: 'divider' });
-    }
+    blocks.push(
+      ...buildConferenceItemBlocks({
+        kind: 'deadline',
+        conference,
+        deadline,
+        daysLeft: getDaysUntilDeadline(deadline),
+      })
+    );
+    if (index < deadlines.length - 1) blocks.push({ type: 'divider' });
   });
 
-  // Add footer with helpful info
   blocks.push(
     { type: 'divider' },
     {
       type: 'context',
       elements: [
-        {
-          type: 'mrkdwn',
-          text: `💡 Use \`/conf-settings\` to manage your notification preferences or \`/conf-unsubscribe\` to stop receiving these reminders.`,
-        },
+        { type: 'mrkdwn', text: '💡 Manage these with `/conf-settings` · stop with `/conf-unsubscribe`' },
       ],
     }
   );
 
   return {
     blocks,
-    text: `Deadline Reminder: ${deadlines.length} upcoming ${
-      deadlines.length === 1 ? 'deadline' : 'deadlines'
-    }`,
+    text: `Deadline reminder: ${deadlines.length} ${deadlines.length === 1 ? 'deadline' : 'deadlines'}`,
   };
 }
 
@@ -494,17 +343,10 @@ export function buildUserDeadlineNotification(
  * Distinct from deadline reminders - this is "the event itself is in N days".
  */
 export function buildEventStartNotification(
-  events: Array<{ conference: Conference; start: { toFormat: (fmt: string) => string }; daysLeft: number }>
+  events: Array<{ conference: Conference; start: DateTime; daysLeft: number }>
 ): BlockKitMessage {
   const blocks: any[] = [
-    {
-      type: 'header',
-      text: {
-        type: 'plain_text',
-        text: '🎟️ Conferences Starting Soon',
-        emoji: true,
-      },
-    },
+    { type: 'header', text: { type: 'plain_text', text: '🎟️ Conferences Starting Soon', emoji: true } },
     {
       type: 'section',
       text: {
@@ -516,33 +358,8 @@ export function buildEventStartNotification(
   ];
 
   events.forEach(({ conference, start, daysLeft }, index) => {
-    const subjects = Array.isArray(conference.sub) ? conference.sub : [conference.sub];
-    const subjectEmojis = subjects.map((s) => SUBJECT_EMOJIS[s] || '📌').join(' ');
-    const urgencyEmoji = getUrgencyEmoji(daysLeft);
-
-    blocks.push({
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text:
-          `${urgencyEmoji} *${conference.title} ${conference.year}*${formatTypeTag(conference.type)} ${subjectEmojis}\n` +
-          `📍 ${conference.place}\n` +
-          `📆 Starts ${start.toFormat('MMM dd, yyyy')} • ⏰ ${formatTimeRemaining(daysLeft)}`,
-      },
-      ...(conference.link
-        ? {
-            accessory: {
-              type: 'button',
-              text: { type: 'plain_text', text: 'Website', emoji: true },
-              url: conference.link,
-            },
-          }
-        : {}),
-    });
-
-    if (index < events.length - 1) {
-      blocks.push({ type: 'divider' });
-    }
+    blocks.push(...buildConferenceItemBlocks({ kind: 'event', conference, start, daysLeft }));
+    if (index < events.length - 1) blocks.push({ type: 'divider' });
   });
 
   return {
@@ -565,4 +382,95 @@ function formatTimeRemaining(days: number): string {
   }
   const months = Math.floor(days / 30);
   return months === 1 ? '1 month' : `${months} months`;
+}
+
+/**
+ * Urgency text for a deadline, in plain language. Built on formatTimeRemaining.
+ */
+export function formatDeadlineUrgency(daysLeft: number): string {
+  if (daysLeft < 0) return 'Expired';
+  if (daysLeft === 0) return 'Due today!';
+  return `${formatTimeRemaining(daysLeft)} left`;
+}
+
+/**
+ * Countdown text for an event start, in plain language.
+ */
+export function formatEventCountdown(daysLeft: number): string {
+  if (daysLeft <= 0) return 'starting today';
+  return `in ${formatTimeRemaining(daysLeft)}`;
+}
+
+/**
+ * Owns the entire daily channel post: unified title, two optional sections built
+ * from the shared card, overflow handling, and a single footer.
+ */
+export function buildChannelDigest(params: {
+  deadlines: Array<{ conference: Conference; deadline: DeadlineInfo; daysLeft: number }>;
+  eventStarts: Array<{ conference: Conference; start: DateTime; daysLeft: number }>;
+  date: Date;
+  maxItems?: number;
+}): BlockKitMessage {
+  const { deadlines, eventStarts, date } = params;
+  const maxItems = params.maxItems ?? NOTIFICATION_CONFIG.MAX_CONFERENCES_PER_MESSAGE;
+
+  const headerDate = date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
+  const blocks: any[] = [
+    { type: 'header', text: { type: 'plain_text', text: '📅 Conference Update', emoji: true } },
+    { type: 'context', elements: [{ type: 'mrkdwn', text: headerDate }] },
+    { type: 'divider' },
+  ];
+
+  const overflowLine = (extra: number) => ({
+    type: 'context',
+    elements: [
+      { type: 'mrkdwn', text: `_+ ${extra} more — type \`/conf-upcoming\` to see them all_` },
+    ],
+  });
+
+  if (deadlines.length > 0) {
+    blocks.push({ type: 'section', text: { type: 'mrkdwn', text: '*🔴 Deadlines approaching*' } });
+    const shown = deadlines.slice(0, maxItems);
+    shown.forEach(({ conference, deadline, daysLeft }, i) => {
+      blocks.push(...buildConferenceItemBlocks({ kind: 'deadline', conference, deadline, daysLeft }));
+      if (i < shown.length - 1) blocks.push({ type: 'divider' });
+    });
+    if (deadlines.length > maxItems) blocks.push(overflowLine(deadlines.length - maxItems));
+  }
+
+  if (eventStarts.length > 0) {
+    if (deadlines.length > 0) blocks.push({ type: 'divider' });
+    blocks.push({ type: 'section', text: { type: 'mrkdwn', text: '*🎟️ Starting soon*' } });
+    const shown = eventStarts.slice(0, maxItems);
+    shown.forEach(({ conference, start, daysLeft }, i) => {
+      blocks.push(...buildConferenceItemBlocks({ kind: 'event', conference, start, daysLeft }));
+      if (i < shown.length - 1) blocks.push({ type: 'divider' });
+    });
+    if (eventStarts.length > maxItems) blocks.push(overflowLine(eventStarts.length - maxItems));
+  }
+
+  blocks.push(
+    { type: 'divider' },
+    {
+      type: 'context',
+      elements: [
+        {
+          type: 'mrkdwn',
+          text: '💡 New here? Type `/conf-help`. Want reminders in your DMs? `/conf-subscribe`',
+        },
+      ],
+    }
+  );
+
+  const parts: string[] = [];
+  if (deadlines.length > 0) parts.push(`${deadlines.length} ${deadlines.length === 1 ? 'deadline' : 'deadlines'}`);
+  if (eventStarts.length > 0) parts.push(`${eventStarts.length} ${eventStarts.length === 1 ? 'event' : 'events'} starting soon`);
+
+  return { blocks, text: `Conference Update: ${parts.join(' • ')}` };
 }

@@ -240,14 +240,14 @@ export default function PrivacyPolicyPage() {
             <Bullet>
               Access your stored preferences using{' '}
               <Text as="code" px="2" py="0.5" fontSize="xs" fontFamily="ui-monospace, SFMono-Regular, monospace" color="brand.500" border="1px solid" borderColor="rgba(46, 95, 168, 0.3)" borderRadius="3px" className="tabular">
-                /conf settings
+                /conf-settings
               </Text>
             </Bullet>
             <Bullet>Modify your notification preferences at any time</Bullet>
             <Bullet>
               Unsubscribe from notifications using{' '}
               <Text as="code" px="2" py="0.5" fontSize="xs" fontFamily="ui-monospace, SFMono-Regular, monospace" color="brand.500" border="1px solid" borderColor="rgba(46, 95, 168, 0.3)" borderRadius="3px" className="tabular">
-                /conf unsubscribe
+                /conf-unsubscribe
               </Text>
             </Bullet>
             <Bullet>Request deletion of your data by uninstalling the bot from your workspace</Bullet>

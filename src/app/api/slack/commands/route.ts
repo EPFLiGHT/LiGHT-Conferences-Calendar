@@ -61,7 +61,10 @@ async function handleSlashCommand(
 
   try {
     const result = await handler(userId, text, teamId);
-    return NextResponse.json(result);
+    return NextResponse.json({
+      ...(result as Record<string, unknown>),
+      response_type: 'ephemeral',
+    });
   } catch (error) {
     console.error(`Error handling command ${command}:`, error);
 

@@ -86,16 +86,16 @@ After the first deploy, update the request URLs in the Slack app config to point
 
 ## Commands
 
-- `/conf upcoming`: next 5 deadlines
-- `/conf search <query>`: search by name (e.g. `/conf search CVPR`)
-- `/conf subject <code>`: filter by subject (e.g. `/conf subject ML`)
-- `/conf info <id>`: details for one conference
-- `/conf subscribe`: turn reminders on
-- `/conf unsubscribe`: turn them off
-- `/conf settings`: change preferences
-- `/conf help`: list commands
+- `/conf-upcoming`: next 5 deadlines
+- `/conf-search <query>`: search by name (e.g. `/conf-search CVPR`)
+- `/conf-subject <code>`: filter by subject (e.g. `/conf-subject ML`)
+- `/conf-info <id>`: details for one conference
+- `/conf-subscribe`: turn reminders on
+- `/conf-unsubscribe`: turn them off
+- `/conf-settings`: change preferences
+- `/conf-help`: list commands
 
-Subject codes include ML, CV, NLP, SEC, DM, HCI, RO, PRIV, and more. Run `/conf subject` with no argument to see all of them.
+Subject codes include ML, CV, NLP, SEC, DM, HCI, RO, PRIV, and more. Run `/conf-subject` with no argument to see all of them.
 
 ## Reminders
 
