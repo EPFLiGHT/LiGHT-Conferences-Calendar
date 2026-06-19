@@ -263,3 +263,148 @@
   paperslink: "https://2026.appliedmldays.org/media-90-posters"
   sub: ML
   type: summit
+
+- title: Africa Health ExCon
+  year: 2026
+  id: ahexcon26
+  full_name: 5th Africa Health ExCon
+  link: https://www.africahealthexcon.com/
+  timezone: Africa/Cairo
+  place: "Egypt International Exhibition Center (EIEC), Cairo, Egypt"
+  date: "June 15-18, 2026"
+  start: "2026-06-15"
+  end: "2026-06-18"
+  sub: Global Health
+  type: summit
+
+- title: ADHS
+  year: 2026
+  id: adhs26
+  full_name: 6th Africa Digital Health Summit
+  link: https://africadigitalhealthsummit.org/
+  timezone: Africa/Lagos
+  place: "Abuja Continental Hotel, Abuja, Nigeria"
+  date: "June 25-26, 2026"
+  start: "2026-06-25"
+  end: "2026-06-26"
+  sub: Global Health
+  type: summit
+
+- title: AAIAC
+  year: 2026
+  id: aaiac26
+  full_name: 2nd International Conference on the Advancements of Artificial Intelligence in the African Context
+  link: https://afriailab.udom.ac.tz/conference
+  deadline: "2026-03-15 23:59"
+  timezone: Africa/Dar_es_Salaam
+  place: "Dar es Salaam, Tanzania"
+  date: "July 22-23, 2026"
+  start: "2026-07-22"
+  end: "2026-07-23"
+  sub: AI
+  type: summit
+
+- title: TAMC
+  year: 2026
+  id: tamc26
+  full_name: Transforming African MedTech Conference
+  link: https://www.africanmedtech.com/
+  timezone: Africa/Nairobi
+  place: "Kenya School of Government, Nairobi, Kenya"
+  date: "August 25-27, 2026"
+  start: "2026-08-25"
+  end: "2026-08-27"
+  sub: Global Health
+  type: summit
+
+- title: WCPH
+  year: 2026
+  id: wcph26
+  full_name: 18th World Congress on Public Health
+  link: https://www.wcph.org/
+  deadline: "2026-01-31 23:59"
+  timezone: Africa/Johannesburg
+  place: "Cape Town International Convention Centre, Cape Town, South Africa"
+  date: "September 6-9, 2026"
+  start: "2026-09-06"
+  end: "2026-09-09"
+  sub: Global Health
+  type: summit
+
+- title: WHX Nairobi
+  year: 2026
+  id: whxnairobi26
+  full_name: World Health Expo Nairobi (formerly Medic East Africa)
+  link: https://www.worldhealthexpo.com/events/healthcare/nairobi/
+  timezone: Africa/Nairobi
+  place: "Kenyatta International Convention Centre (KICC), Nairobi, Kenya"
+  date: "September 16-18, 2026"
+  start: "2026-09-16"
+  end: "2026-09-18"
+  sub: Global Health
+  type: summit
+
+- title: WHX Johannesburg
+  year: 2026
+  id: whxjohannesburg26
+  full_name: World Health Expo Johannesburg (formerly Africa Health)
+  link: https://www.worldhealthexpo.com/events/healthcare/johannesburg/
+  timezone: Africa/Johannesburg
+  place: "Gallagher Convention Centre, Johannesburg, South Africa"
+  date: "October 6-8, 2026"
+  start: "2026-10-06"
+  end: "2026-10-08"
+  sub: Global Health
+  type: summit
+
+- title: AI Expo Africa
+  year: 2026
+  id: aiexpoafrica26
+  full_name: AI Expo Africa (9th Edition)
+  link: https://aiexpoafrica.com/
+  timezone: Africa/Johannesburg
+  place: "Sandton Convention Centre, Johannesburg, South Africa"
+  date: "October 28-29, 2026"
+  start: "2026-10-28"
+  end: "2026-10-29"
+  sub: AI
+  type: summit
+
+- title: AI Summit Cape Town
+  year: 2026
+  id: aisummitcapetown26
+  full_name: The AI Summit Cape Town @ Africa Tech Festival
+  link: https://africatechfestival.com/ai-summit/
+  timezone: Africa/Johannesburg
+  place: "Cape Town International Convention Centre (CTICC), Cape Town, South Africa"
+  date: "November 17-19, 2026"
+  start: "2026-11-17"
+  end: "2026-11-19"
+  sub: AI
+  type: summit
+
+- title: Futurize
+  year: 2026
+  id: futurize26
+  full_name: Futurize HealthTech Summit & Demo Day
+  link: https://www.menterprise.africa/futurize-summit
+  timezone: Africa/Nairobi
+  place: "Nairobi, Kenya"
+  date: "December 2026 (TBC)"
+  start: "2026-12-01"
+  end: "2026-12-01"
+  sub: Global Health
+  type: summit
+
+- title: TZ DHI Forum
+  year: 2026
+  id: tzdhiforum26
+  full_name: 5th Tanzania Digital Health & Innovation Forum
+  link: https://muhas-dhi.ac.tz/
+  timezone: Africa/Dar_es_Salaam
+  place: "Dar es Salaam, Tanzania"
+  date: "November 12-13, 2026"
+  start: "2026-11-12"
+  end: "2026-11-13"
+  sub: Global Health
+  type: summit

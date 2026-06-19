@@ -122,3 +122,42 @@
   end: "2026-01-29"
   sub: ML
   type: workshop
+
+- title: AI for Health Buildathon
+  year: 2026
+  id: tzai4health26
+  full_name: "AI for Health Training & Buildathon (Tanzania Digital Health & Innovation Week)"
+  link: "https://muhas-dhi.ac.tz/"
+  timezone: "Africa/Dar_es_Salaam"
+  place: "Dar es Salaam, Tanzania"
+  date: "July - November 2026"
+  start: "2026-07-01"
+  end: "2026-11-30"
+  sub: AI
+  type: workshop
+
+- title: HDGA Training
+  year: 2026
+  id: tzhdga26
+  full_name: "6th Health Data Governance & Analytics Training (Tanzania Digital Health & Innovation Week)"
+  link: "https://muhas-dhi.ac.tz/"
+  timezone: "Africa/Dar_es_Salaam"
+  place: "Dar es Salaam, Tanzania"
+  date: "November 2-6, 2026"
+  start: "2026-11-02"
+  end: "2026-11-06"
+  sub: Global Health
+  type: workshop
+
+- title: Girls & Women in Health Tech
+  year: 2026
+  id: tzgwht26
+  full_name: "5th Girls & Women in Health Tech Workshop (Tanzania Digital Health & Innovation Week)"
+  link: "https://muhas-dhi.ac.tz/"
+  timezone: "Africa/Dar_es_Salaam"
+  place: "Dar es Salaam, Tanzania"
+  date: "November 11, 2026"
+  start: "2026-11-11"
+  end: "2026-11-11"
+  sub: Global Health
+  type: workshop

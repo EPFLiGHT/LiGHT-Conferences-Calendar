@@ -648,3 +648,17 @@
   timezone: GMT
   sub: Global Health
   type: conference
+
+- title: ICT4D
+  year: 2026
+  id: ict4d26
+  full_name: ICT4D Conference 2026
+  link: "https://www.ict4dconference.org/"
+  deadline: "2026-01-16 23:59"
+  timezone: Africa/Nairobi
+  place: "Nairobi, Kenya"
+  date: "May 20-22, 2026"
+  start: "2026-05-20"
+  end: "2026-05-22"
+  sub: Global Health
+  type: conference
