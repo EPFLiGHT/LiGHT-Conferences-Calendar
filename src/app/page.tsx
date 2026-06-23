@@ -60,7 +60,7 @@ export default function Page() {
         <Container maxW="1200px" px={{ base: '4', md: '6' }} mx="auto">
           <ConferenceFiltersPanel
             title="Research Conferences"
-            eyebrow="LiGHT · Index"
+            eyebrow=""
             description="Track upcoming conferences and never miss a deadline. Click on any entry for full details and to export."
             searchValue={searchQuery}
             onSearchChange={setSearchQuery}

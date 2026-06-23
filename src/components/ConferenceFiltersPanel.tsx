@@ -28,16 +28,18 @@ export default function ConferenceFiltersPanel({
   return (
     <Box mb="10">
       {/* Masthead */}
-      <Text
-        fontSize="11px"
-        color="brand.400"
-        textTransform="uppercase"
-        letterSpacing="0.22em"
-        fontWeight="700"
-        mb="4"
-      >
-        {eyebrow}
-      </Text>
+      {eyebrow && (
+        <Text
+          fontSize="11px"
+          color="brand.400"
+          textTransform="uppercase"
+          letterSpacing="0.22em"
+          fontWeight="700"
+          mb="4"
+        >
+          {eyebrow}
+        </Text>
+      )}
 
       <Heading
         as="h1"

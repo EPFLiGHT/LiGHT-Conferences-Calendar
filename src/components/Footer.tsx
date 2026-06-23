@@ -212,9 +212,6 @@ export default function Footer(): JSX.Element {
                   <Text fontSize="sm" color="gray.700" lineHeight="1.6">
                     EPFL · Lausanne, Switzerland
                   </Text>
-                  <Text fontSize="sm" color="gray.700" lineHeight="1.6">
-                    Ariadne Labs · Harvard, USA
-                  </Text>
                 </Box>
 
                 <Box>

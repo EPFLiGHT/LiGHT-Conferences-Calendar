@@ -662,3 +662,232 @@
   end: "2026-05-22"
   sub: Global Health
   type: conference
+
+- title: ACL
+  year: 2026
+  id: acl26
+  full_name: Annual Meeting of the Association for Computational Linguistics
+  link: "https://2026.aclweb.org/"
+  deadline: "2026-01-05 23:59:59"
+  timezone: "UTC-12"
+  place: "San Diego, CA, USA"
+  date: "July 02-07, 2026"
+  start: "2026-07-02"
+  end: "2026-07-07"
+  sub: NLP
+  type: conference
+  note: "All submissions via ACL Rolling Review (ARR)."
+
+- title: EMNLP
+  year: 2026
+  id: emnlp26
+  full_name: Conference on Empirical Methods in Natural Language Processing
+  link: "https://2026.emnlp.org/"
+  deadline: "2026-05-25 23:59:00"
+  timezone: "UTC-12"
+  place: "TBA"
+  date: "October 24-29, 2026"
+  start: "2026-10-24"
+  end: "2026-10-29"
+  sub: NLP
+  type: conference
+  note: "All submissions via ACL Rolling Review (ARR)."
+
+- title: UAI
+  year: 2026
+  id: uai26
+  full_name: Conference on Uncertainty in Artificial Intelligence
+  link: "https://www.auai.org/uai2026/"
+  deadline: "2026-02-25 23:59:59"
+  timezone: "UTC-12"
+  place: "Amsterdam, Netherlands"
+  date: "August 17-21, 2026"
+  start: "2026-08-17"
+  end: "2026-08-21"
+  sub: ML
+  type: conference
+
+- title: KDD
+  year: 2026
+  id: kdd26
+  full_name: ACM SIGKDD Conference on Knowledge Discovery and Data Mining
+  link: "https://kdd2026.kdd.org/"
+  deadline: "2025-07-31 23:59:59"
+  abstract_deadline: "2025-07-24 23:59:59"
+  timezone: "UTC-12"
+  place: "Jeju, Korea"
+  date: "August 9-13, 2026"
+  start: "2026-08-09"
+  end: "2026-08-13"
+  sub: DM
+  type: conference
+
+- title: ICDM
+  year: 2026
+  id: icdm26
+  full_name: IEEE International Conference on Data Mining
+  link: "http://icdm2026.neu.edu.cn/"
+  deadline: "2026-06-06 23:59:00"
+  abstract_deadline: "2026-05-30 23:59:00"
+  timezone: "UTC-12"
+  place: "Shenyang, China"
+  date: "November 12-15, 2026"
+  start: "2026-11-12"
+  end: "2026-11-15"
+  sub: DM
+  type: conference
+
+- title: ECCV
+  year: 2026
+  id: eccv26
+  full_name: European Conference on Computer Vision
+  link: "https://eccv.ecva.net/Conferences/2026"
+  deadline: "2026-03-05 11:00:00"
+  abstract_deadline: "2026-02-26 11:00:00"
+  timezone: "Europe/Paris"
+  place: "Milano, Italy"
+  date: "September 29 - October 04, 2026"
+  start: "2026-09-29"
+  end: "2026-10-04"
+  sub: CV
+  type: conference
+
+- title: MICCAI
+  year: 2026
+  id: miccai26
+  full_name: International Conference on Medical Image Computing and Computer Assisted Intervention
+  link: "https://conferences.miccai.org/2026/"
+  abstract_deadline: "2026-02-12 23:59"
+  deadline: "2026-02-26 23:59"
+  timezone: "UTC-12"
+  place: "Strasbourg, France"
+  date: "September 27 - October 1, 2026"
+  start: "2026-09-27"
+  end: "2026-10-01"
+  sub: Health AI
+  type: conference
+
+- title: MIDL
+  year: 2026
+  id: midl26
+  full_name: Medical Imaging with Deep Learning
+  link: "https://2026.midl.io/"
+  abstract_deadline: "2025-11-07 23:59"
+  deadline: "2025-11-13 23:59"
+  timezone: "UTC-12"
+  place: "Taipei, Taiwan"
+  date: "July 8-10, 2026"
+  start: "2026-07-08"
+  end: "2026-07-10"
+  sub: Health AI
+  type: conference
+
+- title: AIME
+  year: 2026
+  id: aime26
+  full_name: International Conference on Artificial Intelligence in Medicine
+  link: "https://aime26.aimedicine.info/"
+  deadline: "2026-03-17 23:59"
+  timezone: "UTC-12"
+  place: "Ottawa, Canada"
+  date: "July 7-10, 2026"
+  start: "2026-07-07"
+  end: "2026-07-10"
+  sub: Health AI
+  type: conference
+
+- title: "IEEE EMBC"
+  year: 2026
+  id: embc26
+  full_name: Annual International Conference of the IEEE Engineering in Medicine and Biology Society
+  link: "https://embc.embs.org/2026/"
+  timezone: "UTC-12"
+  place: "Toronto, Canada"
+  date: "July 26-30, 2026"
+  start: "2026-07-26"
+  end: "2026-07-30"
+  sub: Health AI
+  type: conference
+
+- title: AMIA
+  year: 2026
+  id: amia26
+  full_name: AMIA Annual Symposium (American Medical Informatics Association)
+  link: "https://amia.org/education-events/amia-2026-annual-symposium"
+  timezone: "UTC-12"
+  place: "Dallas, TX, USA"
+  date: "November 7-11, 2026"
+  start: "2026-11-07"
+  end: "2026-11-11"
+  sub: Health AI
+  type: conference
+
+- title: PSB
+  year: 2027
+  id: psb27
+  full_name: Pacific Symposium on Biocomputing
+  link: "https://psb.stanford.edu/"
+  abstract_deadline: "2026-12-01 23:59"
+  deadline: "2026-08-03 23:59"
+  timezone: "America/Los_Angeles"
+  place: "Big Island, Hawaii, USA"
+  date: "January 3-7, 2027"
+  start: "2027-01-03"
+  end: "2027-01-07"
+  sub: Health AI
+  type: conference
+  note: "Paper deadline Aug 3, 2026; separate abstract track deadline Dec 1, 2026."
+
+- title: MEDINFO
+  year: 2027
+  id: medinfo27
+  full_name: World Congress on Medical and Health Informatics
+  link: "https://www.medinfo2027.org/"
+  timezone: "UTC-12"
+  place: "Dubai, UAE"
+  date: "August 30 - September 4, 2027"
+  start: "2027-08-30"
+  end: "2027-09-04"
+  sub: Health AI
+  type: conference
+  note: "21st IMIA World Congress; submission deadlines to be announced."
+
+- title: Global Digital Health Forum
+  year: 2026
+  id: gdhf26
+  full_name: Global Digital Health Forum
+  link: "https://www.gdhf.digital/"
+  abstract_deadline: "2026-06-30 23:59"
+  timezone: "America/New_York"
+  place: "Bangkok, Thailand"
+  date: "December 2-4, 2026"
+  start: "2026-12-02"
+  end: "2026-12-04"
+  sub: Global Health
+  type: conference
+
+- title: World Health Summit
+  year: 2026
+  id: whs26
+  full_name: World Health Summit
+  link: "https://www.worldhealthsummit.org/"
+  timezone: "UTC-12"
+  place: "Berlin, Germany"
+  date: "October 11-13, 2026"
+  start: "2026-10-11"
+  end: "2026-10-13"
+  sub: Global Health
+  type: conference
+
+- title: Geneva Health Forum
+  year: 2026
+  id: ghf26
+  full_name: Geneva Health Forum
+  link: "https://genevahealthforum.com/"
+  timezone: "UTC-12"
+  place: "Geneva, Switzerland"
+  date: "November 10-12, 2026"
+  start: "2026-11-10"
+  end: "2026-11-12"
+  sub: Global Health
+  type: conference
