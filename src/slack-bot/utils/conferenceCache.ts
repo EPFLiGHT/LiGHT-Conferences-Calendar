@@ -6,6 +6,7 @@
 import { kv } from '@vercel/kv';
 import type { Conference } from '@/types/conference';
 import { parseConferences } from '@/utils/parser';
+import { DATA_FILES } from '@/constants/dataFiles';
 import { logger } from './logger';
 import { NOTIFICATION_CONFIG } from '../config/constants';
 import { kvKeys } from '../lib/kvKeys';
@@ -46,11 +47,7 @@ async function fetchAndParseYAML(): Promise<Conference[]> {
   const baseUrl = process.env.CONFERENCES_DATA_URL;
   const TIMEOUT_MS = 5000;
 
-  const urls = {
-    conferences: `${baseUrl}/data/conferences.yaml`,
-    summits: `${baseUrl}/data/summits.yaml`,
-    workshops: `${baseUrl}/data/workshops.yaml`,
-  };
+  const urls = DATA_FILES.map((name) => `${baseUrl}/data/${name}.yaml`);
 
   logger.info('Fetching conference data from multiple sources', { urls });
 
@@ -58,44 +55,29 @@ async function fetchAndParseYAML(): Promise<Conference[]> {
   const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
   try {
-    const [conferencesRes, summitsRes, workshopsRes] = await Promise.all([
-      fetch(urls.conferences, {
-        signal: controller.signal,
-        headers: { 'Cache-Control': 'max-age=300' },
-      }),
-      fetch(urls.summits, {
-        signal: controller.signal,
-        headers: { 'Cache-Control': 'max-age=300' },
-      }),
-      fetch(urls.workshops, {
-        signal: controller.signal,
-        headers: { 'Cache-Control': 'max-age=300' },
-      }),
-    ]);
+    const responses = await Promise.all(
+      urls.map((url) =>
+        fetch(url, {
+          signal: controller.signal,
+          headers: { 'Cache-Control': 'max-age=300' },
+        })
+      )
+    );
 
     clearTimeout(timeoutId);
 
-    if (!conferencesRes.ok || !summitsRes.ok || !workshopsRes.ok) {
-      throw new Error(`Failed to fetch YAML files: ${conferencesRes.status}, ${summitsRes.status}, ${workshopsRes.status}`);
+    if (responses.some((res) => !res.ok)) {
+      throw new Error(
+        `Failed to fetch YAML files: ${responses.map((res) => res.status).join(', ')}`
+      );
     }
 
-    const [conferencesText, summitsText, workshopsText] = await Promise.all([
-      conferencesRes.text(),
-      summitsRes.text(),
-      workshopsRes.text(),
-    ]);
-
-    const conferencesData = parseConferences(conferencesText);
-    const summitsData = parseConferences(summitsText);
-    const workshopsData = parseConferences(workshopsText);
-
-    const allConferences = [...conferencesData, ...summitsData, ...workshopsData];
+    const texts = await Promise.all(responses.map((res) => res.text()));
+    const allConferences = texts.flatMap((text) => parseConferences(text));
 
     logger.info('All conference data parsed successfully', {
-      conferences: conferencesData.length,
-      summits: summitsData.length,
-      workshops: workshopsData.length,
-      total: allConferences.length
+      sources: DATA_FILES.length,
+      total: allConferences.length,
     });
 
     return allConferences;

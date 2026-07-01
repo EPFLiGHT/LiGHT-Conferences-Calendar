@@ -1,18 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import {
   Box,
   Flex,
   Heading,
   Text,
   VStack,
-  Portal,
 } from '@chakra-ui/react';
 import { X, ExternalLink } from 'lucide-react';
 import { Speaker } from '@/types/speaker';
 import ExternalLinkButton from './ExternalLinkButton';
 import SpeakerAvatar from './SpeakerAvatar';
+import ModalShell from './ModalShell';
+import SectionLabel from './SectionLabel';
 
 interface SpeakerModalProps {
   speaker: Speaker;
@@ -20,71 +20,13 @@ interface SpeakerModalProps {
 }
 
 export default function SpeakerModal({ speaker, onClose }: SpeakerModalProps): JSX.Element | null {
-  const [isOpen, setIsOpen] = useState(true);
-
   const sortedPresentations = [...speaker.presentations].sort((a, b) => b.year - a.year);
-
-  const handleClose = () => {
-    setIsOpen(false);
-    onClose();
-  };
-
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      handleClose();
-    }
-  };
-
-  useEffect(() => {
-    const handleEscapeKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        handleClose();
-      }
-    };
-    document.addEventListener('keydown', handleEscapeKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', handleEscapeKey);
-      document.body.style.overflow = 'unset';
-    };
-  }, []);
-
-  if (!isOpen) return null;
-
   const total = sortedPresentations.length;
 
   return (
-    <Portal>
-      <Box
-        position="fixed"
-        top="0"
-        left="0"
-        right="0"
-        bottom="0"
-        bg="overlay.scrim"
-        backdropFilter="blur(2px)"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        zIndex="modal"
-        p={{ base: '3', md: '6' }}
-        onClick={handleBackdropClick}
-      >
-        <Box
-          bg="white"
-          borderRadius="4px"
-          maxW="860px"
-          w="full"
-          maxH="90vh"
-          overflowY="auto"
-          border="1px solid"
-          borderColor="brand.500"
-          position="relative"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Top accent rule */}
-          <Box h="3px" bg="brand.500" />
-
+    <ModalShell onClose={onClose}>
+      {(close) => (
+        <>
           {/* Header */}
           <Box
             position="sticky"
@@ -108,13 +50,13 @@ export default function SpeakerModal({ speaker, onClose }: SpeakerModalProps): J
               justifyContent="center"
               border="1px solid"
               borderColor="line.strong"
-              borderRadius="3px"
+              borderRadius="control"
               bg="white"
               color="brand.500"
               cursor="pointer"
               transition="all 0.2s ease"
               _hover={{ bg: 'brand.500', color: 'white', borderColor: 'brand.500' }}
-              onClick={handleClose}
+              onClick={close}
               aria-label="Close"
             >
               <X size={16} strokeWidth={2} />
@@ -161,34 +103,7 @@ export default function SpeakerModal({ speaker, onClose }: SpeakerModalProps): J
 
           {/* Body */}
           <Box px={{ base: '6', md: '8' }} py={{ base: '6', md: '8' }}>
-            <Flex
-              align="baseline"
-              justify="space-between"
-              pb="3"
-              mb="6"
-              borderBottom="1px solid"
-              borderColor="line.default"
-            >
-              <Text
-                fontSize="11px"
-                fontWeight="700"
-                color="brand.500"
-                textTransform="uppercase"
-                letterSpacing="0.22em"
-              >
-                Talks
-              </Text>
-              <Text
-                fontSize="11px"
-                fontWeight="600"
-                color="brand.400"
-                textTransform="uppercase"
-                letterSpacing="0.22em"
-                className="tabular"
-              >
-                Most recent first
-              </Text>
-            </Flex>
+            <SectionLabel label="Talks" trailing="Most recent first" mb="6" />
 
             <VStack gap="0" align="stretch">
               {sortedPresentations.map((presentation, index) => (
@@ -212,14 +127,7 @@ export default function SpeakerModal({ speaker, onClose }: SpeakerModalProps): J
                     >
                       {presentation.year}
                     </Text>
-                    <Text
-                      fontSize="10px"
-                      fontWeight="700"
-                      color="brand.400"
-                      textTransform="uppercase"
-                      letterSpacing="0.2em"
-                      mt="2"
-                    >
+                    <Text textStyle="badgeLabel" color="brand.400" mt="2">
                       {presentation.eventType}
                       {index === 0 && ' · Latest'}
                     </Text>
@@ -228,14 +136,7 @@ export default function SpeakerModal({ speaker, onClose }: SpeakerModalProps): J
                   {/* Body */}
                   <VStack align="stretch" gap="4" flex="1">
                     <Box>
-                      <Text
-                        fontSize="10px"
-                        fontWeight="600"
-                        color="brand.400"
-                        textTransform="uppercase"
-                        letterSpacing="0.2em"
-                        mb="2"
-                      >
+                      <Text textStyle="fieldLabel" color="brand.400" mb="2">
                         Topic
                       </Text>
                       <Text fontSize="md" color="brand.500" fontWeight="500" lineHeight="1.5" fontStyle="italic">
@@ -244,14 +145,7 @@ export default function SpeakerModal({ speaker, onClose }: SpeakerModalProps): J
                     </Box>
 
                     <Box>
-                      <Text
-                        fontSize="10px"
-                        fontWeight="600"
-                        color="brand.400"
-                        textTransform="uppercase"
-                        letterSpacing="0.2em"
-                        mb="2"
-                      >
+                      <Text textStyle="fieldLabel" color="brand.400" mb="2">
                         Event
                       </Text>
                       <Text fontSize="sm" color="gray.700" lineHeight="1.55">
@@ -278,8 +172,8 @@ export default function SpeakerModal({ speaker, onClose }: SpeakerModalProps): J
               ))}
             </VStack>
           </Box>
-        </Box>
-      </Box>
-    </Portal>
+        </>
+      )}
+    </ModalShell>
   );
 }

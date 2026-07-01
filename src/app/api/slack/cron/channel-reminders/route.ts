@@ -11,7 +11,8 @@
 import { NextResponse } from 'next/server';
 import { withSlackMiddleware, SlackRequestType } from '@/slack-bot/lib/middleware';
 import { getConferences } from '@/slack-bot/utils/conferenceCache';
-import { getDeadlinesWithinDays, getEventStartsOnDays } from '@/utils/conferenceQueries';
+import { filterDeadlinesByReminders, getEventStartsOnDays } from '@/utils/conferenceQueries';
+import { NOTIFICATION_CONFIG } from '@/slack-bot/config/constants';
 import { postToChannel } from '@/slack-bot/lib/slackClient';
 import { buildChannelDigest } from '@/slack-bot/lib/messageBuilder';
 import {
@@ -26,12 +27,6 @@ import { logger } from '@/slack-bot/utils/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-
-/**
- * Default reminder days for channel notifications
- * Will notify when deadlines are exactly these days away (±1 day margin)
- */
-const DEFAULT_CHANNEL_REMINDER_DAYS = [30, 7, 3];
 
 /**
  * GET handler for the cron job
@@ -63,29 +58,17 @@ async function handleChannelReminders(): Promise<NextResponse> {
     const reminderDaysStr = process.env.CHANNEL_REMINDER_DAYS || '';
     const reminderDays = reminderDaysStr
       ? reminderDaysStr.split(',').map(d => parseInt(d.trim(), 10)).filter(d => !isNaN(d))
-      : DEFAULT_CHANNEL_REMINDER_DAYS;
+      : [...NOTIFICATION_CONFIG.DEFAULT_REMINDER_DAYS];
 
     const allConferences = await getConferences();
 
-    // Find the maximum reminder day threshold
-    const maxReminderDays = Math.max(...reminderDays);
-
-    // Get deadlines within the reminder window
-    const upcomingDeadlines = getDeadlinesWithinDays(
-      allConferences,
-      maxReminderDays
-    );
-
     // Fire exactly on each configured reminder day (e.g. 30, 7, 3 days out)
     // so the same item isn't re-posted on consecutive days.
-    const relevantDeadlines = upcomingDeadlines.filter(item =>
-      reminderDays.includes(item.daysLeft)
-    );
+    const relevantDeadlines = filterDeadlinesByReminders(allConferences, reminderDays);
     const upcomingEventStarts = getEventStartsOnDays(allConferences, reminderDays);
 
     if (relevantDeadlines.length === 0 && upcomingEventStarts.length === 0) {
       logger.info('No relevant deadlines or event starts for channel notification', {
-        upcomingCount: upcomingDeadlines.length,
         reminderDays,
       });
       return NextResponse.json({

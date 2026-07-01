@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { withSlackMiddleware, SlackRequestType } from '@/slack-bot/lib/middleware';
 import { acknowledgeResponse } from '@/slack-bot/lib/responses';
 import type { SlackInteractionPayload } from '@/types/slack-payloads';
+import type { BlockKitMessage } from '@/types/slack';
 import { getConferenceDetailsById } from '@/slack-bot/lib/conferenceHelpers';
 import {
   buildErrorMessage,
@@ -66,6 +67,23 @@ async function reply(
   return NextResponse.json(payload);
 }
 
+/**
+ * Reply ephemerally with a Block Kit message. Personal button actions are only
+ * visible to the user who clicked; `replaceOriginal` swaps the source message
+ * (used when the action mutates state, e.g. toggling notifications).
+ */
+function replyEphemeral(
+  responseUrl: string | undefined,
+  message: BlockKitMessage,
+  replaceOriginal = false
+): Promise<NextResponse> {
+  return reply(responseUrl, {
+    ...message,
+    response_type: 'ephemeral',
+    replace_original: replaceOriginal,
+  });
+}
+
 async function handleBlockActions(
   payload: SlackInteractionPayload
 ): Promise<NextResponse> {
@@ -79,63 +97,44 @@ async function handleBlockActions(
   if (actionId?.startsWith('details_')) {
     const conferenceId = actionValue;
     if (!conferenceId) {
-      return reply(responseUrl, {
-        ...buildErrorMessage('Invalid conference ID'),
-        response_type: 'ephemeral',
-        replace_original: false,
-      });
+      return replyEphemeral(responseUrl, buildErrorMessage('Invalid conference ID'));
     }
 
     try {
       const message = await getConferenceDetailsById(conferenceId);
-      return reply(responseUrl, {
-        ...message,
-        response_type: 'ephemeral',
-        replace_original: false,
-      });
+      return replyEphemeral(responseUrl, message);
     } catch (error) {
       logger.error('Failed to fetch conference details', error, { conferenceId });
-      return reply(responseUrl, {
-        ...buildErrorMessage('Failed to fetch conference details. Please try again.'),
-        response_type: 'ephemeral',
-        replace_original: false,
-      });
+      return replyEphemeral(
+        responseUrl,
+        buildErrorMessage('Failed to fetch conference details. Please try again.')
+      );
     }
   }
 
   if (actionId === 'enable_notifications') {
     try {
       const prefs = await enableNotifications(userId);
-      return reply(responseUrl, {
-        ...buildSettingsPanel(prefs),
-        response_type: 'ephemeral',
-        replace_original: true,
-      });
+      return replyEphemeral(responseUrl, buildSettingsPanel(prefs), true);
     } catch (error) {
       logger.error('Failed to enable notifications', error, { userId });
-      return reply(responseUrl, {
-        ...buildErrorMessage('Failed to enable notifications. Please try again.'),
-        response_type: 'ephemeral',
-        replace_original: false,
-      });
+      return replyEphemeral(
+        responseUrl,
+        buildErrorMessage('Failed to enable notifications. Please try again.')
+      );
     }
   }
 
   if (actionId === 'disable_notifications') {
     try {
       const prefs = await disableNotifications(userId);
-      return reply(responseUrl, {
-        ...buildSettingsPanel(prefs),
-        response_type: 'ephemeral',
-        replace_original: true,
-      });
+      return replyEphemeral(responseUrl, buildSettingsPanel(prefs), true);
     } catch (error) {
       logger.error('Failed to disable notifications', error, { userId });
-      return reply(responseUrl, {
-        ...buildErrorMessage('Failed to disable notifications. Please try again.'),
-        response_type: 'ephemeral',
-        replace_original: false,
-      });
+      return replyEphemeral(
+        responseUrl,
+        buildErrorMessage('Failed to disable notifications. Please try again.')
+      );
     }
   }
 
@@ -146,23 +145,21 @@ async function handleBlockActions(
       || 'http://localhost:3000';
     const calendarUrl = `${baseUrl}/api/calendar/${conferenceId}`;
 
-    return reply(responseUrl, {
-      ...buildSuccessMessage(
+    return replyEphemeral(
+      responseUrl,
+      buildSuccessMessage(
         `To add this conference to your calendar, visit:\n${calendarUrl}\n\nThis will download an ICS file that you can import into your calendar app.`
-      ),
-      response_type: 'ephemeral',
-      replace_original: false,
-    });
+      )
+    );
   }
 
   if (actionId === 'edit_subjects') {
-    return reply(responseUrl, {
-      ...buildErrorMessage(
+    return replyEphemeral(
+      responseUrl,
+      buildErrorMessage(
         'Subject editing is coming soon! For now, use the web interface to manage your subject preferences.'
-      ),
-      response_type: 'ephemeral',
-      replace_original: false,
-    });
+      )
+    );
   }
 
   return acknowledgeResponse();

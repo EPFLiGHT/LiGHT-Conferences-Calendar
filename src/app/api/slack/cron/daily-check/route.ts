@@ -9,9 +9,9 @@ import {
   buildEventStartNotification,
 } from '@/slack-bot/lib/messageBuilder';
 import {
-  getDeadlinesWithinDays,
   filterBySubject,
   getEventStartsOnDays,
+  filterDeadlinesByReminders,
 } from '@/utils/conferenceQueries';
 import { logger } from '@/slack-bot/utils/logger';
 
@@ -61,19 +61,11 @@ async function handleDailyCheck(): Promise<NextResponse> {
           ).values());
         }
 
-        // Find the maximum reminder day threshold for this user
-        const maxReminderDays = Math.max(...user.reminderDays);
-
-        // Get deadlines within the user's reminder window
-        const upcomingDeadlines = getDeadlinesWithinDays(
-          userConferences,
-          maxReminderDays
-        );
-
         // Fire exactly on each of the user's reminder days
         // (e.g. 30, 7, 3 days out) - no day-by-day repeats.
-        const relevantDeadlines = upcomingDeadlines.filter(item =>
-          user.reminderDays.includes(item.daysLeft)
+        const relevantDeadlines = filterDeadlinesByReminders(
+          userConferences,
+          user.reminderDays
         );
         const upcomingEventStarts = getEventStartsOnDays(
           userConferences,

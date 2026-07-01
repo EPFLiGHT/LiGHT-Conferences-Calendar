@@ -5,6 +5,7 @@ import InfoTooltip from './InfoTooltip';
 import { Conference } from '@/types/conference';
 import { getSubjectsArray } from '@/utils/parser';
 import { SUBJECT_LABELS } from '@/constants/subjects';
+import { VALID_TYPES } from '@/utils/conferenceSchema';
 import type { ConferenceFiltersState } from '@/hooks/useConferenceFilters';
 
 interface FiltersProps {
@@ -33,7 +34,7 @@ const Chip = forwardRef<HTMLButtonElement, ChipProps>(
         fontWeight="700"
         textTransform="uppercase"
         letterSpacing="0.18em"
-        borderRadius="2px"
+        borderRadius="badge"
         border="1px solid"
         bg={selected ? 'brand.500' : 'white'}
         color={selected ? 'white' : 'brand.500'}
@@ -99,7 +100,7 @@ export default function Filters({ conferences, filters, onFilterChange }: Filter
     return [...subjectSet].sort();
   }, [conferences]);
 
-  const types = ['conference', 'summit', 'workshop'];
+  const types = VALID_TYPES;
 
   const sortLabel =
     filters.sortBy === 'deadline' ? 'Upcoming Deadline' :
@@ -110,7 +111,7 @@ export default function Filters({ conferences, filters, onFilterChange }: Filter
     fontSize: 'sm',
     color: 'brand.500',
     borderColor: 'line.strong',
-    borderRadius: '2px',
+    borderRadius: 'badge',
     fontWeight: '500',
     _focus: {
       borderColor: 'brand.500',

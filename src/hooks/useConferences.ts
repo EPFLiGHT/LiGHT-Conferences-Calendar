@@ -9,6 +9,7 @@
 
 import { useState, useEffect } from 'react';
 import { parseConferences } from '@/utils/parser';
+import { DATA_FILES } from '@/constants/dataFiles';
 import type { Conference } from '@/types/conference';
 
 interface UseConferencesReturn {
@@ -25,27 +26,17 @@ export function useConferences(): UseConferencesReturn {
   useEffect(() => {
     const fetchAllData = async () => {
       try {
-        const [conferencesRes, summitsRes, workshopsRes] = await Promise.all([
-          fetch('/data/conferences.yaml'),
-          fetch('/data/summits.yaml'),
-          fetch('/data/workshops.yaml'),
-        ]);
+        const responses = await Promise.all(
+          DATA_FILES.map((name) => fetch(`/data/${name}.yaml`))
+        );
 
-        if (!conferencesRes.ok || !summitsRes.ok || !workshopsRes.ok) {
+        if (responses.some((res) => !res.ok)) {
           throw new Error('Failed to fetch data files');
         }
 
-        const [conferencesText, summitsText, workshopsText] = await Promise.all([
-          conferencesRes.text(),
-          summitsRes.text(),
-          workshopsRes.text(),
-        ]);
+        const texts = await Promise.all(responses.map((res) => res.text()));
+        const allData = texts.flatMap((text) => parseConferences(text));
 
-        const conferencesData = parseConferences(conferencesText);
-        const summitsData = parseConferences(summitsText);
-        const workshopsData = parseConferences(workshopsText);
-
-        const allData = [...conferencesData, ...summitsData, ...workshopsData];
         setConferences(allData);
         setLoading(false);
       } catch (err) {

@@ -4,7 +4,6 @@ import { Suspense, useState, useMemo, useRef } from 'react';
 import {
   Box,
   Button,
-  Container,
   Flex,
   Text,
 } from '@chakra-ui/react';
@@ -17,6 +16,7 @@ import luxonPlugin from '@fullcalendar/luxon3';
 import { DateTime } from 'luxon';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import PageShell from '@/components/PageShell';
 import ConferenceFiltersPanel from '@/components/ConferenceFiltersPanel';
 import ConferenceModal from '@/components/ConferenceModal';
 import LoadingState from '@/components/LoadingState';
@@ -151,8 +151,7 @@ function CalendarContent() {
   return (
     <>
       <Header />
-      <Box py={{ base: '6', md: '8' }} pb={{ base: '12', md: '16' }} minH="calc(100vh - 200px)">
-        <Container maxW="1200px" px={{ base: '4', md: '6' }} mx="auto">
+      <PageShell>
           <ConferenceFiltersPanel
             title="Conference Calendar"
             eyebrow="LiGHT · Calendar"
@@ -214,7 +213,7 @@ function CalendarContent() {
             bg="white"
             border="1px solid"
             borderColor="line.default"
-            borderRadius="4px"
+            borderRadius="card"
             p={{ base: '4', md: '6' }}
           >
             <style>{`
@@ -260,8 +259,7 @@ function CalendarContent() {
               onClose={() => setSelectedConference(null)}
             />
           )}
-        </Container>
-      </Box>
+      </PageShell>
       <Footer />
     </>
   );

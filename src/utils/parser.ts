@@ -1,9 +1,15 @@
 import yaml from 'js-yaml';
 import { DateTime } from 'luxon';
-import { SUBJECT_COLORS } from '@/constants/subjects';
+import { SUBJECT_COLORS, DEFAULT_SUBJECT_COLOR } from '@/constants/subjects';
+import {
+  REQUIRED_FIELDS,
+  YEAR_MIN,
+  YEAR_MAX,
+  isValidTimezone,
+  isValidDateTime,
+  isValidDate,
+} from '@/utils/conferenceSchema';
 import type { Conference, DeadlineInfo } from '@/types/conference';
-
-const REQUIRED_FIELDS = ['title', 'year', 'id', 'timezone'] as const;
 
 /**
  * Converts a date string to ISO 8601 format by replacing space with 'T'
@@ -22,27 +28,27 @@ export function validateConference(conf: any, index: number): string[] {
     }
   });
 
-  // Validate timezone - use Luxon to validate since it accepts more timezones than Intl
-  if (conf.timezone) {
-    const testDate = DateTime.fromISO('2025-01-01T12:00', { zone: conf.timezone });
-    if (!testDate.isValid) {
-      errors.push(`Conference '${conf.id}': Invalid IANA timezone '${conf.timezone}'`);
-    }
+  // Validate timezone
+  if (conf.timezone && !isValidTimezone(conf.timezone)) {
+    errors.push(`Conference '${conf.id}': Invalid IANA timezone '${conf.timezone}'`);
   }
 
-  // Validate date formats
-  const dateFields = ['deadline', 'abstract_deadline', 'start', 'end'];
-  dateFields.forEach((field) => {
-    if (conf[field]) {
-      const parsed = DateTime.fromISO(toISOFormat(String(conf[field])));
-      if (!parsed.isValid) {
-        errors.push(`Conference '${conf.id}': Invalid date format for '${field}': ${conf[field]}`);
-      }
+  // Validate datetime fields (deadline, abstract_deadline)
+  (['deadline', 'abstract_deadline'] as const).forEach((field) => {
+    if (conf[field] && !isValidDateTime(String(conf[field]))) {
+      errors.push(`Conference '${conf.id}': Invalid datetime format for '${field}': ${conf[field]}`);
+    }
+  });
+
+  // Validate date-only fields (start, end)
+  (['start', 'end'] as const).forEach((field) => {
+    if (conf[field] && !isValidDate(String(conf[field]))) {
+      errors.push(`Conference '${conf.id}': Invalid date format for '${field}': ${conf[field]}`);
     }
   });
 
   // Validate year format
-  if (conf.year && (typeof conf.year !== 'number' || conf.year < 1900 || conf.year > 2100)) {
+  if (conf.year && (typeof conf.year !== 'number' || conf.year < YEAR_MIN || conf.year > YEAR_MAX)) {
     errors.push(`Conference '${conf.id}': Invalid year '${conf.year}'`);
   }
 
@@ -145,8 +151,19 @@ export function getNextDeadline(conference: Conference): DeadlineInfo | null {
   return deadlines[deadlines.length - 1];
 }
 
+export function getNoDeadlineLabel(conference: Conference): string {
+  switch (conference.deadline_status) {
+    case 'attendance':
+      return 'Registration only, no submission';
+    case 'tba':
+      return 'Deadline to be announced';
+    default:
+      return 'No deadlines on record';
+  }
+}
+
 export function getSubjectColor(subject: string) {
-  return SUBJECT_COLORS[subject] || { bg: '#f9fafb', color: '#4b5563', border: '#e5e7eb' };
+  return SUBJECT_COLORS[subject] || DEFAULT_SUBJECT_COLOR;
 }
 
 export function getSubjectsArray(sub: string | string[]): string[] {

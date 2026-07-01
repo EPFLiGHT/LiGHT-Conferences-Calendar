@@ -1,36 +1,26 @@
 import fs from 'fs';
 import yaml from 'js-yaml';
 import { DateTime } from 'luxon';
+import {
+  REQUIRED_FIELDS,
+  VALID_TYPES,
+  VALID_DEADLINE_STATUS,
+  YEAR_MIN,
+  YEAR_MAX,
+  isValidTimezone,
+  isValidDateTime,
+  isValidDate,
+} from '../src/utils/conferenceSchema.js';
+import { DATA_FILES } from '../src/constants/dataFiles.js';
+import { SUBJECT_CODES as VALID_SUBJECTS } from '../src/constants/subjects.data.js';
 
-const REQUIRED_FIELDS = ['title', 'year', 'id', 'timezone', 'type'];
 const OPTIONAL_FIELDS = [
   'full_name', 'link', 'deadline', 'abstract_deadline',
   'place', 'date', 'start', 'end', 'paperslink', 'pwclink',
   'hindex', 'sub', 'note', 'deadline_status'
 ];
 
-// Valid values for the optional deadline_status field.
-// 'attendance' = registration/attendance event with no submission.
-// 'tba'        = a deadline will exist but is not yet announced.
-const VALID_DEADLINE_STATUS = ['attendance', 'tba'];
 const ALL_FIELDS = [...REQUIRED_FIELDS, ...OPTIONAL_FIELDS];
-
-// Valid subject tags
-const VALID_SUBJECTS = [
-  'ML',           // Machine Learning
-  'CV',           // Computer Vision
-  'NLP',          // Natural Language Processing
-  'DM',           // Data Mining
-  'HCI',          // Human-Computer Interaction
-  'SEC',          // Security
-  'SE',           // Software Engineering
-  'AI',           // Artificial Intelligence
-  'Global Health', // Global Health
-  'Health AI'     // Health AI
-];
-
-// Valid event types
-const VALID_TYPES = ['conference', 'summit', 'workshop'];
 
 let errorCount = 0;
 let warningCount = 0;
@@ -67,60 +57,23 @@ function validateConference(conf, index) {
   });
 
   // Validate timezone
-  if (conf.timezone) {
-    try {
-      DateTime.now().setZone(conf.timezone);
-      // Additional check: try to create a date in this timezone
-      const test = DateTime.fromISO('2024-01-01T00:00:00', { zone: conf.timezone });
-      if (!test.isValid) {
-        error(`${confId}: Invalid IANA timezone '${conf.timezone}'`);
-      }
-    } catch (e) {
-      error(`${confId}: Could not validate timezone '${conf.timezone}'`);
-    }
+  if (conf.timezone && !isValidTimezone(conf.timezone)) {
+    error(`${confId}: Invalid IANA timezone '${conf.timezone}'`);
   }
 
-  // Validate date formats (allow both HH:MM and HH:MM:SS)
+  // Validate datetime fields (allow both HH:MM and HH:MM:SS)
   const dateTimeFields = ['deadline', 'abstract_deadline'];
   dateTimeFields.forEach(field => {
-    if (conf[field]) {
-      // Check if it's a string first
-      if (typeof conf[field] !== 'string') {
-        error(`${confId}: Field '${field}' must be a string in format YYYY-MM-DD HH:MM:SS or YYYY-MM-DD HH:MM`);
-        return;
-      }
-      // Check format with regex (allow both with and without seconds)
-      if (!/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}(:\d{2})?$/.test(conf[field])) {
-        error(`${confId}: Invalid datetime format for '${field}': ${conf[field]} (use YYYY-MM-DD HH:MM:SS or YYYY-MM-DD HH:MM)`);
-        return;
-      }
-      // Check if it's parseable (convert space to T for ISO parsing)
-      const isoFormat = conf[field].replace(' ', 'T');
-      const parsed = DateTime.fromISO(isoFormat);
-      if (!parsed.isValid) {
-        error(`${confId}: Invalid datetime for '${field}': ${conf[field]}`);
-      }
+    if (conf[field] && !isValidDateTime(conf[field])) {
+      error(`${confId}: Invalid datetime for '${field}': ${JSON.stringify(conf[field])} (use YYYY-MM-DD HH:MM:SS or YYYY-MM-DD HH:MM)`);
     }
   });
 
+  // Validate date-only fields
   const dateFields = ['start', 'end'];
   dateFields.forEach(field => {
-    if (conf[field]) {
-      // Check if it's a string first
-      if (typeof conf[field] !== 'string') {
-        error(`${confId}: Field '${field}' must be a string in format YYYY-MM-DD`);
-        return;
-      }
-      // Check format with regex
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(conf[field])) {
-        error(`${confId}: Invalid date format for '${field}': ${conf[field]} (use YYYY-MM-DD)`);
-        return;
-      }
-      // Check if it's parseable
-      const parsed = DateTime.fromISO(conf[field]);
-      if (!parsed.isValid) {
-        error(`${confId}: Invalid date for '${field}': ${conf[field]}`);
-      }
+    if (conf[field] && !isValidDate(conf[field])) {
+      error(`${confId}: Invalid date for '${field}': ${JSON.stringify(conf[field])} (use YYYY-MM-DD)`);
     }
   });
 
@@ -133,7 +86,7 @@ function validateConference(conf, index) {
   if (conf.year) {
     if (typeof conf.year !== 'number') {
       error(`${confId}: Year must be a number, got ${typeof conf.year}`);
-    } else if (conf.year < 1900 || conf.year > 2100) {
+    } else if (conf.year < YEAR_MIN || conf.year > YEAR_MAX) {
       error(`${confId}: Year '${conf.year}' is out of reasonable range`);
     }
   }
@@ -242,11 +195,10 @@ function main() {
   console.log('🔍 Validating conference data files...\n');
 
   try {
-    const files = [
-      { path: 'public/data/conferences.yaml', type: 'conferences' },
-      { path: 'public/data/summits.yaml', type: 'summits' },
-      { path: 'public/data/workshops.yaml', type: 'workshops' }
-    ];
+    const files = DATA_FILES.map(name => ({
+      path: `public/data/${name}.yaml`,
+      type: name,
+    }));
 
     const allIds = [];
 

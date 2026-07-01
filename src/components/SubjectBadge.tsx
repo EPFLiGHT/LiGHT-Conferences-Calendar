@@ -23,11 +23,8 @@ export default function SubjectBadge({
         <InfoTooltip key={subject} label={SUBJECT_LABELS[subject] || subject}>
           <Text
             as="span"
-            fontSize="10px"
-            fontWeight="700"
+            textStyle="badgeLabel"
             color="brand.400"
-            textTransform="uppercase"
-            letterSpacing="0.2em"
             whiteSpace="nowrap"
             cursor="help"
             borderBottom="1px solid"

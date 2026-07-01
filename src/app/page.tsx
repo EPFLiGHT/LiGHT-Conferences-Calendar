@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Box, Container, Grid, Button, Flex, Text } from '@chakra-ui/react';
+import { Box, Grid, Button, Flex, Text } from '@chakra-ui/react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import PageShell from '@/components/PageShell';
 import ConferenceCard from '@/components/ConferenceCard';
 import ConferenceModal from '@/components/ConferenceModal';
 import ConferenceFiltersPanel from '@/components/ConferenceFiltersPanel';
@@ -56,8 +57,7 @@ export default function Page() {
   return (
     <>
       <Header />
-      <Box py={{ base: '6', md: '8' }} pb={{ base: '12', md: '16' }} minH="calc(100vh - 200px)">
-        <Container maxW="1200px" px={{ base: '4', md: '6' }} mx="auto">
+      <PageShell>
           <ConferenceFiltersPanel
             title="Research Conferences"
             eyebrow=""
@@ -175,15 +175,14 @@ export default function Page() {
               </Flex>
             </Box>
           )}
-        </Container>
+      </PageShell>
 
-        {selectedConference && (
-          <ConferenceModal
-            conference={selectedConference}
-            onClose={() => setSelectedConference(null)}
-          />
-        )}
-      </Box>
+      {selectedConference && (
+        <ConferenceModal
+          conference={selectedConference}
+          onClose={() => setSelectedConference(null)}
+        />
+      )}
       <Footer />
     </>
   );

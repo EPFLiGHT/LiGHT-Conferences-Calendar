@@ -7,7 +7,7 @@ import type { Conference } from '@/types/conference';
 import type { BlockKitMessage } from '@/types/slack';
 import { getConferences } from '../utils/conferenceCache';
 import { getUpcomingDeadlines, getUpcomingEvents, getDaysUntilDeadline } from '@/utils/conferenceQueries';
-import { getNextDeadline } from '@/utils/parser';
+import { getNextDeadline, getNoDeadlineLabel } from '@/utils/parser';
 import { buildConferenceItemBlocks, buildErrorMessage, buildChannelDigest } from './messageBuilder';
 
 /**
@@ -70,12 +70,7 @@ export function buildConferenceDetailsCard(
   };
 
   if (!deadline) {
-    const noDeadlineText =
-      conference.deadline_status === 'attendance'
-        ? 'Registration only, no submission.'
-        : conference.deadline_status === 'tba'
-          ? 'Deadline to be announced.'
-          : 'No upcoming deadline announced yet.';
+    const noDeadlineText = getNoDeadlineLabel(conference);
     return {
       blocks: [
         {

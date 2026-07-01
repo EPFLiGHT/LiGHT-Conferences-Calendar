@@ -38,10 +38,51 @@ export const system = createSystem(defaultConfig, defineConfig({
         // Ivy Presto Headline is Adobe-licensed; Playfair Display is the free stand-in.
         body: { value: 'Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif' },
         heading: { value: '"Ivy Presto Headline", "Playfair Display", Georgia, serif' },
+        mono: { value: 'ui-monospace, SFMono-Regular, Menlo, monospace' },
+      },
+      // Corner-radius scale, by role. Custom names (not Chakra's xs/sm/md) so
+      // existing default-token usage is untouched. Change a shape in one place.
+      radii: {
+        badge: { value: '2px' },
+        control: { value: '3px' },
+        card: { value: '4px' },
+        panel: { value: '8px' },
+        sheet: { value: '12px' },
+        hero: { value: '20px' },
+        pill: { value: '24px' },
       },
       animations: {
         'button-transition': { value: 'all 0.2s ease-in-out' },
         'card-transition': { value: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' },
+      },
+    },
+    // Shared uppercase micro-label typography. Callers still set `color` (it
+    // varies by context); everything else lives here so the label look is
+    // defined once. See COLORS/SHADOWS/TRANSITIONS below for raw-string contexts.
+    textStyles: {
+      eyebrow: {
+        value: {
+          fontSize: '11px',
+          fontWeight: '700',
+          textTransform: 'uppercase',
+          letterSpacing: '0.22em',
+        },
+      },
+      badgeLabel: {
+        value: {
+          fontSize: '10px',
+          fontWeight: '700',
+          textTransform: 'uppercase',
+          letterSpacing: '0.2em',
+        },
+      },
+      fieldLabel: {
+        value: {
+          fontSize: '10px',
+          fontWeight: '600',
+          textTransform: 'uppercase',
+          letterSpacing: '0.2em',
+        },
       },
     },
     semanticTokens: {
@@ -302,6 +343,7 @@ export const SHADOWS = {
 
 export const TRANSITIONS = {
   normal: 'all 0.2s ease-in-out',
+  standard: 'all 0.2s ease',
 } as const;
 
 /** Brand color at the given alpha, for raw color strings. */

@@ -5,16 +5,8 @@ import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
-
-const inlineLink = {
-  color: 'brand.500',
-  fontWeight: 500,
-  borderBottom: '1px solid',
-  borderColor: 'line.hover',
-  pb: '1px',
-  transition: 'all 0.2s ease',
-  _hover: { color: 'brand.700', borderColor: 'brand.700', textDecoration: 'none' },
-} as const;
+import { inlineLinkStyle } from '@/styles/linkStyles';
+import { ROUTES } from '@/constants/routes';
 
 interface SectionProps {
   num: string;
@@ -80,7 +72,7 @@ export default function PrivacyPolicyPage() {
           {/* Back link */}
           <ChakraLink
             as={Link}
-            href="/slack-install"
+            href={ROUTES.slackInstall}
             display="inline-flex"
             alignItems="center"
             gap="2"
@@ -239,14 +231,14 @@ export default function PrivacyPolicyPage() {
             </Text>
             <Bullet>
               Access your stored preferences using{' '}
-              <Text as="code" px="2" py="0.5" fontSize="xs" fontFamily="ui-monospace, SFMono-Regular, monospace" color="brand.500" border="1px solid" borderColor="line.strong" borderRadius="3px" className="tabular">
+              <Text as="code" px="2" py="0.5" fontSize="xs" fontFamily="mono" color="brand.500" border="1px solid" borderColor="line.strong" borderRadius="control" className="tabular">
                 /conf-settings
               </Text>
             </Bullet>
             <Bullet>Modify your notification preferences at any time</Bullet>
             <Bullet>
               Unsubscribe from notifications using{' '}
-              <Text as="code" px="2" py="0.5" fontSize="xs" fontFamily="ui-monospace, SFMono-Regular, monospace" color="brand.500" border="1px solid" borderColor="line.strong" borderRadius="3px" className="tabular">
+              <Text as="code" px="2" py="0.5" fontSize="xs" fontFamily="mono" color="brand.500" border="1px solid" borderColor="line.strong" borderRadius="control" className="tabular">
                 /conf-unsubscribe
               </Text>
             </Bullet>
@@ -260,13 +252,13 @@ export default function PrivacyPolicyPage() {
             </Text>
             <Bullet>
               <Text as="span" fontWeight="600" color="brand.500">Slack API</Text>: messaging and user authentication.{' '}
-              <ChakraLink href="https://slack.com/privacy-policy" target="_blank" rel="noopener noreferrer" {...inlineLink} display="inline-flex" alignItems="center" gap="1">
+              <ChakraLink href="https://slack.com/privacy-policy" target="_blank" rel="noopener noreferrer" {...inlineLinkStyle} display="inline-flex" alignItems="center" gap="1">
                 Privacy policy <ArrowUpRight size={11} strokeWidth={2} />
               </ChakraLink>
             </Bullet>
             <Bullet>
               <Text as="span" fontWeight="600" color="brand.500">Vercel</Text>: hosting and database storage.{' '}
-              <ChakraLink href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" {...inlineLink} display="inline-flex" alignItems="center" gap="1">
+              <ChakraLink href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" {...inlineLinkStyle} display="inline-flex" alignItems="center" gap="1">
                 Privacy policy <ArrowUpRight size={11} strokeWidth={2} />
               </ChakraLink>
             </Bullet>
@@ -321,7 +313,7 @@ export default function PrivacyPolicyPage() {
                   display="inline-flex"
                   alignItems="center"
                   gap="1.5"
-                  {...inlineLink}
+                  {...inlineLinkStyle}
                   alignSelf="flex-start"
                 >
                   omar.azgaoui@epfl.ch
@@ -334,7 +326,7 @@ export default function PrivacyPolicyPage() {
                   display="inline-flex"
                   alignItems="center"
                   gap="1.5"
-                  {...inlineLink}
+                  {...inlineLinkStyle}
                   alignSelf="flex-start"
                 >
                   github.com/EPFLiGHT/Conferences-Calendar

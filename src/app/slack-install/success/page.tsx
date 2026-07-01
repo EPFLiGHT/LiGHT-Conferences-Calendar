@@ -36,7 +36,7 @@ function SuccessContent() {
           {/* Success Card */}
           <Box
             bg="white"
-            borderRadius="24px"
+            borderRadius="pill"
             border="2px solid"
             borderColor="brand.200"
             boxShadow={`0 8px 32px ${brandAlpha(0.15)}`}
@@ -82,7 +82,7 @@ function SuccessContent() {
               px="4"
               py="2"
               bg="brand.50"
-              borderRadius="12px"
+              borderRadius="sheet"
               border="1px solid"
               borderColor="brand.200"
               mb="10"
@@ -96,7 +96,7 @@ function SuccessContent() {
             <Box
               p={{ base: '6', md: '8' }}
               bg={`linear-gradient(135deg, ${COLORS.brand[50]} 0%, ${COLORS.brand[100]} 100%)`}
-              borderRadius="20px"
+              borderRadius="hero"
               border="1px solid"
               borderColor="brand.200"
               mb="8"
@@ -128,7 +128,7 @@ function SuccessContent() {
                     gap="4"
                     p="4"
                     bg="white"
-                    borderRadius="12px"
+                    borderRadius="sheet"
                     border="1px solid"
                     borderColor="brand.100"
                     transition="all 0.2s ease"
@@ -144,7 +144,7 @@ function SuccessContent() {
                       px="3"
                       py="2"
                       bg="brand.50"
-                      borderRadius="8px"
+                      borderRadius="panel"
                       fontFamily="mono"
                       fontSize="sm"
                       fontWeight="600"
@@ -171,7 +171,7 @@ function SuccessContent() {
               py="4"
               bg="brand.500"
               color="white"
-              borderRadius="12px"
+              borderRadius="sheet"
               fontWeight="600"
               fontSize="lg"
               textDecoration="none"

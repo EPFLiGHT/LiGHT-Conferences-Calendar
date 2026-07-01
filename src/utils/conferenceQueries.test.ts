@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { DateTime } from 'luxon';
-import { getUpcomingEvents } from '@/utils/conferenceQueries';
+import { getUpcomingEvents, filterDeadlinesByReminders } from '@/utils/conferenceQueries';
 import type { Conference } from '@/types/conference';
 
 function conf(id: string, start?: string): Conference {
@@ -12,6 +12,21 @@ function conf(id: string, start?: string): Conference {
     sub: 'ML',
     type: 'conference',
     ...(start ? { start } : {}),
+  } as Conference;
+}
+
+// A conference whose paper deadline is `days` out from now (UTC, minute-truncated).
+function confDeadlineInDays(id: string, days: number): Conference {
+  const deadline = DateTime.now().setZone('utc').plus({ days }).toFormat('yyyy-MM-dd HH:mm');
+  return {
+    id,
+    title: id,
+    year: 2026,
+    full_name: id,
+    sub: 'ML',
+    type: 'conference',
+    timezone: 'utc',
+    deadline,
   } as Conference;
 }
 
@@ -47,5 +62,27 @@ describe('getUpcomingEvents', () => {
   it('reports a non-negative daysLeft for upcoming events', () => {
     const [event] = getUpcomingEvents([conf('x', iso(5))]);
     expect(event.daysLeft).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('filterDeadlinesByReminders', () => {
+  it('keeps only deadlines that land exactly on a reminder day', () => {
+    const result = filterDeadlinesByReminders(
+      [
+        confDeadlineInDays('on7', 7),
+        confDeadlineInDays('off5', 5),
+        confDeadlineInDays('on30', 30),
+      ],
+      [30, 7, 3]
+    );
+    expect(result.map((r) => r.conference.id).sort()).toEqual(['on30', 'on7']);
+  });
+
+  it('returns nothing when no deadline matches a reminder day', () => {
+    const result = filterDeadlinesByReminders(
+      [confDeadlineInDays('off', 5)],
+      [30, 7, 3]
+    );
+    expect(result).toEqual([]);
   });
 });

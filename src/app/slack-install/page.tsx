@@ -5,6 +5,7 @@ import { Bell, Search, SlidersHorizontal } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { COMMAND_DESCRIPTIONS } from '@/slack-bot/config/constants';
+import { ROUTES, EXTERNAL_URLS } from '@/constants/routes';
 import Link from 'next/link';
 
 /**
@@ -56,7 +57,7 @@ export default function SlackInstallPage() {
                 alt="Conferences Calendar Slack Bot"
                 h={{ base: '88px', md: '104px' }}
                 w="auto"
-                borderRadius="20px"
+                borderRadius="hero"
                 border="1px solid"
                 borderColor="line.default"
               />
@@ -88,7 +89,7 @@ export default function SlackInstallPage() {
 
             <Flex justify="center" mb="5">
               <ChakraLink
-                href="https://conferences-calendar.vercel.app/api/slack/install"
+                href={EXTERNAL_URLS.slackOauthInstall}
                 display="inline-block"
                 transition="opacity 0.2s ease"
                 _hover={{ opacity: 0.85 }}
@@ -117,7 +118,7 @@ export default function SlackInstallPage() {
               By installing, you agree to our{' '}
               <ChakraLink
                 as={Link}
-                href="/slack-install/privacy"
+                href={ROUTES.slackPrivacy}
                 color="brand.500"
                 fontWeight="600"
                 borderBottom="1px solid"
@@ -240,13 +241,13 @@ export default function SlackInstallPage() {
                     as="code"
                     px="3"
                     py="1.5"
-                    fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
+                    fontFamily="mono"
                     fontSize="xs"
                     fontWeight="500"
                     color="brand.500"
                     border="1px solid"
                     borderColor="line.strong"
-                    borderRadius="3px"
+                    borderRadius="control"
                     whiteSpace="nowrap"
                     className="tabular"
                   >

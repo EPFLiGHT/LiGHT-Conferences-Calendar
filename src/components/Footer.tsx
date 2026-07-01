@@ -2,6 +2,7 @@
 
 import { Box, Container, Flex, Grid, Heading, Text, Link, Image } from '@chakra-ui/react';
 import { MapPin, Mail, Linkedin, Github, ArrowUpRight, ArrowUp } from 'lucide-react';
+import { ROUTES } from '@/constants/routes';
 
 const linkUnderline = {
   borderBottom: '1px solid',
@@ -285,7 +286,7 @@ export default function Footer(): JSX.Element {
                 </Link>
 
                 <Link
-                  href="/slack-install"
+                  href={ROUTES.slackInstall}
                   fontSize="sm"
                   color="brand.500"
                   fontWeight="500"
@@ -297,7 +298,7 @@ export default function Footer(): JSX.Element {
                 </Link>
 
                 <Link
-                  href="/slack-install/privacy"
+                  href={ROUTES.slackPrivacy}
                   fontSize="sm"
                   color="brand.500"
                   fontWeight="500"

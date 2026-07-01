@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, Container, Flex, Grid, Heading, Text } from '@chakra-ui/react';
+import { Box, Flex, Grid, Heading, Text } from '@chakra-ui/react';
 import yaml from 'js-yaml';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import PageShell from '@/components/PageShell';
 import SpeakerCard from '@/components/SpeakerCard';
 import SpeakerModal from '@/components/SpeakerModal';
 import LoadingState from '@/components/LoadingState';
@@ -43,8 +44,7 @@ export default function SpeakersPage() {
   return (
     <>
       <Header />
-      <Box py={{ base: '6', md: '8' }} pb={{ base: '12', md: '16' }} minH="calc(100vh - 200px)">
-        <Container maxW="1200px" px={{ base: '4', md: '6' }} mx="auto">
+      <PageShell>
           {/* Page Header */}
           <Box mb="10">
             <Text
@@ -128,8 +128,7 @@ export default function SpeakersPage() {
               </Text>
             </Box>
           )}
-        </Container>
-      </Box>
+      </PageShell>
       <Footer />
 
       {/* Speaker Modal */}

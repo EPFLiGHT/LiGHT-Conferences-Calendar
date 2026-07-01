@@ -6,8 +6,10 @@ import SubjectBadge from './SubjectBadge';
 import TypeBadge from './TypeBadge';
 import NoteBadge from './NoteBadge';
 import ConferenceDetails from './ConferenceDetails';
-import { getDeadlineInfo } from '@/utils/parser';
+import { getDeadlineInfo, getNoDeadlineLabel } from '@/utils/parser';
 import { Conference } from '@/types/conference';
+import { cardSurfaceStyle } from '@/styles/containerStyles';
+import { useCardAnimation } from '@/hooks/useCardAnimation';
 import { brandAlpha } from '@/theme';
 
 const MotionBox = motion.create(Box);
@@ -22,17 +24,9 @@ export default function ConferenceCard({ conference, onClick, index = 0 }: Confe
   const allDeadlines = getDeadlineInfo(conference);
 
   // Label shown when an event carries no deadline, honest about which case applies.
-  const noDeadlineLabel =
-    conference.deadline_status === 'attendance'
-      ? 'Registration only, no submission'
-      : conference.deadline_status === 'tba'
-        ? 'Deadline to be announced'
-        : 'No deadlines on record';
+  const noDeadlineLabel = getNoDeadlineLabel(conference);
 
-  // Lighter animation for mobile (faster, less "aggressive")
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  const animationDelay = isMobile ? (index % 12) * 0.03 : (index % 12) * 0.02;
-  const animationDuration = isMobile ? 0.3 : 0.25;
+  const { animationDelay, animationDuration } = useCardAnimation(index);
 
   return (
     <MotionBox
@@ -44,11 +38,7 @@ export default function ConferenceCard({ conference, onClick, index = 0 }: Confe
         delay: animationDelay,
         ease: [0.25, 0.46, 0.45, 0.94],
       }}
-      bg="white"
-      borderRadius="4px"
-      border="1px solid"
-      borderColor="line.default"
-      p="6"
+      {...cardSurfaceStyle}
       cursor="pointer"
       position="relative"
       whileHover={{

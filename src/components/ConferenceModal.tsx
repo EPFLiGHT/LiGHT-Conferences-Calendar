@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -6,12 +5,13 @@ import {
   Heading,
   Text,
   VStack,
-  Portal,
 } from '@chakra-ui/react';
 import { X, Globe, FileText, Code, Calendar } from 'lucide-react';
 import DeadlineCard from './DeadlineCard';
 import ExternalLinkButton from './ExternalLinkButton';
 import ConferenceDetails from './ConferenceDetails';
+import ModalShell from './ModalShell';
+import SectionLabel from './SectionLabel';
 import { getDeadlineInfo } from '@/utils/parser';
 import { exportConference } from '@/utils/ics';
 import { secondaryButtonStyle } from '@/styles/buttonStyles';
@@ -23,105 +23,16 @@ interface ConferenceModalProps {
 }
 
 export default function ConferenceModal({ conference, onClose }: ConferenceModalProps): JSX.Element | null {
-  const [isOpen, setIsOpen] = useState(true);
   const deadlines = getDeadlineInfo(conference);
 
   const handleExport = () => {
     exportConference(conference);
   };
 
-  const handleClose = () => {
-    setIsOpen(false);
-    onClose();
-  };
-
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      handleClose();
-    }
-  };
-
-  useEffect(() => {
-    const handleEscapeKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        handleClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleEscapeKey);
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      document.removeEventListener('keydown', handleEscapeKey);
-      document.body.style.overflow = 'unset';
-    };
-  }, []);
-
-  if (!isOpen) return null;
-
-  const SectionLabel = ({ children, num }: { children: React.ReactNode; num: string }) => (
-    <Flex
-      align="baseline"
-      justify="space-between"
-      pb="3"
-      mb="5"
-      borderBottom="1px solid"
-      borderColor="line.default"
-    >
-      <Text
-        fontSize="11px"
-        fontWeight="700"
-        color="brand.500"
-        textTransform="uppercase"
-        letterSpacing="0.22em"
-      >
-        {children}
-      </Text>
-      <Text
-        fontSize="11px"
-        fontWeight="600"
-        color="brand.400"
-        textTransform="uppercase"
-        letterSpacing="0.22em"
-        className="tabular"
-      >
-        § {num}
-      </Text>
-    </Flex>
-  );
-
   return (
-    <Portal>
-      <Box
-        position="fixed"
-        top="0"
-        left="0"
-        right="0"
-        bottom="0"
-        bg="overlay.scrim"
-        backdropFilter="blur(2px)"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        zIndex="modal"
-        p={{ base: '3', md: '6' }}
-        onClick={handleBackdropClick}
-      >
-        <Box
-          bg="white"
-          borderRadius="4px"
-          maxW="860px"
-          w="full"
-          maxH="90vh"
-          overflowY="auto"
-          border="1px solid"
-          borderColor="brand.500"
-          position="relative"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Top accent rule */}
-          <Box h="3px" bg="brand.500" />
-
+    <ModalShell onClose={onClose}>
+      {(close) => (
+        <>
           {/* Header */}
           <Box
             position="sticky"
@@ -145,13 +56,13 @@ export default function ConferenceModal({ conference, onClose }: ConferenceModal
               justifyContent="center"
               border="1px solid"
               borderColor="line.strong"
-              borderRadius="3px"
+              borderRadius="control"
               bg="white"
               color="brand.500"
               cursor="pointer"
               transition="all 0.2s ease"
               _hover={{ bg: 'brand.500', color: 'white', borderColor: 'brand.500' }}
-              onClick={handleClose}
+              onClick={close}
               aria-label="Close"
             >
               <X size={16} strokeWidth={2} />
@@ -192,14 +103,14 @@ export default function ConferenceModal({ conference, onClose }: ConferenceModal
             <VStack align="stretch" gap="10">
               {/* Conference Details */}
               <Box>
-                <SectionLabel num="01">Details</SectionLabel>
+                <SectionLabel label="Details" trailing="§ 01" />
                 <ConferenceDetails conference={conference} variant="modal" />
               </Box>
 
               {/* Deadlines */}
               {deadlines.length > 0 && (
                 <Box>
-                  <SectionLabel num="02">Deadlines</SectionLabel>
+                  <SectionLabel label="Deadlines" trailing="§ 02" />
                   <VStack align="stretch" gap="4">
                     {deadlines.map((deadline, idx) => (
                       <DeadlineCard
@@ -215,7 +126,7 @@ export default function ConferenceModal({ conference, onClose }: ConferenceModal
 
               {/* Quick Links */}
               <Box>
-                <SectionLabel num={deadlines.length > 0 ? '03' : '02'}>Resources</SectionLabel>
+                <SectionLabel label="Resources" trailing={`§ ${deadlines.length > 0 ? '03' : '02'}`} />
                 <Flex gap="3" wrap="wrap">
                   {conference.link && (
                     <ExternalLinkButton href={conference.link} variant="primary" size="md" px="5">
@@ -256,8 +167,8 @@ export default function ConferenceModal({ conference, onClose }: ConferenceModal
               </Box>
             </VStack>
           </Box>
-        </Box>
-      </Box>
-    </Portal>
+        </>
+      )}
+    </ModalShell>
   );
 }

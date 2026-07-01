@@ -8,6 +8,11 @@ import { DateTime } from 'luxon';
 import { getNextDeadline } from './parser';
 import type { Conference, DeadlineInfo } from '@/types/conference';
 
+/** Whole days from `today` (start-of-day) until `start`, rounded up. */
+function daysUntilStart(start: DateTime, today: DateTime): number {
+  return Math.ceil(start.startOf('day').diff(today, 'days').days);
+}
+
 /**
  * Search conferences by title, year, or full name
  * Case-insensitive, whitespace-insensitive matching
@@ -79,7 +84,7 @@ export function getUpcomingEvents(
       if (!conf.start) return null;
       const start = DateTime.fromISO(conf.start, { zone: conf.timezone || 'utc' });
       if (!start.isValid) return null;
-      const daysLeft = Math.ceil(start.startOf('day').diff(today, 'days').days);
+      const daysLeft = daysUntilStart(start, today);
       if (daysLeft < 0) return null;
       return { conference: conf, start, daysLeft };
     })
@@ -116,7 +121,7 @@ export function getEventStartsOnDays(
       if (!conf.start) return null;
       const start = DateTime.fromISO(conf.start, { zone: conf.timezone || 'utc' });
       if (!start.isValid) return null;
-      const daysLeft = Math.ceil(start.startOf('day').diff(today, 'days').days);
+      const daysLeft = daysUntilStart(start, today);
       if (!reminderDays.includes(daysLeft)) return null;
       return { conference: conf, start, daysLeft };
     })
@@ -145,4 +150,19 @@ export function getDeadlinesWithinDays(
     })
     .filter((item): item is { conference: Conference; deadline: DeadlineInfo; daysLeft: number } => item !== null)
     .sort((a, b) => a.daysLeft - b.daysLeft);
+}
+
+/**
+ * Deadlines that land exactly on one of the given reminder-day offsets
+ * (e.g. 30, 7, 3 days out). Shared by the user-DM and channel crons so both
+ * fire on the same cadence and never re-post the same item on consecutive days.
+ */
+export function filterDeadlinesByReminders(
+  conferences: Conference[],
+  reminderDays: number[]
+): Array<{ conference: Conference; deadline: DeadlineInfo; daysLeft: number }> {
+  const maxReminderDays = Math.max(...reminderDays);
+  return getDeadlinesWithinDays(conferences, maxReminderDays).filter(item =>
+    reminderDays.includes(item.daysLeft)
+  );
 }

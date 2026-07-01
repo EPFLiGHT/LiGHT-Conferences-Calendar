@@ -45,13 +45,7 @@ export default function DeadlineCard({
           borderColor="line.default"
           bg="brand.50"
         >
-          <Text
-            fontSize="11px"
-            fontWeight="700"
-            color="brand.500"
-            textTransform="uppercase"
-            letterSpacing="0.22em"
-          >
+          <Text textStyle="eyebrow" color="brand.500">
             {deadline.label}
           </Text>
           {isExpired && (
@@ -105,7 +99,7 @@ export default function DeadlineCard({
           {/* Times */}
           <VStack align="stretch" gap="4" flex="1" justify="center">
             <VStack align="start" gap="1">
-              <Text fontSize="10px" fontWeight="600" color="brand.400" textTransform="uppercase" letterSpacing="0.2em">
+              <Text textStyle="fieldLabel" color="brand.400">
                 Original time
               </Text>
               <Text fontSize="sm" color="brand.500" fontWeight="500" className="tabular" lineHeight="1.5">
@@ -116,7 +110,7 @@ export default function DeadlineCard({
               </Text>
             </VStack>
             <VStack align="start" gap="1">
-              <Text fontSize="10px" fontWeight="600" color="brand.400" textTransform="uppercase" letterSpacing="0.2em">
+              <Text textStyle="fieldLabel" color="brand.400">
                 Your local time
               </Text>
               <Text fontSize="sm" color="brand.500" fontWeight="500" className="tabular" lineHeight="1.5">

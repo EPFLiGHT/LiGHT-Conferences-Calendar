@@ -7,6 +7,8 @@ import { ExternalLink } from 'lucide-react';
 import { Speaker } from '@/types/speaker';
 import ExternalLinkButton from './ExternalLinkButton';
 import SpeakerAvatar from './SpeakerAvatar';
+import { cardSurfaceStyle } from '@/styles/containerStyles';
+import { useCardAnimation } from '@/hooks/useCardAnimation';
 import { brandAlpha } from '@/theme';
 
 const MotionBox = motion.create(Box);
@@ -18,9 +20,7 @@ interface SpeakerCardProps {
 }
 
 export default function SpeakerCard({ speaker, index = 0, onClick }: SpeakerCardProps): JSX.Element {
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  const animationDelay = isMobile ? (index % 12) * 0.03 : (index % 12) * 0.02;
-  const animationDuration = isMobile ? 0.3 : 0.25;
+  const { animationDelay, animationDuration } = useCardAnimation(index);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentPresentation = speaker.presentations[currentIndex];
@@ -48,11 +48,7 @@ export default function SpeakerCard({ speaker, index = 0, onClick }: SpeakerCard
         delay: animationDelay,
         ease: [0.25, 0.46, 0.45, 0.94],
       }}
-      bg="white"
-      border="1px solid"
-      borderColor="line.default"
-      borderRadius="4px"
-      p="6"
+      {...cardSurfaceStyle}
       cursor={onClick ? 'pointer' : 'default'}
       onClick={onClick}
       whileHover={{
@@ -117,14 +113,7 @@ export default function SpeakerCard({ speaker, index = 0, onClick }: SpeakerCard
             <VStack align="stretch" gap="4">
               {/* Topic */}
               <Box>
-                <Text
-                  fontSize="10px"
-                  fontWeight="600"
-                  color="brand.400"
-                  textTransform="uppercase"
-                  letterSpacing="0.2em"
-                  mb="2"
-                >
+                <Text textStyle="fieldLabel" color="brand.400" mb="2">
                   Topic
                 </Text>
                 <Text fontSize="md" color="brand.500" fontWeight="500" lineHeight="1.45" fontStyle="italic">
@@ -134,14 +123,7 @@ export default function SpeakerCard({ speaker, index = 0, onClick }: SpeakerCard
 
               {/* Event */}
               <Box>
-                <Text
-                  fontSize="10px"
-                  fontWeight="600"
-                  color="brand.400"
-                  textTransform="uppercase"
-                  letterSpacing="0.2em"
-                  mb="2"
-                >
+                <Text textStyle="fieldLabel" color="brand.400" mb="2">
                   Event
                 </Text>
                 <Text fontSize="sm" color="gray.700" lineHeight="1.5">

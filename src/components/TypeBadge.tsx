@@ -10,14 +10,11 @@ export default function TypeBadge({ type }: TypeBadgeProps): JSX.Element | null 
   return (
     <Text
       as="span"
-      fontSize="10px"
-      fontWeight="700"
+      textStyle="badgeLabel"
       color="brand.500"
-      textTransform="uppercase"
-      letterSpacing="0.2em"
       border="1px solid"
       borderColor="line.strong"
-      borderRadius="2px"
+      borderRadius="badge"
       px="2"
       py="1"
       whiteSpace="nowrap"
