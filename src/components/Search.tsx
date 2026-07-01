@@ -13,7 +13,7 @@ export default function Search({ value, onChange }: SearchProps): JSX.Element {
         align="center"
         gap="3"
         borderBottom="1px solid"
-        borderColor={value ? 'brand.500' : 'rgba(46, 95, 168, 0.3)'}
+        borderColor={value ? 'brand.500' : 'rgba(12, 67, 160, 0.3)'}
         transition="border-color 0.2s ease"
         _focusWithin={{ borderColor: 'brand.500' }}
       >

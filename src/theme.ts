@@ -4,22 +4,27 @@ export const system = createSystem(defaultConfig, defineConfig({
   theme: {
     tokens: {
       colors: {
+        // Brand blue ramp anchored on the official palette (brand guidelines, p.11):
+        // 300 = Light Blue (#68AFE7, accent), 500 = Dark Blue (#0C43A0, base).
         brand: {
-          50: { value: '#f0f7ff' },
-          100: { value: '#e6f2ff' },
-          200: { value: '#d9ebff' },
-          300: { value: '#a8cef7' },
-          400: { value: '#5d9fd2' },
-          500: { value: '#2e5fa9' },
-          600: { value: '#234a87' },
-          700: { value: '#1a3766' },
-          800: { value: '#122751' },
-          900: { value: '#0a1a3d' },
+          50: { value: '#eef4fc' },
+          100: { value: '#d9e7f7' },
+          200: { value: '#b4ccec' },
+          300: { value: '#68afe7' },
+          400: { value: '#3d84d4' },
+          500: { value: '#0c43a0' },
+          600: { value: '#0a3a8a' },
+          700: { value: '#082f6f' },
+          800: { value: '#062350' },
+          900: { value: '#041634' },
         },
+        // Neutral background (brand guidelines, p.11).
+        eggshell: { value: '#FEFFF7' },
       },
       fonts: {
-        body: { value: 'Chillax, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif' },
-        heading: { value: 'Chillax, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif' },
+        // Ivy Presto Headline is Adobe-licensed; Playfair Display is the free stand-in.
+        body: { value: 'Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif' },
+        heading: { value: '"Ivy Presto Headline", "Playfair Display", Georgia, serif' },
       },
       animations: {
         'button-transition': { value: 'all 0.2s ease-in-out' },
@@ -37,7 +42,7 @@ export const system = createSystem(defaultConfig, defineConfig({
   globalCss: {
     'html, body': {
       background: '#ffffff',
-      color: '#0a1a3d',
+      color: '#041634',
     },
     '.tabular': {
       fontVariantNumeric: 'tabular-nums',
@@ -59,7 +64,7 @@ export const system = createSystem(defaultConfig, defineConfig({
     /* Toolbar buttons */
     '.fc .fc-button': {
       background: 'white !important',
-      borderColor: 'rgba(46, 95, 168, 0.35) !important',
+      borderColor: 'rgba(12, 67, 160, 0.35) !important',
       textTransform: 'uppercase',
       fontWeight: '600',
       letterSpacing: '0.16em',
@@ -126,11 +131,11 @@ export const system = createSystem(defaultConfig, defineConfig({
 
     /* Grid borders */
     '.fc-theme-standard td, .fc-theme-standard th': {
-      borderColor: 'rgba(46, 95, 168, 0.14)',
+      borderColor: 'rgba(12, 67, 160, 0.14)',
     },
 
     '.fc-theme-standard .fc-scrollgrid': {
-      borderColor: 'rgba(46, 95, 168, 0.22)',
+      borderColor: 'rgba(12, 67, 160, 0.22)',
     },
 
     /* Day numbers */
@@ -166,13 +171,13 @@ export const system = createSystem(defaultConfig, defineConfig({
 
     '.fc .fc-col-header-cell': {
       background: 'white',
-      borderColor: 'rgba(46, 95, 168, 0.22)',
+      borderColor: 'rgba(12, 67, 160, 0.22)',
       borderBottomWidth: '2px',
     },
 
     /* Today background */
     '.fc .fc-day-today': {
-      background: 'rgba(46, 95, 168, 0.04) !important',
+      background: 'rgba(12, 67, 160, 0.04) !important',
     },
 
     /* Events */
@@ -205,8 +210,8 @@ export const system = createSystem(defaultConfig, defineConfig({
     /* List view */
     '.fc-list-day-cushion, .fc-list-day-cushion.fc-cell-shaded': {
       background: 'white !important',
-      borderTop: '1px solid rgba(46, 95, 168, 0.22)',
-      borderBottom: '1px solid rgba(46, 95, 168, 0.14)',
+      borderTop: '1px solid rgba(12, 67, 160, 0.22)',
+      borderBottom: '1px solid rgba(12, 67, 160, 0.14)',
     },
 
     '.fc-list-day-text, .fc-list-day-side-text': {
@@ -219,7 +224,7 @@ export const system = createSystem(defaultConfig, defineConfig({
     },
 
     '.fc-list-event:hover td': {
-      background: 'rgba(46, 95, 168, 0.04) !important',
+      background: 'rgba(12, 67, 160, 0.04) !important',
     },
 
     '.fc-list-event-time, .fc-list-event-title': {
@@ -256,14 +261,14 @@ export const system = createSystem(defaultConfig, defineConfig({
 
 export const COLORS = {
   brand: {
-    50: '#f0f7ff',
-    100: '#e6f2ff',
-    500: '#2e5fa9',
+    50: '#eef4fc',
+    100: '#d9e7f7',
+    500: '#0c43a0',
   },
 } as const;
 
 export const SHADOWS = {
-  md: '0 2px 8px rgba(46, 95, 169, 0.08)',
+  md: '0 2px 8px rgba(12, 67, 160, 0.08)',
 } as const;
 
 export const TRANSITIONS = {
@@ -271,5 +276,5 @@ export const TRANSITIONS = {
 } as const;
 
 export const brandAlpha = (_shade: 500, alpha: number) =>
-  `rgba(46, 95, 169, ${alpha})`;
+  `rgba(12, 67, 160, ${alpha})`;
 

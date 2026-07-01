@@ -49,13 +49,13 @@ export default function SpeakerCard({ speaker, index = 0, onClick }: SpeakerCard
       }}
       bg="white"
       border="1px solid"
-      borderColor="rgba(46, 95, 168, 0.22)"
+      borderColor="rgba(12, 67, 160, 0.22)"
       borderRadius="4px"
       p="6"
       cursor={onClick ? 'pointer' : 'default'}
       onClick={onClick}
       whileHover={{
-        borderColor: 'rgba(46, 95, 168, 0.6)',
+        borderColor: 'rgba(12, 67, 160, 0.6)',
         transition: { duration: 0.18, ease: 'easeOut' },
       }}
     >
@@ -89,7 +89,7 @@ export default function SpeakerCard({ speaker, index = 0, onClick }: SpeakerCard
       </Flex>
 
       {/* Top hairline rule */}
-      <Box borderTop="1px solid" borderColor="rgba(46, 95, 168, 0.18)" mb="5" />
+      <Box borderTop="1px solid" borderColor="rgba(12, 67, 160, 0.18)" mb="5" />
 
       {/* Type tag */}
       <Text

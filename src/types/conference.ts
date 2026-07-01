@@ -8,6 +8,8 @@ export interface Conference {
   link?: string;
   deadline?: string;
   abstract_deadline?: string;
+  // 'attendance' = registration event, no submission; 'tba' = deadline not yet announced.
+  deadline_status?: 'attendance' | 'tba';
   timezone: string;
   date?: string;
   start?: string;

@@ -397,8 +397,10 @@
   id: ecmlpkdd26
   full_name: European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases
   link: "https://ecmlpkdd.org/2026/"
+  abstract_deadline: "2026-03-05 23:59"
+  deadline: "2026-03-12 23:59"
   timezone: UTC-12
-  place: "Nalpes, Italy"
+  place: "Naples, Italy"
   date: "Sep 07-11, 2026"
   start: "2026-09-07"
   end: "2026-09-11"
@@ -411,14 +413,20 @@
   id: cikm26
   full_name: Conference on Information and Knowledge Management
   link: "http://www.cikmconference.org/"
+  abstract_deadline: "2026-05-16 23:59"
+  deadline: "2026-05-23 23:59"
   timezone: UTC-12
   place: "Rome, Italy"
+  date: "November 7-11, 2026"
+  start: "2026-11-07"
+  end: "2026-11-11"
   sub: DM
   type: conference
 
 - title: CIKM
   year: 2027
   id: cikm27
+  deadline_status: tba
   full_name: Conference on Information and Knowledge Management
   link: "http://www.cikmconference.org/"
   timezone: UTC-12
@@ -522,8 +530,12 @@
   id: mlhc26
   full_name: Machine Learning for Healthcare
   link: "https://www.mlforhc.org/2026-conference"
+  deadline: "2026-04-17 23:59"
   timezone: UTC-12
   place: "Baltimore, Maryland, USA"
+  date: "August 13-14, 2026"
+  start: "2026-08-13"
+  end: "2026-08-14"
   paperslink: "https://www.mlforhc.org/paper-submission"
   sub: Health AI
   type: conference
@@ -585,10 +597,11 @@
   sub: Global Health
   type: conference
 
-- title: World Health AI
+- title: World Health AI (Boston)
   year: 2026
   id: worldhealthaibo26
-  full_name: World Health AI
+  deadline_status: attendance
+  full_name: World Health AI — Boston Forum
   link: "https://www.worldhealth.ai/events/boston-forum"
   timezone: UTC-12
   date: "May 20, 2026"
@@ -599,10 +612,11 @@
   type: conference
   note: "Driving healthcare transformation in the U.S. through seamless technology integration, intelligent systems, and data-informed models for prevention"
 
-- title: World Health AI
+- title: World Health AI (London)
   year: 2026
   id: worldhealthailo26
-  full_name: World Health AI
+  deadline_status: attendance
+  full_name: World Health AI — London Forum
   link: "https://www.worldhealth.ai/london"
   timezone: UTC-12
   date: "Sep 22, 2026"
@@ -814,6 +828,7 @@
   id: amia26
   full_name: AMIA Annual Symposium (American Medical Informatics Association)
   link: "https://amia.org/education-events/amia-2026-annual-symposium"
+  deadline: "2026-03-10 23:59"
   timezone: "UTC-12"
   place: "Dallas, TX, USA"
   date: "November 7-11, 2026"
@@ -841,6 +856,7 @@
 - title: MEDINFO
   year: 2027
   id: medinfo27
+  deadline_status: tba
   full_name: World Congress on Medical and Health Informatics
   link: "https://www.medinfo2027.org/"
   timezone: "UTC-12"
@@ -869,6 +885,7 @@
 - title: World Health Summit
   year: 2026
   id: whs26
+  deadline_status: attendance
   full_name: World Health Summit
   link: "https://www.worldhealthsummit.org/"
   timezone: "UTC-12"
@@ -882,6 +899,7 @@
 - title: Geneva Health Forum
   year: 2026
   id: ghf26
+  deadline_status: tba
   full_name: Geneva Health Forum
   link: "https://genevahealthforum.com/"
   timezone: "UTC-12"

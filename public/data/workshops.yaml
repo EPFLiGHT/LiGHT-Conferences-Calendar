@@ -115,6 +115,7 @@
   id: menaml26
   full_name: "The Middle East and North Africa Machine Learning (MenaML) Winter School"
   link: "https://www.mena.ml/"
+  deadline: "2025-09-18 23:59"
   timezone: "UTC"
   place: "KAUST, Saudi Arabia"
   date: "January 24-29, 2026"
@@ -126,6 +127,7 @@
 - title: AI for Health Buildathon
   year: 2026
   id: tzai4health26
+  deadline_status: attendance
   full_name: "AI for Health Training & Buildathon (Tanzania Digital Health & Innovation Week)"
   link: "https://muhas-dhi.ac.tz/"
   timezone: "Africa/Dar_es_Salaam"
@@ -139,6 +141,7 @@
 - title: HDGA Training
   year: 2026
   id: tzhdga26
+  deadline_status: attendance
   full_name: "6th Health Data Governance & Analytics Training (Tanzania Digital Health & Innovation Week)"
   link: "https://muhas-dhi.ac.tz/"
   timezone: "Africa/Dar_es_Salaam"
@@ -152,6 +155,7 @@
 - title: Girls & Women in Health Tech
   year: 2026
   id: tzgwht26
+  deadline_status: attendance
   full_name: "5th Girls & Women in Health Tech Workshop (Tanzania Digital Health & Innovation Week)"
   link: "https://muhas-dhi.ac.tz/"
   timezone: "Africa/Dar_es_Salaam"

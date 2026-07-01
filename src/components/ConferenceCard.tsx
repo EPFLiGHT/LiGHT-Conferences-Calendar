@@ -20,6 +20,14 @@ interface ConferenceCardProps {
 export default function ConferenceCard({ conference, onClick, index = 0 }: ConferenceCardProps): JSX.Element {
   const allDeadlines = getDeadlineInfo(conference);
 
+  // Label shown when an event carries no deadline, honest about which case applies.
+  const noDeadlineLabel =
+    conference.deadline_status === 'attendance'
+      ? 'Registration only, no submission'
+      : conference.deadline_status === 'tba'
+        ? 'Deadline to be announced'
+        : 'No deadlines on record';
+
   // Lighter animation for mobile (faster, less "aggressive")
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   const animationDelay = isMobile ? (index % 12) * 0.03 : (index % 12) * 0.02;
@@ -38,12 +46,12 @@ export default function ConferenceCard({ conference, onClick, index = 0 }: Confe
       bg="white"
       borderRadius="4px"
       border="1px solid"
-      borderColor="rgba(46, 95, 168, 0.22)"
+      borderColor="rgba(12, 67, 160, 0.22)"
       p="6"
       cursor="pointer"
       position="relative"
       whileHover={{
-        borderColor: 'rgba(46, 95, 168, 0.6)',
+        borderColor: 'rgba(12, 67, 160, 0.6)',
         transition: { duration: 0.18, ease: 'easeOut' }
       }}
       onClick={onClick}
@@ -55,7 +63,6 @@ export default function ConferenceCard({ conference, onClick, index = 0 }: Confe
             as="h3"
             flex="1"
             minW="200px"
-            fontFamily="Chillax, sans-serif"
             fontWeight="600"
             fontSize="22px"
             lineHeight="1.2"
@@ -100,7 +107,7 @@ export default function ConferenceCard({ conference, onClick, index = 0 }: Confe
           px="0"
           borderTop="1px solid"
           borderBottom="1px solid"
-          borderColor="rgba(46, 95, 168, 0.18)"
+          borderColor="rgba(12, 67, 160, 0.18)"
           mb="4"
         >
           {allDeadlines.map((deadline, idx) => (
@@ -118,11 +125,11 @@ export default function ConferenceCard({ conference, onClick, index = 0 }: Confe
           textAlign="center"
           borderTop="1px solid"
           borderBottom="1px solid"
-          borderColor="rgba(46, 95, 168, 0.18)"
+          borderColor="rgba(12, 67, 160, 0.18)"
           mb="4"
         >
           <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.14em">
-            No deadlines on record
+            {noDeadlineLabel}
           </Text>
         </Box>
       )}

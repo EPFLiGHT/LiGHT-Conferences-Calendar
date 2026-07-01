@@ -6,8 +6,13 @@ const REQUIRED_FIELDS = ['title', 'year', 'id', 'timezone', 'type'];
 const OPTIONAL_FIELDS = [
   'full_name', 'link', 'deadline', 'abstract_deadline',
   'place', 'date', 'start', 'end', 'paperslink', 'pwclink',
-  'hindex', 'sub', 'note'
+  'hindex', 'sub', 'note', 'deadline_status'
 ];
+
+// Valid values for the optional deadline_status field.
+// 'attendance' = registration/attendance event with no submission.
+// 'tba'        = a deadline will exist but is not yet announced.
+const VALID_DEADLINE_STATUS = ['attendance', 'tba'];
 const ALL_FIELDS = [...REQUIRED_FIELDS, ...OPTIONAL_FIELDS];
 
 // Valid subject tags
@@ -118,6 +123,11 @@ function validateConference(conf, index) {
       }
     }
   });
+
+  // Validate deadline_status
+  if (conf.deadline_status && !VALID_DEADLINE_STATUS.includes(conf.deadline_status)) {
+    error(`${confId}: Invalid deadline_status '${conf.deadline_status}' (use one of: ${VALID_DEADLINE_STATUS.join(', ')})`);
+  }
 
   // Validate year
   if (conf.year) {

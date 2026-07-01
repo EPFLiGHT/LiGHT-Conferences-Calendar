@@ -16,7 +16,7 @@ export default function TypeBadge({ type }: TypeBadgeProps): JSX.Element | null 
       textTransform="uppercase"
       letterSpacing="0.2em"
       border="1px solid"
-      borderColor="rgba(46, 95, 168, 0.35)"
+      borderColor="rgba(12, 67, 160, 0.35)"
       borderRadius="2px"
       px="2"
       py="1"

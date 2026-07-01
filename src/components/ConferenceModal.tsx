@@ -66,7 +66,7 @@ export default function ConferenceModal({ conference, onClose }: ConferenceModal
       pb="3"
       mb="5"
       borderBottom="1px solid"
-      borderColor="rgba(46, 95, 168, 0.22)"
+      borderColor="rgba(12, 67, 160, 0.22)"
     >
       <Text
         fontSize="11px"
@@ -128,7 +128,7 @@ export default function ConferenceModal({ conference, onClose }: ConferenceModal
             top="0"
             bg="white"
             borderBottom="1px solid"
-            borderColor="rgba(46, 95, 168, 0.25)"
+            borderColor="rgba(12, 67, 160, 0.25)"
             px={{ base: '6', md: '8' }}
             py={{ base: '5', md: '6' }}
             zIndex="10"
@@ -144,7 +144,7 @@ export default function ConferenceModal({ conference, onClose }: ConferenceModal
               alignItems="center"
               justifyContent="center"
               border="1px solid"
-              borderColor="rgba(46, 95, 168, 0.35)"
+              borderColor="rgba(12, 67, 160, 0.35)"
               borderRadius="3px"
               bg="white"
               color="brand.500"

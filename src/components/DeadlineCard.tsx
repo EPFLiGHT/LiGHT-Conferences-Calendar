@@ -33,7 +33,7 @@ export default function DeadlineCard({
       <Box
         bg="white"
         border="1px solid"
-        borderColor="rgba(46, 95, 168, 0.25)"
+        borderColor="rgba(12, 67, 160, 0.25)"
       >
         {/* Header */}
         <Flex
@@ -42,7 +42,7 @@ export default function DeadlineCard({
           px="5"
           py="3"
           borderBottom="1px solid"
-          borderColor="rgba(46, 95, 168, 0.18)"
+          borderColor="rgba(12, 67, 160, 0.18)"
           bg="brand.50"
         >
           <Text
@@ -77,7 +77,7 @@ export default function DeadlineCard({
             minW="80px"
             pr="5"
             borderRight="1px solid"
-            borderColor="rgba(46, 95, 168, 0.22)"
+            borderColor="rgba(12, 67, 160, 0.22)"
           >
             <Text
               fontSize="56px"
@@ -128,7 +128,7 @@ export default function DeadlineCard({
             </VStack>
 
             {!isExpired && (
-              <Box pt="1" borderTop="1px solid" borderColor="rgba(46, 95, 168, 0.18)">
+              <Box pt="1" borderTop="1px solid" borderColor="rgba(12, 67, 160, 0.18)">
                 <Countdown deadline={deadline.localDatetime} label="Time remaining" />
               </Box>
             )}
@@ -151,7 +151,7 @@ export default function DeadlineCard({
         minW="56px"
         pr="4"
         borderRight="1px solid"
-        borderColor="rgba(46, 95, 168, 0.22)"
+        borderColor="rgba(12, 67, 160, 0.22)"
       >
         <Text
           fontSize="38px"

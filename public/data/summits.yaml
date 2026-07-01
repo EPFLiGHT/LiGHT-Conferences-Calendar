@@ -3,6 +3,7 @@
   id: himss27
   full_name: HIMSS Global Health Conference & Exhibition
   link: https://www.himssconference.com/
+  deadline: "2026-06-30 23:59"
   timezone: America/Chicago
   place: "Chicago, Illinois, USA"
   date: "April 5-8, 2027"
@@ -14,6 +15,7 @@
 - title: HLTH
   year: 2026
   id: hlth26
+  deadline_status: attendance
   full_name: HLTH USA
   link: https://hlth.com/events/usa/
   timezone: America/Los_Angeles
@@ -27,6 +29,7 @@
 - title: Africa HealthTech Summit
   year: 2026
   id: ahts26
+  deadline_status: attendance
   full_name: 5th Africa HealthTech Summit
   link: https://healthtechsummit.africa/
   timezone: Africa/Kigali
@@ -40,6 +43,7 @@
 - title: World Health Assembly
   year: 2026
   id: worldhealthassembly26
+  deadline_status: attendance
   full_name: Seventy-ninth World Health Assembly (WHA79)
   link: https://www.who.int/about/governance/world-health-assembly/seventy-ninth
   timezone: Europe/Zurich
@@ -53,6 +57,7 @@
 - title: AI4Good
   year: 2026
   id: ai4good26
+  deadline_status: attendance
   full_name: AI for Good Global Summit
   link: https://aiforgood.itu.int/
   timezone: America/New_York
@@ -79,6 +84,7 @@
 - title: Global AI Summit on Africa
   year: 2025
   id: globalaisummitonafrica25
+  deadline_status: attendance
   full_name: Global AI Summit on Africa
   link: https://c4ir.rw/global-ai-summit-on-africa
   timezone: Africa/Kigali
@@ -105,6 +111,7 @@
 - title: WHS
   year: 2025
   id: whs25
+  deadline_status: attendance
   full_name: World Health Summit
   link: https://www.worldhealthsummit.org/events/annual-whs
   timezone: UTC
@@ -131,6 +138,7 @@
 - title: WMA Council Session
   year: 2026
   id: wmacouncilbelgrade26
+  deadline_status: attendance
   full_name: 232nd WMA Council Session, Belgrade 2026
   link: https://www.wma.net/events-post/232nd-wma-council-session-belgrade-2026/
   timezone: UTC
@@ -145,6 +153,7 @@
 - title: WMA General Assembly
   year: 2026
   id: wmaga2026
+  deadline_status: attendance
   full_name: WMA General Assembly, Rotterdam 2026
   link: https://www.wma.net/events-post/wma-general-assembly-2026-in-the-netherlands/
   timezone: UTC
@@ -159,6 +168,7 @@
 - title: WMA Council Session
   year: 2027
   id: wmacouncilrio27
+  deadline_status: attendance
   full_name: 235th WMA Council Session, Rio de Janeiro 2027
   link: https://www.wma.net/events-post/235th-wma-council-session/
   timezone: UTC
@@ -173,6 +183,7 @@
 - title: WMA General Assembly
   year: 2027
   id: wmaga2027
+  deadline_status: attendance
   full_name: WMA General Assembly, Bangkok 2027
   link: https://www.wma.net/events-post/wma-general-assembly-bangkok-2027/
   timezone: UTC
@@ -187,6 +198,7 @@
 - title: WEF
   year: 2026
   id: wef26
+  deadline_status: attendance
   full_name: World Economic Forum
   link: https://www.weforum.org/
   timezone: UTC
@@ -213,6 +225,7 @@
 - title: World Health Assembly
   year: 2025
   id: worldhealthassembly25
+  deadline_status: attendance
   full_name: World Health Assembly
   link: https://www.who.int/about/governance/world-health-assembly
   timezone: UTC
@@ -226,6 +239,7 @@
 - title: UNGA
   year: 2025
   id: unga25
+  deadline_status: attendance
   full_name: United Nations General Assembly
   link: https://sdg.iisd.org/events/80th-session-of-the-un-general-assembly-unga-80/
   timezone: UTC
@@ -241,6 +255,7 @@
   id: ths26
   full_name: Tanzania health summit
   link: https://ths.or.tz/
+  deadline: "2026-06-15 23:59"
   timezone: UTC
   place: Dar es Salaam, Tanzania
   date: October 7-9, 2026
@@ -267,6 +282,7 @@
 - title: Africa Health ExCon
   year: 2026
   id: ahexcon26
+  deadline_status: attendance
   full_name: 5th Africa Health ExCon
   link: https://www.africahealthexcon.com/
   timezone: Africa/Cairo
@@ -282,6 +298,7 @@
   id: adhs26
   full_name: 6th Africa Digital Health Summit
   link: https://africadigitalhealthsummit.org/
+  abstract_deadline: "2026-02-27 23:59"
   timezone: Africa/Lagos
   place: "Abuja Continental Hotel, Abuja, Nigeria"
   date: "June 25-26, 2026"
@@ -307,6 +324,7 @@
 - title: TAMC
   year: 2026
   id: tamc26
+  deadline_status: attendance
   full_name: Transforming African MedTech Conference
   link: https://www.africanmedtech.com/
   timezone: Africa/Nairobi
@@ -334,6 +352,7 @@
 - title: WHX Nairobi
   year: 2026
   id: whxnairobi26
+  deadline_status: attendance
   full_name: World Health Expo Nairobi (formerly Medic East Africa)
   link: https://www.worldhealthexpo.com/events/healthcare/nairobi/
   timezone: Africa/Nairobi
@@ -347,6 +366,7 @@
 - title: WHX Johannesburg
   year: 2026
   id: whxjohannesburg26
+  deadline_status: attendance
   full_name: World Health Expo Johannesburg (formerly Africa Health)
   link: https://www.worldhealthexpo.com/events/healthcare/johannesburg/
   timezone: Africa/Johannesburg
@@ -360,6 +380,7 @@
 - title: AI Expo Africa
   year: 2026
   id: aiexpoafrica26
+  deadline_status: attendance
   full_name: AI Expo Africa (9th Edition)
   link: https://aiexpoafrica.com/
   timezone: Africa/Johannesburg
@@ -373,6 +394,7 @@
 - title: AI Summit Cape Town
   year: 2026
   id: aisummitcapetown26
+  deadline_status: attendance
   full_name: The AI Summit Cape Town @ Africa Tech Festival
   link: https://africatechfestival.com/ai-summit/
   timezone: Africa/Johannesburg
@@ -386,6 +408,7 @@
 - title: Futurize
   year: 2026
   id: futurize26
+  deadline_status: attendance
   full_name: Futurize HealthTech Summit & Demo Day
   link: https://www.menterprise.africa/futurize-summit
   timezone: Africa/Nairobi
@@ -399,6 +422,7 @@
 - title: TZ DHI Forum
   year: 2026
   id: tzdhiforum26
+  deadline_status: attendance
   full_name: 5th Tanzania Digital Health & Innovation Forum
   link: https://muhas-dhi.ac.tz/
   timezone: Africa/Dar_es_Salaam

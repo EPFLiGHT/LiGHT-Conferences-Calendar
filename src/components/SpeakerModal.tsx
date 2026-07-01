@@ -91,7 +91,7 @@ export default function SpeakerModal({ speaker, onClose }: SpeakerModalProps): J
             top="0"
             bg="white"
             borderBottom="1px solid"
-            borderColor="rgba(46, 95, 168, 0.25)"
+            borderColor="rgba(12, 67, 160, 0.25)"
             px={{ base: '6', md: '8' }}
             py={{ base: '5', md: '6' }}
             zIndex="10"
@@ -107,7 +107,7 @@ export default function SpeakerModal({ speaker, onClose }: SpeakerModalProps): J
               alignItems="center"
               justifyContent="center"
               border="1px solid"
-              borderColor="rgba(46, 95, 168, 0.35)"
+              borderColor="rgba(12, 67, 160, 0.35)"
               borderRadius="3px"
               bg="white"
               color="brand.500"
@@ -167,7 +167,7 @@ export default function SpeakerModal({ speaker, onClose }: SpeakerModalProps): J
               pb="3"
               mb="6"
               borderBottom="1px solid"
-              borderColor="rgba(46, 95, 168, 0.22)"
+              borderColor="rgba(12, 67, 160, 0.22)"
             >
               <Text
                 fontSize="11px"
@@ -197,7 +197,7 @@ export default function SpeakerModal({ speaker, onClose }: SpeakerModalProps): J
                   gap={{ base: '4', md: '8' }}
                   py="6"
                   borderTop={index === 0 ? 'none' : '1px solid'}
-                  borderColor="rgba(46, 95, 168, 0.18)"
+                  borderColor="rgba(12, 67, 160, 0.18)"
                   direction={{ base: 'column', md: 'row' }}
                 >
                   {/* Year gutter */}

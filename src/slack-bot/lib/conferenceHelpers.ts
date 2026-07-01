@@ -70,18 +70,24 @@ export function buildConferenceDetailsCard(
   };
 
   if (!deadline) {
+    const noDeadlineText =
+      conference.deadline_status === 'attendance'
+        ? 'Registration only, no submission.'
+        : conference.deadline_status === 'tba'
+          ? 'Deadline to be announced.'
+          : 'No upcoming deadline announced yet.';
     return {
       blocks: [
         {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `📅 *${conference.title} ${conference.year}*\n_No upcoming deadline announced yet._`,
+            text: `📅 *${conference.title} ${conference.year}*\n_${noDeadlineText}_`,
           },
         },
         detailBlock,
       ],
-      text: `${conference.title} ${conference.year} - No deadlines`,
+      text: `${conference.title} ${conference.year} - ${noDeadlineText}`,
     };
   }
 

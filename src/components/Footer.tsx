@@ -5,7 +5,7 @@ import { MapPin, Mail, Linkedin, Github, ArrowUpRight, ArrowUp } from 'lucide-re
 
 const linkUnderline = {
   borderBottom: '1px solid',
-  borderColor: 'rgba(46, 95, 168, 0.5)',
+  borderColor: 'rgba(12, 67, 160, 0.5)',
   pb: '1px',
   transition: 'all 0.2s ease',
 } as const;
@@ -25,7 +25,7 @@ const colHeadStyle = {
   mb: '2',
   pb: '3',
   borderBottom: '1px solid',
-  borderColor: 'rgba(46, 95, 168, 0.3)',
+  borderColor: 'rgba(12, 67, 160, 0.3)',
 };
 
 export default function Footer(): JSX.Element {
@@ -34,7 +34,7 @@ export default function Footer(): JSX.Element {
   return (
     <Box as="footer" mt="auto" position="relative">
       {/* Top accent rule */}
-      <Box position="relative" h="3px" overflow="hidden" bg="rgba(46, 95, 168, 0.12)">
+      <Box position="relative" h="3px" overflow="hidden" bg="rgba(12, 67, 160, 0.12)">
         <Box
           position="absolute"
           top="0"
@@ -315,7 +315,7 @@ export default function Footer(): JSX.Element {
                 p="5"
                 bg="white"
                 border="1px solid"
-                borderColor="rgba(46, 95, 168, 0.3)"
+                borderColor="rgba(12, 67, 160, 0.3)"
                 position="relative"
               >
                 <Box
@@ -373,7 +373,7 @@ export default function Footer(): JSX.Element {
             justify="space-between"
             pt="6"
             borderTop="1px solid"
-            borderColor="rgba(46, 95, 168, 0.3)"
+            borderColor="rgba(12, 67, 160, 0.3)"
             gap="4"
             flexWrap="wrap"
           >
