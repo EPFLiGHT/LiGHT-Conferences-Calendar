@@ -75,7 +75,7 @@ export default function Page() {
             mb="6"
             pb="3"
             borderBottom="1px solid"
-            borderColor="rgba(12, 67, 160, 0.18)"
+            borderColor="line.default"
             gap="4"
             flexWrap="wrap"
           >

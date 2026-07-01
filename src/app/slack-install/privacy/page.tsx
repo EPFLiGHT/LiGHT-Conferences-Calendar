@@ -10,7 +10,7 @@ const inlineLink = {
   color: 'brand.500',
   fontWeight: 500,
   borderBottom: '1px solid',
-  borderColor: 'rgba(12, 67, 160, 0.45)',
+  borderColor: 'line.hover',
   pb: '1px',
   transition: 'all 0.2s ease',
   _hover: { color: 'brand.700', borderColor: 'brand.700', textDecoration: 'none' },
@@ -29,7 +29,7 @@ function Section({ num, title, children }: SectionProps): JSX.Element {
       gap={{ base: '3', md: '10' }}
       py={{ base: '8', md: '10' }}
       borderBottom="1px solid"
-      borderColor="rgba(12, 67, 160, 0.18)"
+      borderColor="line.default"
     >
       <Box>
         <Text
@@ -91,7 +91,7 @@ export default function PrivacyPolicyPage() {
             textTransform="uppercase"
             letterSpacing="0.18em"
             borderBottom="1px solid"
-            borderColor="rgba(12, 67, 160, 0.45)"
+            borderColor="line.hover"
             pb="1px"
             transition="all 0.2s ease"
             _hover={{ color: 'brand.700', borderColor: 'brand.700', textDecoration: 'none' }}
@@ -130,7 +130,7 @@ export default function PrivacyPolicyPage() {
             pb="3"
             mb="0"
             borderBottom="1px solid"
-            borderColor="rgba(12, 67, 160, 0.4)"
+            borderColor="line.hover"
             gap="4"
             flexWrap="wrap"
           >
@@ -151,7 +151,7 @@ export default function PrivacyPolicyPage() {
           </Flex>
 
           {/* Intro */}
-          <Box py={{ base: '8', md: '10' }} borderBottom="1px solid" borderColor="rgba(12, 67, 160, 0.18)">
+          <Box py={{ base: '8', md: '10' }} borderBottom="1px solid" borderColor="line.default">
             <Text fontSize={{ base: 'md', md: 'lg' }} color="gray.700" lineHeight="1.65">
               The Conferences Calendar Bot (&ldquo;the Bot&rdquo;) is operated by LiGHT Laboratory.
               This Privacy Policy explains how we collect, use, and protect your information when
@@ -239,14 +239,14 @@ export default function PrivacyPolicyPage() {
             </Text>
             <Bullet>
               Access your stored preferences using{' '}
-              <Text as="code" px="2" py="0.5" fontSize="xs" fontFamily="ui-monospace, SFMono-Regular, monospace" color="brand.500" border="1px solid" borderColor="rgba(12, 67, 160, 0.3)" borderRadius="3px" className="tabular">
+              <Text as="code" px="2" py="0.5" fontSize="xs" fontFamily="ui-monospace, SFMono-Regular, monospace" color="brand.500" border="1px solid" borderColor="line.strong" borderRadius="3px" className="tabular">
                 /conf-settings
               </Text>
             </Bullet>
             <Bullet>Modify your notification preferences at any time</Bullet>
             <Bullet>
               Unsubscribe from notifications using{' '}
-              <Text as="code" px="2" py="0.5" fontSize="xs" fontFamily="ui-monospace, SFMono-Regular, monospace" color="brand.500" border="1px solid" borderColor="rgba(12, 67, 160, 0.3)" borderRadius="3px" className="tabular">
+              <Text as="code" px="2" py="0.5" fontSize="xs" fontFamily="ui-monospace, SFMono-Regular, monospace" color="brand.500" border="1px solid" borderColor="line.strong" borderRadius="3px" className="tabular">
                 /conf-unsubscribe
               </Text>
             </Bullet>
@@ -297,7 +297,7 @@ export default function PrivacyPolicyPage() {
             <Box
               p={{ base: '6', md: '8' }}
               border="1px solid"
-              borderColor="rgba(12, 67, 160, 0.22)"
+              borderColor="line.default"
               borderRight={{ base: '1px solid', md: 'none' }}
               borderBottom={{ base: 'none', md: '1px solid' }}
             >

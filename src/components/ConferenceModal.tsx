@@ -66,7 +66,7 @@ export default function ConferenceModal({ conference, onClose }: ConferenceModal
       pb="3"
       mb="5"
       borderBottom="1px solid"
-      borderColor="rgba(12, 67, 160, 0.22)"
+      borderColor="line.default"
     >
       <Text
         fontSize="11px"
@@ -98,7 +98,7 @@ export default function ConferenceModal({ conference, onClose }: ConferenceModal
         left="0"
         right="0"
         bottom="0"
-        bg="rgba(10, 26, 61, 0.45)"
+        bg="overlay.scrim"
         backdropFilter="blur(2px)"
         display="flex"
         alignItems="center"
@@ -128,7 +128,7 @@ export default function ConferenceModal({ conference, onClose }: ConferenceModal
             top="0"
             bg="white"
             borderBottom="1px solid"
-            borderColor="rgba(12, 67, 160, 0.25)"
+            borderColor="line.strong"
             px={{ base: '6', md: '8' }}
             py={{ base: '5', md: '6' }}
             zIndex="10"
@@ -144,7 +144,7 @@ export default function ConferenceModal({ conference, onClose }: ConferenceModal
               alignItems="center"
               justifyContent="center"
               border="1px solid"
-              borderColor="rgba(12, 67, 160, 0.35)"
+              borderColor="line.strong"
               borderRadius="3px"
               bg="white"
               color="brand.500"

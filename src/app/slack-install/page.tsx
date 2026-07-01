@@ -58,7 +58,7 @@ export default function SlackInstallPage() {
                 w="auto"
                 borderRadius="20px"
                 border="1px solid"
-                borderColor="rgba(12, 67, 160, 0.22)"
+                borderColor="line.default"
               />
             </Flex>
 
@@ -138,7 +138,7 @@ export default function SlackInstallPage() {
             mb="6"
             pb="3"
             borderBottom="1px solid"
-            borderColor="rgba(12, 67, 160, 0.22)"
+            borderColor="line.default"
           >
             <Text
               fontSize="11px"
@@ -170,7 +170,7 @@ export default function SlackInstallPage() {
                 borderTop={{ base: '1px solid', md: 'none' }}
                 borderBottom={{ base: index === features.length - 1 ? '1px solid' : 'none', md: 'none' }}
                 borderRight={{ base: 'none', md: index < features.length - 1 ? '1px solid' : 'none' }}
-                borderColor="rgba(12, 67, 160, 0.18)"
+                borderColor="line.default"
               >
                 <Icon size={20} strokeWidth={1.5} color="var(--chakra-colors-brand-500)" />
                 <Heading
@@ -198,7 +198,7 @@ export default function SlackInstallPage() {
             mb="6"
             pb="3"
             borderBottom="1px solid"
-            borderColor="rgba(12, 67, 160, 0.22)"
+            borderColor="line.default"
           >
             <Text
               fontSize="11px"
@@ -234,7 +234,7 @@ export default function SlackInstallPage() {
                   px={{ base: '0', md: '5' }}
                   borderBottom={!isLastRow ? '1px solid' : 'none'}
                   borderRight={{ base: 'none', md: !isRight ? '1px solid' : 'none' }}
-                  borderColor="rgba(12, 67, 160, 0.14)"
+                  borderColor="line.subtle"
                 >
                   <Box
                     as="code"
@@ -245,7 +245,7 @@ export default function SlackInstallPage() {
                     fontWeight="500"
                     color="brand.500"
                     border="1px solid"
-                    borderColor="rgba(12, 67, 160, 0.3)"
+                    borderColor="line.strong"
                     borderRadius="3px"
                     whiteSpace="nowrap"
                     className="tabular"

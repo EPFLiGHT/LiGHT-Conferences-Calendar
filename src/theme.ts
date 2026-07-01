@@ -1,5 +1,18 @@
 import { createSystem, defaultConfig, defineConfig } from '@chakra-ui/react'
 
+/**
+ * Single source of truth for the brand colors.
+ * Change BRAND_RGB and every border, tint, shadow, and derived export below
+ * updates with it. Values match LiGHT Brand Guidelines (April 2026, p.11):
+ *   Dark Blue (base)    #0C43A0  rgb(12, 67, 160)   -> brand.500 anchor
+ *   Light Blue (accent) #68AFE7  rgb(104, 175, 231) -> brand.300
+ *   Eggshell (neutral)  #FEFFF7                     -> eggshell token
+ */
+const BRAND_RGB = '12, 67, 160'   // #0C43A0, official Dark Blue
+const NAVY_RGB = '10, 26, 61'     // non-brand dark scrim for overlays only
+const alpha = (rgb: string, a: number) => `rgba(${rgb}, ${a})`
+const brand = (a: number) => alpha(BRAND_RGB, a)
+
 export const system = createSystem(defaultConfig, defineConfig({
   theme: {
     tokens: {
@@ -36,6 +49,19 @@ export const system = createSystem(defaultConfig, defineConfig({
         primary: { value: '{colors.brand.500}' },
         'primary.solid': { value: '{colors.brand.500}' },
         'primary.contrast': { value: 'white' },
+        // Brand-tinted hairline borders, by emphasis. Custom namespace to avoid
+        // colliding with Chakra's gray-based `border.*` defaults. Nested (not
+        // dotted keys) so Chakra emits proper `--chakra-colors-line-*` vars.
+        line: {
+          subtle: { value: brand(0.14) },
+          default: { value: brand(0.22) },
+          strong: { value: brand(0.3) },
+          hover: { value: brand(0.55) },
+        },
+        // Dark scrim behind modals.
+        overlay: {
+          scrim: { value: alpha(NAVY_RGB, 0.45) },
+        },
       },
     },
   },
@@ -64,7 +90,7 @@ export const system = createSystem(defaultConfig, defineConfig({
     /* Toolbar buttons */
     '.fc .fc-button': {
       background: 'white !important',
-      borderColor: 'rgba(12, 67, 160, 0.35) !important',
+      borderColor: `${brand(0.35)} !important`,
       textTransform: 'uppercase',
       fontWeight: '600',
       letterSpacing: '0.16em',
@@ -131,11 +157,11 @@ export const system = createSystem(defaultConfig, defineConfig({
 
     /* Grid borders */
     '.fc-theme-standard td, .fc-theme-standard th': {
-      borderColor: 'rgba(12, 67, 160, 0.14)',
+      borderColor: brand(0.14),
     },
 
     '.fc-theme-standard .fc-scrollgrid': {
-      borderColor: 'rgba(12, 67, 160, 0.22)',
+      borderColor: brand(0.22),
     },
 
     /* Day numbers */
@@ -171,13 +197,13 @@ export const system = createSystem(defaultConfig, defineConfig({
 
     '.fc .fc-col-header-cell': {
       background: 'white',
-      borderColor: 'rgba(12, 67, 160, 0.22)',
+      borderColor: brand(0.22),
       borderBottomWidth: '2px',
     },
 
     /* Today background */
     '.fc .fc-day-today': {
-      background: 'rgba(12, 67, 160, 0.04) !important',
+      background: `${brand(0.04)} !important`,
     },
 
     /* Events */
@@ -210,8 +236,8 @@ export const system = createSystem(defaultConfig, defineConfig({
     /* List view */
     '.fc-list-day-cushion, .fc-list-day-cushion.fc-cell-shaded': {
       background: 'white !important',
-      borderTop: '1px solid rgba(12, 67, 160, 0.22)',
-      borderBottom: '1px solid rgba(12, 67, 160, 0.14)',
+      borderTop: `1px solid ${brand(0.22)}`,
+      borderBottom: `1px solid ${brand(0.14)}`,
     },
 
     '.fc-list-day-text, .fc-list-day-side-text': {
@@ -224,7 +250,7 @@ export const system = createSystem(defaultConfig, defineConfig({
     },
 
     '.fc-list-event:hover td': {
-      background: 'rgba(12, 67, 160, 0.04) !important',
+      background: `${brand(0.04)} !important`,
     },
 
     '.fc-list-event-time, .fc-list-event-title': {
@@ -259,22 +285,25 @@ export const system = createSystem(defaultConfig, defineConfig({
 // Plain-value tokens for inline usage (e.g. inside SVG icon props
 // or style strings that can't reference Chakra tokens).
 
+// Plain-value exports for contexts that can't reference Chakra tokens
+// (SVG props, gradient/shadow strings). All derived from BRAND_RGB above so the
+// brand color still lives in exactly one place. 50/100 mirror the brand ramp.
 export const COLORS = {
   brand: {
     50: '#eef4fc',
     100: '#d9e7f7',
-    500: '#0c43a0',
+    500: `rgb(${BRAND_RGB})`,
   },
 } as const;
 
 export const SHADOWS = {
-  md: '0 2px 8px rgba(12, 67, 160, 0.08)',
+  md: `0 2px 8px ${brand(0.08)}`,
 } as const;
 
 export const TRANSITIONS = {
   normal: 'all 0.2s ease-in-out',
 } as const;
 
-export const brandAlpha = (_shade: 500, alpha: number) =>
-  `rgba(12, 67, 160, ${alpha})`;
+/** Brand color at the given alpha, for raw color strings. */
+export const brandAlpha = (a: number) => brand(a);
 

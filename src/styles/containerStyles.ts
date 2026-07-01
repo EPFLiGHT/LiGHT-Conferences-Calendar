@@ -4,6 +4,6 @@ export const paginationContainerStyle: Partial<BoxProps> = {
   bg: 'white',
   borderRadius: '4px',
   border: '1px solid',
-  borderColor: 'rgba(12, 67, 160, 0.22)',
+  borderColor: 'line.default',
   p: '6',
 };

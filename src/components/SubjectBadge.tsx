@@ -31,7 +31,7 @@ export default function SubjectBadge({
             whiteSpace="nowrap"
             cursor="help"
             borderBottom="1px solid"
-            borderColor="rgba(12, 67, 160, 0.3)"
+            borderColor="line.strong"
             pb="1px"
           >
             {subject}

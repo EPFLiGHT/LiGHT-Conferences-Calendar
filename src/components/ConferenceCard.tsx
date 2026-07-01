@@ -8,6 +8,7 @@ import NoteBadge from './NoteBadge';
 import ConferenceDetails from './ConferenceDetails';
 import { getDeadlineInfo } from '@/utils/parser';
 import { Conference } from '@/types/conference';
+import { brandAlpha } from '@/theme';
 
 const MotionBox = motion.create(Box);
 
@@ -46,12 +47,12 @@ export default function ConferenceCard({ conference, onClick, index = 0 }: Confe
       bg="white"
       borderRadius="4px"
       border="1px solid"
-      borderColor="rgba(12, 67, 160, 0.22)"
+      borderColor="line.default"
       p="6"
       cursor="pointer"
       position="relative"
       whileHover={{
-        borderColor: 'rgba(12, 67, 160, 0.6)',
+        borderColor: brandAlpha(0.55),
         transition: { duration: 0.18, ease: 'easeOut' }
       }}
       onClick={onClick}
@@ -107,7 +108,7 @@ export default function ConferenceCard({ conference, onClick, index = 0 }: Confe
           px="0"
           borderTop="1px solid"
           borderBottom="1px solid"
-          borderColor="rgba(12, 67, 160, 0.18)"
+          borderColor="line.default"
           mb="4"
         >
           {allDeadlines.map((deadline, idx) => (
@@ -125,7 +126,7 @@ export default function ConferenceCard({ conference, onClick, index = 0 }: Confe
           textAlign="center"
           borderTop="1px solid"
           borderBottom="1px solid"
-          borderColor="rgba(12, 67, 160, 0.18)"
+          borderColor="line.default"
           mb="4"
         >
           <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.14em">

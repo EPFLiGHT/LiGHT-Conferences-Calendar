@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Box, Flex, Image } from '@chakra-ui/react';
 import { UserRound } from 'lucide-react';
-import { COLORS } from '@/theme';
+import { COLORS, brandAlpha } from '@/theme';
 
 interface SpeakerAvatarProps {
   imageUrl?: string | string[];
@@ -79,7 +79,7 @@ export default function SpeakerAvatar({
         borderColor={size === 'sm' ? 'brand.200' : undefined}
         boxShadow={
           size === 'sm'
-            ? '0 2px 8px rgba(12, 67, 160, 0.15)'
+            ? `0 2px 8px ${brandAlpha(0.15)}`
             : '0 4px 12px rgba(0, 0, 0, 0.15)'
         }
         onMouseEnter={handleMouseEnter}
@@ -152,10 +152,10 @@ export default function SpeakerAvatar({
               boxShadow={
                 isActive && isHovering
                   ? size === 'sm'
-                    ? '0 4px 16px rgba(12, 67, 160, 0.4)'
+                    ? `0 4px 16px ${brandAlpha(0.4)}`
                     : '0 6px 20px rgba(255, 255, 255, 0.5)'
                   : size === 'sm'
-                  ? '0 2px 8px rgba(12, 67, 160, 0.2)'
+                  ? `0 2px 8px ${brandAlpha(0.2)}`
                   : '0 4px 12px rgba(0, 0, 0, 0.15)'
               }
               zIndex={zIndex}

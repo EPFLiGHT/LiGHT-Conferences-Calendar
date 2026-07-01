@@ -170,7 +170,7 @@ function CalendarContent() {
             mb="6"
             pb="3"
             borderBottom="1px solid"
-            borderColor="rgba(12, 67, 160, 0.22)"
+            borderColor="line.default"
             gap="3"
             flexWrap="wrap"
           >
@@ -213,7 +213,7 @@ function CalendarContent() {
           <Box
             bg="white"
             border="1px solid"
-            borderColor="rgba(12, 67, 160, 0.22)"
+            borderColor="line.default"
             borderRadius="4px"
             p={{ base: '4', md: '6' }}
           >

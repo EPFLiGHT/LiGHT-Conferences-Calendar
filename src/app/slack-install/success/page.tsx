@@ -39,7 +39,7 @@ function SuccessContent() {
             borderRadius="24px"
             border="2px solid"
             borderColor="brand.200"
-            boxShadow={`0 8px 32px ${brandAlpha(500, 0.15)}`}
+            boxShadow={`0 8px 32px ${brandAlpha(0.15)}`}
             p={{ base: '8', md: '12' }}
             textAlign="center"
           >
@@ -176,11 +176,11 @@ function SuccessContent() {
               fontSize="lg"
               textDecoration="none"
               transition="all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)"
-              boxShadow={`0 4px 12px ${brandAlpha(500, 0.3)}`}
+              boxShadow={`0 4px 12px ${brandAlpha(0.3)}`}
               _hover={{
                 bg: 'brand.600',
                 transform: 'translateY(-2px) scale(1.05)',
-                boxShadow: `0 8px 20px ${brandAlpha(500, 0.4)}`,
+                boxShadow: `0 8px 20px ${brandAlpha(0.4)}`,
               }}
               _active={{
                 transform: 'scale(0.98)',

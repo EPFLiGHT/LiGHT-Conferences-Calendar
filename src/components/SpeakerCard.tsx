@@ -7,6 +7,7 @@ import { ExternalLink } from 'lucide-react';
 import { Speaker } from '@/types/speaker';
 import ExternalLinkButton from './ExternalLinkButton';
 import SpeakerAvatar from './SpeakerAvatar';
+import { brandAlpha } from '@/theme';
 
 const MotionBox = motion.create(Box);
 
@@ -49,13 +50,13 @@ export default function SpeakerCard({ speaker, index = 0, onClick }: SpeakerCard
       }}
       bg="white"
       border="1px solid"
-      borderColor="rgba(12, 67, 160, 0.22)"
+      borderColor="line.default"
       borderRadius="4px"
       p="6"
       cursor={onClick ? 'pointer' : 'default'}
       onClick={onClick}
       whileHover={{
-        borderColor: 'rgba(12, 67, 160, 0.6)',
+        borderColor: brandAlpha(0.55),
         transition: { duration: 0.18, ease: 'easeOut' },
       }}
     >
@@ -89,7 +90,7 @@ export default function SpeakerCard({ speaker, index = 0, onClick }: SpeakerCard
       </Flex>
 
       {/* Top hairline rule */}
-      <Box borderTop="1px solid" borderColor="rgba(12, 67, 160, 0.18)" mb="5" />
+      <Box borderTop="1px solid" borderColor="line.default" mb="5" />
 
       {/* Type tag */}
       <Text

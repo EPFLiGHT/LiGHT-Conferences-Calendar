@@ -48,7 +48,7 @@ export default function Header(): JSX.Element {
       bg="rgba(255, 255, 255, 0.92)"
       backdropFilter="blur(12px) saturate(140%)"
       borderBottom="1px solid"
-      borderColor="rgba(12, 67, 160, 0.18)"
+      borderColor="line.default"
     >
       {/* Scroll Progress Bar */}
       <Box
@@ -102,7 +102,7 @@ export default function Header(): JSX.Element {
             <Box
               w="1px"
               h="48px"
-              bg="rgba(12, 67, 160, 0.22)"
+              bg="line.default"
               display={{ base: 'none', md: 'block' }}
             />
 

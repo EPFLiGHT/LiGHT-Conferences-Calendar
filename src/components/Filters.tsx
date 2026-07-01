@@ -37,7 +37,7 @@ const Chip = forwardRef<HTMLButtonElement, ChipProps>(
         border="1px solid"
         bg={selected ? 'brand.500' : 'white'}
         color={selected ? 'white' : 'brand.500'}
-        borderColor={selected ? 'brand.500' : 'rgba(12, 67, 160, 0.3)'}
+        borderColor={selected ? 'brand.500' : 'line.strong'}
         cursor={cursor}
         transition="all 0.18s ease"
         whiteSpace="nowrap"
@@ -69,7 +69,7 @@ function FilterGroup({ label, selectedLabel, children }: FilterGroupProps): JSX.
         pb="2"
         mb="3"
         borderBottom="1px solid"
-        borderColor="rgba(12, 67, 160, 0.18)"
+        borderColor="line.default"
         gap="3"
         flexWrap="wrap"
       >
@@ -109,7 +109,7 @@ export default function Filters({ conferences, filters, onFilterChange }: Filter
   const selectStyle = {
     fontSize: 'sm',
     color: 'brand.500',
-    borderColor: 'rgba(12, 67, 160, 0.3)',
+    borderColor: 'line.strong',
     borderRadius: '2px',
     fontWeight: '500',
     _focus: {
