@@ -77,7 +77,7 @@ export default function Header(): JSX.Element {
               _hover={{ transform: 'scale(1.05)' }}
             >
               <Image
-                src="/light-logo-new.png"
+                src="/light-logo.png"
                 alt="LiGHT Lab"
                 h={{ base: '36px', md: '52px' }}
                 w="auto"

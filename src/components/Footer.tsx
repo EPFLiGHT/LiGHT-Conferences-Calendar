@@ -112,7 +112,7 @@ export default function Footer(): JSX.Element {
                   _hover={{ transform: 'translate(-3px, -3px)' }}
                 >
                   <Image
-                    src="/light-banner-new.png"
+                    src="/light-banner.png"
                     alt="LiGHT Laboratory"
                     w="100%"
                     h="auto"
