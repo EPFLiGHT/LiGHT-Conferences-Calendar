@@ -30,11 +30,14 @@ At [api.slack.com/apps](https://api.slack.com/apps), create a new app from scrat
 
 Under **OAuth & Permissions → Bot Token Scopes**, add:
 
-```
-chat:write
-chat:write.public
-commands
-users:read
+```text
+chat:write         # post to channels the bot is in
+chat:write.public  # post to channels the bot is not in
+commands           # slash commands
+channels:read      # detect when the bot joins/leaves public channels
+groups:read        # same, for private channels
+mpim:read          # same, for group DMs
+users:read         # look up user timezones
 users:read.email   # optional
 ```
 
@@ -46,39 +49,53 @@ In **OAuth & Permissions**, click "Install to Workspace" and copy the bot token 
 
 Under **Basic Information → App Credentials**, copy the signing secret.
 
-### 5. Slash command
+### 5. Slash commands
 
-Under **Slash Commands**, create `/conf`:
+Under **Slash Commands**, create one command per entry below. They all share the same request URL: `https://your-project.vercel.app/api/slack/commands`.
 
-- Request URL: `https://your-project.vercel.app/api/slack/commands`
-- Description: Track conference deadlines
-- Usage hint: `upcoming | search <query> | subscribe`
+```text
+/conf-upcoming      Next deadlines
+/conf-search        Search by name
+/conf-subject       Filter by subject
+/conf-info          Details for one conference
+/conf-subscribe     Turn reminders on
+/conf-unsubscribe   Turn reminders off
+/conf-settings      Change preferences
+/conf-help          List commands
+```
 
 ### 6. Interactivity
 
 Under **Interactivity & Shortcuts**, turn it on and set the request URL to `https://your-project.vercel.app/api/slack/interactions`.
 
-### 7. Events (optional)
+### 7. Events
 
-Under **Event Subscriptions**, enable events with request URL `https://your-project.vercel.app/api/slack/events` and subscribe to `app_mention` and `message.im`.
+Under **Event Subscriptions**, enable events with request URL `https://your-project.vercel.app/api/slack/events` and subscribe to these bot events:
+
+- `member_joined_channel` and `member_left_channel`: the bot uses these to track which channels should get channel reminders
+- `app_uninstalled` and `tokens_revoked`: cleanup when a workspace removes the app
+
+Skipping this step means channel reminders won't work (personal DM reminders still will).
 
 ## Deploying
 
 Import the repo into Vercel and set these environment variables:
 
-```
+```text
 SLACK_BOT_TOKEN=xoxb-...
 SLACK_SIGNING_SECRET=...
 CONFERENCES_DATA_URL=https://conferences.light-laboratory.org
 APP_URL=https://your-project.vercel.app
 CRON_SECRET=<random string>
+CHANNEL_REMINDER_DAYS=30,7,3   # optional
 ```
 
 Notes:
 
 - `CONFERENCES_DATA_URL` is the base URL serving the YAML files. The bot appends `/data/conferences.yaml`, `/data/summits.yaml`, and `/data/workshops.yaml`.
 - `APP_URL` is used to build the ICS download links sent in messages.
-- `CRON_SECRET` authenticates the daily cron job.
+- `CRON_SECRET` authenticates the cron jobs.
+- `CHANNEL_REMINDER_DAYS` sets which days before a deadline channel reminders fire (defaults to `30,7,3`).
 
 Then create a Vercel KV (Redis) database, name it `conferences-slack-bot-kv`, and link it to the project. Credentials are injected automatically.
 
@@ -95,13 +112,14 @@ After the first deploy, update the request URLs in the Slack app config to point
 - `/conf-settings`: change preferences
 - `/conf-help`: list commands
 
-Subject codes include ML, CV, NLP, SEC, DM, HCI, RO, PRIV, and more. Run `/conf-subject` with no argument to see all of them.
+Subject codes are ML, CV, NLP, DM, HCI, SEC, SE, AI, Global Health, and Health AI. Run `/conf-subject` with no argument to see the list.
 
 ## Reminders
 
-Subscribed users get a DM each morning (9 AM, configured in `vercel.json`). They get pinged on the days they selected (default 30 / 7 / 3 days out), filtered by their subscribed subjects if they set any, and in their Slack timezone.
+Two cron jobs run each morning at 9:00 UTC (configured in `vercel.json`):
 
-Channel reminders are sent to any channel the bot is added to.
+- **Personal reminders** (`cron/daily-check`): subscribed users get a DM on the days they selected (default 30 / 7 / 3 days out), filtered by their subscribed subjects if they set any, and in their Slack timezone.
+- **Channel reminders** (`cron/channel-reminders`): any channel the bot is a member of gets a post when a deadline or event start is exactly `CHANNEL_REMINDER_DAYS` days away (default 30 / 7 / 3).
 
 ## Local development
 
@@ -126,17 +144,20 @@ To hit a command directly:
 ```bash
 curl -X POST http://localhost:3000/api/slack/commands \
   -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "command=/conf&text=upcoming&user_id=U123456"
+  -d "command=/conf-upcoming&user_id=U123456"
 ```
 
 ## Layout
 
-```
-app/api/slack/
-├── commands/route.ts        # slash commands
-├── interactions/route.ts    # buttons / menus
-├── events/route.ts          # mentions, DMs
-└── cron/daily-check/route.ts
+```text
+src/app/api/slack/
+├── commands/route.ts             # slash commands
+├── interactions/route.ts         # buttons / menus
+├── events/route.ts               # channel joins/leaves, uninstalls
+├── install/route.ts              # OAuth "Add to Slack" entry point
+├── oauth/callback/route.ts       # OAuth token exchange
+├── cron/daily-check/route.ts     # personal DM reminders
+└── cron/channel-reminders/route.ts
 
 src/slack-bot/
 ├── commands/user/           # one file per command

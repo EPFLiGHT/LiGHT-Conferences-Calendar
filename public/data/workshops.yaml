@@ -42,22 +42,22 @@
   type: workshop
 
 - title: SCI
-  year: 2026
-  id: sci26
+  year: 2025
+  id: sci25
   full_name: "6th ACNS Workshop on Secure Cryptographic Implementation"
   link: "https://acns-sci.github.io/"
   deadline: "2025-03-22 23:59"
   timezone: "UTC-12"
   place: "Munich, Germany"
   date: "June 25, 2025"
-  start: "2025-06-23"
-  end: "2025-06-26"
+  start: "2025-06-25"
+  end: "2025-06-25"
   sub: SEC
   type: workshop
 
 - title: ARTMAN
-  year: 2026
-  id: artman26
+  year: 2025
+  id: artman25
   full_name: "Workshop on Recent Advances in Resilient and Trustworthy MAchine learning-driveN system"
   link: "https://artman-workshop.gitlab.io/"
   deadline: "2025-07-03 23:59"

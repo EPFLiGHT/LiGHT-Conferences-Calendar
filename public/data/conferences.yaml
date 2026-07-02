@@ -28,6 +28,22 @@
   sub: SEC
   type: conference
 
+- title: NDSS Symposium
+  year: 2027
+  id: ndss27
+  full_name: Network and Distributed System Security Symposium
+  link: "https://www.ndss-symposium.org/ndss2027/"
+  deadline: "2026-08-19 23:59"
+  timezone: "UTC-12"
+  place: "Seoul, South Korea"
+  date: "Mar 22-26, 2027"
+  start: "2027-03-22"
+  end: "2027-03-26"
+  paperslink: https://www.ndss-symposium.org/ndss2027/submissions/call-for-papers/
+  sub: SEC
+  type: conference
+  note: "Fall cycle deadline; summer cycle closed May 6, 2026."
+
 - title: NeurIPS
   year: 2025
   id: neuripssd25
@@ -53,12 +69,63 @@
   deadline: "2025-05-15 23:59"
   timezone: America/Mexico_City
   place: "Mexico City, Mexico"
-  date: "Nov 10 - Dec 5, 2025"
-  start: "2025-11-10"
+  date: "Nov 30 - Dec 5, 2025"
+  start: "2025-11-30"
   end: "2025-12-05"
   paperslink: "https://neurips.cc/virtual/2025/loc/mexico-city/papers.html"
   sub: ML
   type: conference
+
+- title: NeurIPS
+  year: 2026
+  id: neuripssy26
+  full_name: 40th Annual Conference on Neural Information Processing Systems
+  link: "https://neurips.cc/"
+  abstract_deadline: "2026-05-04 23:59"
+  deadline: "2026-05-06 23:59"
+  timezone: Australia/Sydney
+  place: "Sydney, Australia"
+  date: "Dec 6-12, 2026"
+  start: "2026-12-06"
+  end: "2026-12-12"
+  paperslink: "https://neurips.cc/Conferences/2026/CallForPapers"
+  sub: ML
+  type: conference
+  note: "Main site; satellite sites in Atlanta and Paris."
+
+- title: NeurIPS
+  year: 2026
+  id: neuripsat26
+  full_name: 40th Annual Conference on Neural Information Processing Systems
+  link: "https://neurips.cc/"
+  abstract_deadline: "2026-05-04 23:59"
+  deadline: "2026-05-06 23:59"
+  timezone: America/New_York
+  place: "Atlanta, Georgia, USA"
+  date: "Dec 9-13, 2026"
+  start: "2026-12-09"
+  end: "2026-12-13"
+  paperslink: "https://neurips.cc/Conferences/2026/CallForPapers"
+  sub: ML
+  type: conference
+  note: "Satellite site; main conference in Sydney."
+
+- title: NeurIPS
+  year: 2026
+  id: neuripspa26
+  full_name: 40th Annual Conference on Neural Information Processing Systems
+  link: "https://neurips.cc/"
+  abstract_deadline: "2026-05-04 23:59"
+  deadline: "2026-05-06 23:59"
+  timezone: Europe/Paris
+  place: "Paris, France"
+  date: "Dec 9-13, 2026"
+  start: "2026-12-09"
+  end: "2026-12-13"
+  paperslink: "https://neurips.cc/Conferences/2026/CallForPapers"
+  sub: ML
+  type: conference
+  note: "Satellite site; main conference in Sydney."
 
 - title: "IEEE ICST"
   year: 2026
@@ -138,8 +205,8 @@
   type: conference
 
 - title: LoG
-  year: 2026
-  id: log26
+  year: 2025
+  id: log25
   full_name: Learning on Graphs Conference
   link: "https://logconference.org/"
   abstract_deadline: "2025-08-24 23:59"
@@ -152,6 +219,23 @@
   paperslink: "https://logconference.org/cfp/#call-for-papers"
   sub: ML
   type: conference
+
+- title: LoG
+  year: 2026
+  id: log26
+  full_name: Learning on Graphs Conference
+  link: "https://logconference.org/"
+  abstract_deadline: "2026-07-29 23:59"
+  deadline: "2026-08-01 23:59"
+  timezone: UTC-12
+  place: "Boston, Massachusetts, USA"
+  date: "November 20-22, 2026"
+  start: "2026-11-20"
+  end: "2026-11-22"
+  paperslink: "https://logconference.org/cfp/#call-for-papers"
+  sub: ML
+  type: conference
+  note: "Conference dates tentative."
 
 - title: ECIR
   year: 2026
@@ -174,12 +258,31 @@
   id: wacv26
   full_name: IEEE/CVF Winter Conference on Applications of Computer Vision
   link: "https://wacv.thecvf.com/"
-  abstract_deadline: "2025-09-12 23:59"
+  deadline: "2025-09-12 23:59"
   timezone: UTC-12
   place: "JW Marriott Starpass in Tucson, Arizona, USA"
+  date: "March 6-10, 2026"
+  start: "2026-03-06"
+  end: "2026-03-10"
   paperslink: "https://wacv.thecvf.com/Conferences/2026/CallForPapers"
   sub: CV
   type: conference
+
+- title: WACV
+  year: 2027
+  id: wacv27
+  full_name: IEEE/CVF Winter Conference on Applications of Computer Vision
+  link: "https://wacv.thecvf.com/"
+  deadline: "2026-08-28 23:59"
+  timezone: UTC-12
+  place: "Disney Springs, Orlando, Florida, USA"
+  date: "January 4-8, 2027"
+  start: "2027-01-04"
+  end: "2027-01-08"
+  paperslink: "https://wacv.thecvf.com/Conferences/2027/CallForPapers"
+  sub: CV
+  type: conference
+  note: "Round 2 deadline; round 1 closed June 26, 2026."
 
 - title: CHI
   year: 2026
@@ -194,6 +297,21 @@
   start: "2026-04-13"
   end: "2026-04-17"
   paperslink: "https://chi2026.acm.org/for-authors/papers/"
+  sub: HCI
+  type: conference
+
+- title: CHI
+  year: 2027
+  id: chi27
+  full_name: The ACM Conference on Human Factors in Computing Systems
+  link: "https://chi2027.acm.org/"
+  deadline: "2026-09-10 23:59"
+  timezone: UTC-12
+  place: "Pittsburgh, Pennsylvania, USA"
+  date: "May 10-14, 2027"
+  start: "2027-05-10"
+  end: "2027-05-14"
+  paperslink: "https://chi2027.acm.org/authors/papers/"
   sub: HCI
   type: conference
 
@@ -228,6 +346,22 @@
   sub: DM
   type: conference
 
+- title: WSDM
+  year: 2027
+  id: wsdm27
+  full_name: 20th ACM International Conference on Web Search and Data Mining
+  link: "https://wsdm-conference.org/2027/"
+  abstract_deadline: "2026-08-17 23:59"
+  deadline: "2026-08-24 23:59"
+  timezone: UTC-12
+  place: "Hong Kong, China"
+  date: "Feb 15-19, 2027"
+  start: "2027-02-15"
+  end: "2027-02-19"
+  paperslink: "https://wsdm-conference.org/2027/cffp.html"
+  sub: DM
+  type: conference
+
 - title: Iberamia
   year: 2026
   id: iberamia26
@@ -256,20 +390,52 @@
   sub: ML
   type: conference
 
+- title: AAAI
+  year: 2027
+  id: aaai27
+  full_name: 41st Annual AAAI Conference on Artificial Intelligence
+  link: "https://aaai.org/conference/aaai/aaai-27/"
+  abstract_deadline: "2026-07-21 23:59"
+  deadline: "2026-07-28 23:59"
+  timezone: UTC-12
+  place: "Montréal, Canada"
+  date: "Feb 16-23, 2027"
+  start: "2027-02-16"
+  end: "2027-02-23"
+  paperslink: "https://aaai.org/conference/aaai/aaai-27/submission-instructions/"
+  sub: ML
+  type: conference
+
 - title: AABI
   year: 2025
   id: aabi25
   full_name: Advances in Approximate Bayesian Inference
-  link: "https://approximateinference.org/"
-  deadline: "2025-04-29 23:59"
+  link: "https://probml.cc/"
+  deadline: "2025-02-14 23:59"
   timezone: UTC-12
   place: "NTU College of Computing and Data Science, Singapore"
   date: "April 29, 2025"
   start: "2025-04-29"
   end: "2025-04-29"
-  paperslink: "https://approximateinference.org/accepted/"
+  paperslink: "https://probml.cc/archives/2025/accepted/"
   sub: ML
   type: conference
+
+- title: ProbML
+  year: 2026
+  id: probml26
+  full_name: Symposium on Probabilistic Machine Learning
+  link: "https://probml.cc/"
+  deadline: "2026-03-20 23:59"
+  timezone: UTC-12
+  place: "Korea Institute for Advanced Study, Seoul, South Korea"
+  date: "July 5, 2026"
+  start: "2026-07-05"
+  end: "2026-07-05"
+  paperslink: "https://probml.cc/call/"
+  sub: ML
+  type: conference
+  note: "Formerly AABI; co-located with ICML 2026."
 
 - title: COLM
   year: 2025
@@ -283,6 +449,22 @@
   date: "October 7-10, 2025"
   start: "2025-10-07"
   end: "2025-10-10"
+  paperslink: "https://colmweb.org/cfp.html"
+  sub: NLP
+  type: conference
+
+- title: COLM
+  year: 2026
+  id: colm26
+  full_name: 3rd Conference on Language Modeling
+  link: "https://colmweb.org/"
+  abstract_deadline: "2026-03-26 23:59"
+  deadline: "2026-03-31 23:59"
+  timezone: UTC-12
+  place: "San Francisco, California, USA"
+  date: "October 6-9, 2026"
+  start: "2026-10-06"
+  end: "2026-10-09"
   paperslink: "https://colmweb.org/cfp.html"
   sub: NLP
   type: conference
@@ -331,6 +513,19 @@
   paperslink: "https://satml.org/call-for-papers/"
   sub: SEC
   type: conference
+
+- title: SaTML
+  year: 2027
+  id: satml27
+  full_name: 5th IEEE Conference on Secure and Trustworthy Machine Learning
+  link: "https://satml.org/"
+  deadline: "2026-09-29 23:59"
+  timezone: UTC-12
+  place: "Reykjavik, Iceland"
+  paperslink: "https://satml.org/participate-cfp/"
+  sub: SEC
+  type: conference
+  note: "Conference dates TBA (early May 2027 per satml.org)."
 
 - title: ICPRAI
   year: 2026
@@ -431,8 +626,12 @@
   link: "http://www.cikmconference.org/"
   timezone: UTC-12
   place: "Sydney, Australia"
+  date: "Oct 25-29, 2027"
+  start: "2027-10-25"
+  end: "2027-10-29"
   sub: DM
   type: conference
+  note: "Conference dates tentative; CFP not yet published."
 
 - title: SPECOM
   year: 2025
@@ -448,6 +647,20 @@
   sub: NLP
   type: conference
 
+- title: SPECOM
+  year: 2026
+  id: specom26
+  full_name: 28th International Conference on Speech and Computer
+  link: "https://specom.nw.ru/2026/"
+  deadline: "2026-06-08 23:59"
+  timezone: UTC-12
+  place: "Ohrid, North Macedonia"
+  date: "September 17-18, 2026"
+  start: "2026-09-17"
+  end: "2026-09-18"
+  sub: NLP
+  type: conference
+
 - title: AutoML
   year: 2025
   id: automl25
@@ -460,6 +673,21 @@
   start: "2025-09-08"
   end: "2025-09-11"
   paperslink: "https://2025.automl.cc/call-for-papers/"
+  sub: ML
+  type: conference
+
+- title: AutoML
+  year: 2026
+  id: automl26
+  full_name: International Conference on Automated Machine Learning
+  link: "https://2026.automl.cc/"
+  deadline: "2026-04-30 23:59"
+  timezone: UTC-12
+  place: "Ljubljana, Slovenia"
+  date: "Sep 28 - Oct 1, 2026"
+  start: "2026-09-28"
+  end: "2026-10-01"
+  paperslink: "https://2026.automl.cc/call-for-papers/"
   sub: ML
   type: conference
 
@@ -660,6 +888,10 @@
   link: "https://msf.org.uk/msf-scientific-days"
   deadline: "2026-01-18 23:59"
   timezone: GMT
+  place: "Royal College of Physicians, London, UK"
+  date: "May 20, 2026"
+  start: "2026-05-20"
+  end: "2026-05-20"
   sub: Global Health
   type: conference
 

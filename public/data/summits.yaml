@@ -203,9 +203,23 @@
   link: https://www.weforum.org/
   timezone: UTC
   place: Davos-Klosters, Switzerland
-  date: January 20-24, 2026
+  date: January 19-23, 2026
   start: "2026-01-19"
   end: "2026-01-23"
+  sub: Global Health
+  type: summit
+
+- title: WEF
+  year: 2027
+  id: wef27
+  deadline_status: attendance
+  full_name: World Economic Forum
+  link: https://www.weforum.org/
+  timezone: UTC
+  place: Davos-Klosters, Switzerland
+  date: January 18-22, 2027
+  start: "2027-01-18"
+  end: "2027-01-22"
   sub: Global Health
   type: summit
 
@@ -249,6 +263,21 @@
   end: "2025-09-23"
   sub: Global Health
   type: summit
+
+- title: UNGA
+  year: 2026
+  id: unga26
+  deadline_status: attendance
+  full_name: United Nations General Assembly
+  link: https://sdg.iisd.org/events/81st-session-of-the-un-general-assembly-unga-81/
+  timezone: UTC
+  place: New York, USA
+  date: September 22-28, 2026
+  start: "2026-09-22"
+  end: "2026-09-28"
+  sub: Global Health
+  type: summit
+  note: "High-level week of the 81st session; session opens September 8, 2026."
 
 - title: THS
   year: 2026

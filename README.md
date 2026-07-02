@@ -1,6 +1,8 @@
 # Conference Deadlines
 
-A site for tracking research conference deadlines. Built with Next.js.
+A site for tracking research conference deadlines, across AI/ML and global health. Built with Next.js.
+
+Live at [conferences.light-laboratory.org](https://conferences.light-laboratory.org/).
 
 Made by [Omar Ziyad Azgaoui](https://github.com/AZOGOAT) at [LiGHT Lab](https://github.com/EPFLiGHT).
 
@@ -10,6 +12,7 @@ Made by [Omar Ziyad Azgaoui](https://github.com/AZOGOAT) at [LiGHT Lab](https://
 - Countdown timers (timezone-aware)
 - Search and filter by year, subject, type
 - ICS export
+- Speakers page showcasing lab members' talks
 - Slack bot for deadline reminders
 
 ## Running it
@@ -20,16 +23,20 @@ The project uses pnpm.
 pnpm install
 pnpm dev        # dev server
 pnpm validate   # check the YAML data
+pnpm test       # run tests
 pnpm build      # production build
 ```
 
 ## Conference data
 
-All conferences live in three YAML files under `public/data/`:
+All events live in three YAML files under `public/data/`:
 
 - `conferences.yaml`: academic conferences
 - `summits.yaml`: industry summits
 - `workshops.yaml`: workshops and smaller events
+
+A fourth file, `speakers.yaml`, powers the Speakers page (lab members and their
+presentations). It has its own format and is not checked by `pnpm validate`.
 
 ### Schema
 

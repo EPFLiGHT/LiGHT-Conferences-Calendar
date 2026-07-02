@@ -14,16 +14,16 @@ Under **OAuth & Permissions**, add this redirect URL (replace the host with your
 https://your-app-domain.vercel.app/api/slack/oauth/callback
 ```
 
-Make sure these bot scopes are enabled:
+Make sure these bot scopes are enabled (the install endpoint requests exactly this list, see `src/app/api/slack/install/route.ts`):
 
 - `chat:write`
 - `chat:write.public`
 - `commands`
+- `channels:read`
+- `groups:read`
+- `mpim:read`
 - `users:read`
 - `users:read.email`
-- `app_mentions:read`
-- `im:read`
-- `channels:read`
 
 ## 2. Get the OAuth credentials
 
@@ -36,9 +36,6 @@ Add the OAuth credentials alongside the existing variables in Vercel:
 ```bash
 SLACK_CLIENT_ID=1234567890.1234567890
 SLACK_CLIENT_SECRET=...
-
-# Optional: defaults to APP_URL/api/slack/oauth/callback
-SLACK_REDIRECT_URI=https://your-app-domain.vercel.app/api/slack/oauth/callback
 
 # Existing
 SLACK_SIGNING_SECRET=...
@@ -54,6 +51,8 @@ KV_URL=rediss://...
 KV_REST_API_URL=https://...
 KV_REST_API_TOKEN=...
 ```
+
+The redirect URI is always `APP_URL` + `/api/slack/oauth/callback`, so `APP_URL` must match the redirect URL you registered in step 1.
 
 If you want to keep an existing single-workspace install working at the same time, leave `SLACK_BOT_TOKEN` in place. The bot falls back to it when no OAuth token is found.
 
@@ -84,7 +83,7 @@ A simple landing page with the standard "Add to Slack" button:
 
 ## 6. Test it
 
-Visit `https://your-app-domain.vercel.app/api/slack/install` and authorize. You should see a success page, and the Vercel logs should show something like:
+Visit `https://your-app-domain.vercel.app/api/slack/install` and authorize. You should land on the success page at `conferences.light-laboratory.org/slack-install/success`, and the Vercel logs should show something like:
 
 ```text
 Bot installed successfully for team: <name> (T01234567)
@@ -105,6 +104,8 @@ When someone installs the bot:
 
 For each incoming request, middleware reads `team_id` from the payload and `slackClient.ts` looks up that workspace's token. If there's no stored token, it falls back to `SLACK_BOT_TOKEN`.
 
+When a workspace uninstalls the app, Slack sends an `app_uninstalled` (or `tokens_revoked`) event and the bot purges that workspace's stored tokens and subscriptions.
+
 ## Troubleshooting
 
 **"Invalid redirect_uri"**: the URL in Slack settings must match exactly, including `/api/slack/oauth/callback`.
@@ -122,7 +123,3 @@ For each incoming request, middleware reads `team_id` from the payload and `slac
 3. Deploy.
 4. The original workspace keeps working via the token fallback.
 5. Optionally, re-install the original workspace via OAuth so its token lives in KV too.
-
-## TODO
-
-- Handle app uninstall webhooks
