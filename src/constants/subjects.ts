@@ -36,3 +36,14 @@ export const SUBJECT_COLORS: Record<string, { bg: string; color: string; border:
 export const SUBJECT_EMOJIS: Record<string, string> = Object.fromEntries(
   Object.entries(SUBJECTS).map(([k, v]) => [k, v.emoji])
 );
+
+/**
+ * Resolve free-form user input (any case, padded) to a canonical subject code,
+ * or null if it matches none. Needed because codes are mixed-case
+ * ("Global Health", "Health AI") while users type them however they like.
+ */
+export function resolveSubjectCode(input: string): string | null {
+  const normalized = input.trim().toLowerCase();
+  if (!normalized) return null;
+  return Object.keys(SUBJECTS).find(code => code.toLowerCase() === normalized) ?? null;
+}

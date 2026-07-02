@@ -7,7 +7,7 @@ import type { BlockKitMessage } from '@/types/slack';
 import { getConferences } from '../../utils/conferenceCache';
 import { filterBySubject, getUpcomingDeadlines } from '@/utils/conferenceQueries';
 import { buildDeadlineList } from '../../lib/messageBuilder';
-import { SUBJECT_LABELS } from '@/constants/subjects';
+import { SUBJECT_LABELS, resolveSubjectCode } from '@/constants/subjects';
 import { withCommandHandler } from '../../lib/commandWrapper';
 
 export async function handleSubject(userId: string, subjectCode: string): Promise<BlockKitMessage> {
@@ -30,7 +30,7 @@ export async function handleSubject(userId: string, subjectCode: string): Promis
     };
   }
 
-  const subject = subjectCode.toUpperCase();
+  const subject = resolveSubjectCode(subjectCode) ?? subjectCode.trim();
 
   return withCommandHandler(
     'subject',
