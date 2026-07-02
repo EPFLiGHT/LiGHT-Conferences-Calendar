@@ -13,6 +13,7 @@
 import { useMemo } from 'react';
 import { DateTime } from 'luxon';
 import { getNextDeadline } from '@/utils/parser';
+import { searchConferences, filterBySubjects } from '@/utils/conferenceQueries';
 import type { Conference } from '@/types/conference';
 
 export interface ConferenceFiltersState {
@@ -28,28 +29,15 @@ export function useConferenceFilters(
   filters: ConferenceFiltersState
 ) {
   return useMemo(() => {
-    let result = [...conferences];
-
-    // Apply search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase().replace(/\s+/g, '');
-      result = result.filter(conf => {
-        const searchableText = `${conf.title}${conf.year}${conf.full_name}`.toLowerCase().replace(/\s+/g, '');
-        return searchableText.includes(query);
-      });
-    }
+    // Shared query utilities keep web filtering in lockstep with the Slack bot.
+    // Copy first: the helpers pass the input through untouched when their
+    // filter is empty, and the sort below mutates in place.
+    let result = searchConferences([...conferences], searchQuery);
+    result = filterBySubjects(result, filters.subject ?? []);
 
     // Apply year filter
     if (filters.year) {
       result = result.filter(conf => conf.year === parseInt(filters.year));
-    }
-
-    // Apply subject filter (multi-select)
-    if (filters.subject && filters.subject.length > 0) {
-      result = result.filter(conf => {
-        const confSubjects = Array.isArray(conf.sub) ? conf.sub : [conf.sub];
-        return confSubjects.some(subject => filters.subject.includes(subject));
-      });
     }
 
     // Apply type filter (multi-select)

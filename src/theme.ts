@@ -84,6 +84,16 @@ export const system = createSystem(defaultConfig, defineConfig({
           letterSpacing: '0.2em',
         },
       },
+      // Secondary meta text: page numbers, counts, dates, quiet captions.
+      // The 600-weight sibling of `eyebrow`.
+      metaLabel: {
+        value: {
+          fontSize: '11px',
+          fontWeight: '600',
+          textTransform: 'uppercase',
+          letterSpacing: '0.2em',
+        },
+      },
     },
     semanticTokens: {
       colors: {

@@ -4,6 +4,7 @@
  */
 
 import { WebClient } from '@slack/web-api';
+import type { BlockElement } from '@/types/slack';
 import { getTokenWithFallback } from './teamStorage';
 
 // Cache of WebClient instances per team
@@ -35,13 +36,6 @@ export async function getSlackClient(teamId?: string): Promise<WebClient> {
 }
 
 /**
- * Clear the client cache (useful for testing or token rotation)
- */
-export function clearClientCache(): void {
-  clientCache.clear();
-}
-
-/**
  * Drop the cached client for a single team (call after token rotation/uninstall).
  */
 export function clearTeamClient(teamId?: string): void {
@@ -58,7 +52,7 @@ export function clearTeamClient(teamId?: string): void {
  */
 export async function postToChannel(
   channelId: string,
-  blocks: any[],
+  blocks: BlockElement[],
   text: string,
   teamId?: string
 ): Promise<void> {
@@ -81,7 +75,7 @@ export async function postToChannel(
  */
 export async function sendDM(
   userId: string,
-  blocks: any[],
+  blocks: BlockElement[],
   text?: string,
   teamId?: string
 ): Promise<void> {

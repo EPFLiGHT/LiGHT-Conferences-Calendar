@@ -6,11 +6,11 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
-import { X, Globe, FileText, Code, Calendar } from 'lucide-react';
+import { Globe, FileText, Code, Calendar } from 'lucide-react';
 import DeadlineCard from './DeadlineCard';
 import ExternalLinkButton from './ExternalLinkButton';
 import ConferenceDetails from './ConferenceDetails';
-import ModalShell from './ModalShell';
+import ModalShell, { ModalHeader } from './ModalShell';
 import SectionLabel from './SectionLabel';
 import { getDeadlineInfo } from '@/utils/parser';
 import { exportConference } from '@/utils/ics';
@@ -33,51 +33,7 @@ export default function ConferenceModal({ conference, onClose }: ConferenceModal
     <ModalShell onClose={onClose}>
       {(close) => (
         <>
-          {/* Header */}
-          <Box
-            position="sticky"
-            top="0"
-            bg="white"
-            borderBottom="1px solid"
-            borderColor="line.strong"
-            px={{ base: '6', md: '8' }}
-            py={{ base: '5', md: '6' }}
-            zIndex="10"
-          >
-            <Box
-              as="button"
-              position="absolute"
-              top="5"
-              right="5"
-              w="32px"
-              h="32px"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              border="1px solid"
-              borderColor="line.strong"
-              borderRadius="control"
-              bg="white"
-              color="brand.500"
-              cursor="pointer"
-              transition="all 0.2s ease"
-              _hover={{ bg: 'brand.500', color: 'white', borderColor: 'brand.500' }}
-              onClick={close}
-              aria-label="Close"
-            >
-              <X size={16} strokeWidth={2} />
-            </Box>
-
-            <Text
-              fontSize="11px"
-              color="brand.400"
-              textTransform="uppercase"
-              letterSpacing="0.22em"
-              fontWeight="700"
-              mb="3"
-            >
-              Conference Dossier
-            </Text>
+          <ModalHeader eyebrow="Conference Dossier" onClose={close}>
             <VStack align="start" gap="2" pr="12">
               <Heading
                 as="h2"
@@ -96,7 +52,7 @@ export default function ConferenceModal({ conference, onClose }: ConferenceModal
                 {conference.full_name}
               </Text>
             </VStack>
-          </Box>
+          </ModalHeader>
 
           {/* Body */}
           <Box px={{ base: '6', md: '8' }} py={{ base: '6', md: '8' }}>

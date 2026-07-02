@@ -55,7 +55,7 @@ describe('buildConferenceItemBlocks — deadline', () => {
   it('shows Website (primary) and Add to Calendar buttons', () => {
     const blocks = buildConferenceItemBlocks(item);
     expect(buttonLabels(blocks)).toEqual(['🌐 Website', '📅 Add to Calendar']);
-    const actions = blocks.find((b) => b.type === 'actions');
+    const actions = blocks.find((b) => b.type === 'actions') as any;
     expect(actions.elements[0].style).toBe('primary');
     expect(actions.elements[0].url).toBe('https://petsymposium.org');
     expect(actions.elements[1].action_id).toBe('calendar_pets25');

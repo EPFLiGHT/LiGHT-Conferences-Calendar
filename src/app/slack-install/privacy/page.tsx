@@ -24,14 +24,7 @@ function Section({ num, title, children }: SectionProps): JSX.Element {
       borderColor="line.default"
     >
       <Box>
-        <Text
-          fontSize="11px"
-          color="brand.400"
-          textTransform="uppercase"
-          letterSpacing="0.22em"
-          fontWeight="600"
-          className="tabular"
-        >
+        <Text textStyle="metaLabel" color="brand.400" className="tabular">
           § {num}
         </Text>
       </Box>
@@ -93,14 +86,7 @@ export default function PrivacyPolicyPage() {
           </ChakraLink>
 
           {/* Masthead */}
-          <Text
-            fontSize="11px"
-            color="brand.400"
-            textTransform="uppercase"
-            letterSpacing="0.22em"
-            fontWeight="600"
-            mb="5"
-          >
+          <Text textStyle="eyebrow" color="brand.400" mb="5">
             LiGHT · Slack Bot
           </Text>
 
@@ -129,16 +115,8 @@ export default function PrivacyPolicyPage() {
             <Text fontSize="sm" color="gray.600" maxW="640px" lineHeight="1.6">
               How the Conferences Calendar Bot collects, uses, and protects your information.
             </Text>
-            <Text
-              fontSize="11px"
-              color="brand.400"
-              textTransform="uppercase"
-              letterSpacing="0.2em"
-              fontWeight="600"
-              className="tabular"
-              whiteSpace="nowrap"
-            >
-              Updated 23 Oct 2025
+            <Text textStyle="metaLabel" color="brand.400" className="tabular" whiteSpace="nowrap">
+              Updated 2 Jul 2026
             </Text>
           </Flex>
 
@@ -207,7 +185,7 @@ export default function PrivacyPolicyPage() {
 
           <Section num="03" title="Data storage & security">
             <Bullet>All user preferences are stored securely in a Vercel KV (Redis) database with encryption at rest.</Bullet>
-            <Bullet>Slack OAuth tokens are stored securely as environment variables.</Bullet>
+            <Bullet>Workspace OAuth tokens are stored securely in the same encrypted database.</Bullet>
             <Bullet>All communications with the Slack API are encrypted via HTTPS.</Bullet>
             <Bullet>Access to the database is restricted and authenticated.</Bullet>
             <Bullet>We do not sell, trade, or share your personal information with third parties.</Bullet>
@@ -215,13 +193,14 @@ export default function PrivacyPolicyPage() {
 
           <Section num="04" title="Data retention">
             <Text fontSize="sm" color="gray.700" lineHeight="1.7" mb="4">
-              We retain your data as long as your workspace has the bot installed, or you remain
-              subscribed to notifications.
+              When your workspace uninstalls the bot, workspace data (OAuth tokens, workspace
+              details, and channel subscriptions) is deleted{' '}
+              <Text as="span" fontWeight="600" color="brand.500">immediately</Text>.
             </Text>
             <Text fontSize="sm" color="gray.700" lineHeight="1.7">
-              When you unsubscribe or uninstall the bot, your preferences are retained for{' '}
-              <Text as="span" fontWeight="600" color="brand.500">30 days</Text> in case you wish to resubscribe.
-              After 30 days, your data may be permanently deleted.
+              Your personal notification preferences are retained after you unsubscribe, so your
+              settings are preserved if you choose to resubscribe. You can request their permanent
+              deletion at any time by contacting us (see &ldquo;Your rights&rdquo; below).
             </Text>
           </Section>
 
@@ -242,8 +221,8 @@ export default function PrivacyPolicyPage() {
                 /conf-unsubscribe
               </Text>
             </Bullet>
-            <Bullet>Request deletion of your data by uninstalling the bot from your workspace</Bullet>
-            <Bullet>Contact us to request a complete data export or deletion</Bullet>
+            <Bullet>Have workspace data (tokens and channel subscriptions) deleted automatically by uninstalling the bot</Bullet>
+            <Bullet>Contact us to request a complete data export, or permanent deletion of your notification preferences</Bullet>
           </Section>
 
           <Section num="06" title="Third-party services">
@@ -293,14 +272,7 @@ export default function PrivacyPolicyPage() {
               borderRight={{ base: '1px solid', md: 'none' }}
               borderBottom={{ base: 'none', md: '1px solid' }}
             >
-              <Text
-                fontSize="11px"
-                color="brand.400"
-                textTransform="uppercase"
-                letterSpacing="0.22em"
-                fontWeight="600"
-                mb="4"
-              >
+              <Text textStyle="metaLabel" color="brand.400" mb="4">
                 Contact us
               </Text>
               <Text fontSize="sm" color="gray.700" lineHeight="1.7" mb="4">
@@ -341,14 +313,7 @@ export default function PrivacyPolicyPage() {
               border="1px solid"
               borderColor="brand.300"
             >
-              <Text
-                fontSize="11px"
-                color="brand.500"
-                textTransform="uppercase"
-                letterSpacing="0.22em"
-                fontWeight="600"
-                mb="4"
-              >
+              <Text textStyle="metaLabel" color="brand.500" mb="4">
                 Consent
               </Text>
               <Text fontSize="sm" color="brand.700" fontWeight="500" lineHeight="1.7">

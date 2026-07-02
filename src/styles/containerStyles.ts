@@ -15,6 +15,3 @@ export const cardSurfaceStyle: SurfaceStyle = {
   borderColor: 'line.default',
   p: '6',
 };
-
-/** Pagination shell reuses the standard card surface. */
-export const paginationContainerStyle: SurfaceStyle = cardSurfaceStyle;

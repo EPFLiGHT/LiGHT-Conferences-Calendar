@@ -7,11 +7,11 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
-import { X, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { Speaker } from '@/types/speaker';
 import ExternalLinkButton from './ExternalLinkButton';
 import SpeakerAvatar from './SpeakerAvatar';
-import ModalShell from './ModalShell';
+import ModalShell, { ModalHeader } from './ModalShell';
 import SectionLabel from './SectionLabel';
 
 interface SpeakerModalProps {
@@ -27,52 +27,7 @@ export default function SpeakerModal({ speaker, onClose }: SpeakerModalProps): J
     <ModalShell onClose={onClose}>
       {(close) => (
         <>
-          {/* Header */}
-          <Box
-            position="sticky"
-            top="0"
-            bg="white"
-            borderBottom="1px solid"
-            borderColor="line.strong"
-            px={{ base: '6', md: '8' }}
-            py={{ base: '5', md: '6' }}
-            zIndex="10"
-          >
-            <Box
-              as="button"
-              position="absolute"
-              top="5"
-              right="5"
-              w="32px"
-              h="32px"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              border="1px solid"
-              borderColor="line.strong"
-              borderRadius="control"
-              bg="white"
-              color="brand.500"
-              cursor="pointer"
-              transition="all 0.2s ease"
-              _hover={{ bg: 'brand.500', color: 'white', borderColor: 'brand.500' }}
-              onClick={close}
-              aria-label="Close"
-            >
-              <X size={16} strokeWidth={2} />
-            </Box>
-
-            <Text
-              fontSize="11px"
-              color="brand.400"
-              textTransform="uppercase"
-              letterSpacing="0.22em"
-              fontWeight="700"
-              mb="3"
-            >
-              Speaker Profile
-            </Text>
-
+          <ModalHeader eyebrow="Speaker Profile" onClose={close}>
             <Flex align="center" gap="5" pr="12">
               <SpeakerAvatar imageUrl={speaker.imageUrl} name={speaker.name} size="md" />
               <Box>
@@ -87,19 +42,12 @@ export default function SpeakerModal({ speaker, onClose }: SpeakerModalProps): J
                 >
                   {speaker.name}
                 </Heading>
-                <Text
-                  fontSize="11px"
-                  color="brand.400"
-                  textTransform="uppercase"
-                  letterSpacing="0.22em"
-                  fontWeight="600"
-                  className="tabular"
-                >
+                <Text textStyle="metaLabel" color="brand.400" className="tabular">
                   {String(total).padStart(2, '0')} presentation{total === 1 ? '' : 's'}
                 </Text>
               </Box>
             </Flex>
-          </Box>
+          </ModalHeader>
 
           {/* Body */}
           <Box px={{ base: '6', md: '8' }} py={{ base: '6', md: '8' }}>

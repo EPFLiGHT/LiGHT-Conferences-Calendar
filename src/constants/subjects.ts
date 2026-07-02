@@ -6,13 +6,9 @@
  * can share it; this file layers the TypeScript types and derived lookup maps.
  */
 
-import {
-  SUBJECTS as SUBJECTS_DATA,
-  SUBJECT_CODES,
-  DEFAULT_SUBJECT_COLOR,
-} from './subjects.data';
+import { SUBJECTS as SUBJECTS_DATA, DEFAULT_SUBJECT_COLOR } from './subjects.data';
 
-export interface SubjectConfig {
+interface SubjectConfig {
   code: string;
   label: string;
   emoji: string;
@@ -23,9 +19,9 @@ export interface SubjectConfig {
   };
 }
 
-export const SUBJECTS: Record<string, SubjectConfig> = SUBJECTS_DATA;
+const SUBJECTS: Record<string, SubjectConfig> = SUBJECTS_DATA;
 
-export { SUBJECT_CODES, DEFAULT_SUBJECT_COLOR };
+export { DEFAULT_SUBJECT_COLOR };
 
 /**
  * Derived exports for backward compatibility

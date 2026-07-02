@@ -4,7 +4,7 @@
  */
 
 import type { Conference, DeadlineInfo } from '@/types/conference';
-import type { BlockKitMessage, UserPreferences } from '@/types/slack';
+import type { BlockKitMessage, BlockElement, ButtonElement, UserPreferences } from '@/types/slack';
 import { getDaysUntilDeadline } from '@/utils/conferenceQueries';
 import { SUBJECT_LABELS, SUBJECT_EMOJIS } from '@/constants/subjects';
 import { DateTime } from 'luxon';
@@ -23,7 +23,7 @@ export type ConferenceCardItem =
  * Single source of truth for a conference "card". Used by channel digests and DMs
  * so the layout can never drift between them.
  */
-export function buildConferenceItemBlocks(item: ConferenceCardItem): any[] {
+export function buildConferenceItemBlocks(item: ConferenceCardItem): BlockElement[] {
   const { conference } = item;
   const urgencyEmoji = getUrgencyEmoji(item.daysLeft);
   const subjects = Array.isArray(conference.sub) ? conference.sub : [conference.sub];
@@ -41,11 +41,11 @@ export function buildConferenceItemBlocks(item: ConferenceCardItem): any[] {
     lines.push(`📆 Starts *${item.start.toFormat('MMM d, yyyy')}* · ${formatEventCountdown(item.daysLeft)}`);
   }
 
-  const blocks: any[] = [
+  const blocks: BlockElement[] = [
     { type: 'section', text: { type: 'mrkdwn', text: lines.join('\n') } },
   ];
 
-  const actionElements: any[] = [];
+  const actionElements: ButtonElement[] = [];
   if (conference.link) {
     actionElements.push({
       type: 'button',
@@ -78,7 +78,7 @@ export function buildConferenceItemBlocks(item: ConferenceCardItem): any[] {
 export function buildDeadlineList(
   deadlines: Array<{ conference: Conference; deadline: DeadlineInfo }>
 ): BlockKitMessage {
-  const blocks: any[] = [
+  const blocks: BlockElement[] = [
     {
       type: 'header',
       text: {
@@ -126,7 +126,7 @@ export function buildDeadlineList(
  * Build help message with all commands
  */
 export function buildHelpMessage(): BlockKitMessage {
-  const blocks: any[] = [
+  const blocks: BlockElement[] = [
     {
       type: 'header',
       text: {
@@ -184,7 +184,7 @@ export function buildHelpMessage(): BlockKitMessage {
  * Build settings panel with user preferences
  */
 export function buildSettingsPanel(prefs: UserPreferences): BlockKitMessage {
-  const blocks: any[] = [
+  const blocks: BlockElement[] = [
     {
       type: 'header',
       text: {
@@ -304,7 +304,7 @@ function getUrgencyEmoji(daysLeft: number): string {
 export function buildUserDeadlineNotification(
   deadlines: Array<{ conference: Conference; deadline: DeadlineInfo }>
 ): BlockKitMessage {
-  const blocks: any[] = [
+  const blocks: BlockElement[] = [
     { type: 'header', text: { type: 'plain_text', text: '🔔 Your deadline reminder', emoji: true } },
     { type: 'context', elements: [{ type: 'mrkdwn', text: 'You asked to be reminded about these' }] },
     { type: 'divider' },
@@ -345,7 +345,7 @@ export function buildUserDeadlineNotification(
 export function buildEventStartNotification(
   events: Array<{ conference: Conference; start: DateTime; daysLeft: number }>
 ): BlockKitMessage {
-  const blocks: any[] = [
+  const blocks: BlockElement[] = [
     { type: 'header', text: { type: 'plain_text', text: '🎟️ Conferences Starting Soon', emoji: true } },
     {
       type: 'section',
@@ -421,13 +421,13 @@ export function buildChannelDigest(params: {
     day: 'numeric',
   });
 
-  const blocks: any[] = [
+  const blocks: BlockElement[] = [
     { type: 'header', text: { type: 'plain_text', text: '📅 Conference Update', emoji: true } },
     { type: 'context', elements: [{ type: 'mrkdwn', text: headerDate }] },
     { type: 'divider' },
   ];
 
-  const overflowLine = (extra: number) => ({
+  const overflowLine = (extra: number): BlockElement => ({
     type: 'context',
     elements: [
       { type: 'mrkdwn', text: `_+ ${extra} more — type \`/conf-upcoming\` to see them all_` },

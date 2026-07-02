@@ -47,14 +47,7 @@ export default function SpeakersPage() {
       <PageShell>
           {/* Page Header */}
           <Box mb="10">
-            <Text
-              fontSize="11px"
-              color="brand.400"
-              textTransform="uppercase"
-              letterSpacing="0.22em"
-              fontWeight="700"
-              mb="4"
-            >
+            <Text textStyle="eyebrow" color="brand.400" mb="4">
               LiGHT · Speakers
             </Text>
 
@@ -83,11 +76,8 @@ export default function SpeakersPage() {
                 Members of LiGHT Lab who have presented their research at conferences, workshops, summits, and seminars around the world.
               </Text>
               <Text
-                fontSize="11px"
+                textStyle="metaLabel"
                 color="brand.400"
-                textTransform="uppercase"
-                letterSpacing="0.22em"
-                fontWeight="600"
                 className="tabular"
                 whiteSpace="nowrap"
               >

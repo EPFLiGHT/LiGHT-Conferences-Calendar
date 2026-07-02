@@ -72,11 +72,8 @@ export default function SpeakerCard({ speaker, index = 0, onClick }: SpeakerCard
         </Flex>
         {hasMultiplePresentations && (
           <Text
-            fontSize="10px"
-            fontWeight="700"
+            textStyle="badgeLabel"
             color="brand.400"
-            textTransform="uppercase"
-            letterSpacing="0.22em"
             className="tabular"
             whiteSpace="nowrap"
           >
@@ -89,14 +86,7 @@ export default function SpeakerCard({ speaker, index = 0, onClick }: SpeakerCard
       <Box borderTop="1px solid" borderColor="line.default" mb="5" />
 
       {/* Type tag */}
-      <Text
-        fontSize="10px"
-        fontWeight="700"
-        color="brand.500"
-        textTransform="uppercase"
-        letterSpacing="0.22em"
-        mb="4"
-      >
+      <Text textStyle="badgeLabel" color="brand.500" mb="4">
         {currentPresentation.eventType}
       </Text>
 

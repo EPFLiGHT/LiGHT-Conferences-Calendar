@@ -58,21 +58,3 @@ export async function verifySlackRequest(
   }
   return isValid;
 }
-
-/**
- * Extract Slack command parameters from form-encoded body
- */
-export function parseSlackCommand(body: string): Record<string, string> {
-  const params = new URLSearchParams(body);
-  return {
-    token: params.get('token') || '',
-    team_id: params.get('team_id') || '',
-    user_id: params.get('user_id') || '',
-    user_name: params.get('user_name') || '',
-    command: params.get('command') || '',
-    text: params.get('text') || '',
-    response_url: params.get('response_url') || '',
-    trigger_id: params.get('trigger_id') || '',
-    channel_id: params.get('channel_id') || '',
-  };
-}

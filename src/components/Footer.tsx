@@ -3,26 +3,11 @@
 import { Box, Container, Flex, Grid, Heading, Text, Link, Image } from '@chakra-ui/react';
 import { MapPin, Mail, Linkedin, Github, ArrowUpRight, ArrowUp } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
-
-const linkUnderline = {
-  borderBottom: '1px solid',
-  borderColor: 'line.hover',
-  pb: '1px',
-  transition: 'all 0.2s ease',
-} as const;
-
-const linkHover = {
-  color: 'brand.700',
-  borderColor: 'brand.700',
-  textDecoration: 'none',
-} as const;
+import { inlineLinkStyle } from '@/styles/linkStyles';
 
 const colHeadStyle = {
-  fontSize: '11px',
+  textStyle: 'eyebrow',
   color: 'brand.500',
-  textTransform: 'uppercase' as const,
-  letterSpacing: '0.22em',
-  fontWeight: 700,
   mb: '2',
   pb: '3',
   borderBottom: '1px solid',
@@ -188,10 +173,8 @@ export default function Footer(): JSX.Element {
                 alignItems="center"
                 gap="2"
                 fontSize="sm"
+                {...inlineLinkStyle}
                 fontWeight="600"
-                color="brand.500"
-                {...linkUnderline}
-                _hover={linkHover}
               >
                 Visit the lab
                 <ArrowUpRight size={15} strokeWidth={2} />
@@ -225,10 +208,7 @@ export default function Footer(): JSX.Element {
                   <Link
                     href="mailto:mary-anne.hartley@epfl.ch"
                     fontSize="sm"
-                    color="brand.500"
-                    fontWeight="500"
-                    {...linkUnderline}
-                    _hover={linkHover}
+                    {...inlineLinkStyle}
                   >
                     mary-anne.hartley@epfl.ch
                   </Link>
@@ -246,13 +226,10 @@ export default function Footer(): JSX.Element {
                     target="_blank"
                     rel="noopener noreferrer"
                     fontSize="sm"
-                    color="brand.500"
-                    fontWeight="500"
                     display="inline-flex"
                     alignItems="center"
                     gap="1"
-                    {...linkUnderline}
-                    _hover={linkHover}
+                    {...inlineLinkStyle}
                   >
                     LiGHT Laboratory
                     <ArrowUpRight size={12} strokeWidth={2} />
@@ -271,14 +248,11 @@ export default function Footer(): JSX.Element {
                   target="_blank"
                   rel="noopener noreferrer"
                   fontSize="sm"
-                  color="brand.500"
-                  fontWeight="500"
                   display="inline-flex"
                   alignItems="center"
                   gap="2"
                   alignSelf="flex-start"
-                  {...linkUnderline}
-                  _hover={linkHover}
+                  {...inlineLinkStyle}
                 >
                   <Github size={14} strokeWidth={1.75} />
                   Contribute on GitHub
@@ -288,11 +262,8 @@ export default function Footer(): JSX.Element {
                 <Link
                   href={ROUTES.slackInstall}
                   fontSize="sm"
-                  color="brand.500"
-                  fontWeight="500"
                   alignSelf="flex-start"
-                  {...linkUnderline}
-                  _hover={linkHover}
+                  {...inlineLinkStyle}
                 >
                   Add the Slack bot →
                 </Link>
@@ -300,11 +271,8 @@ export default function Footer(): JSX.Element {
                 <Link
                   href={ROUTES.slackPrivacy}
                   fontSize="sm"
-                  color="brand.500"
-                  fontWeight="500"
                   alignSelf="flex-start"
-                  {...linkUnderline}
-                  _hover={linkHover}
+                  {...inlineLinkStyle}
                 >
                   Privacy policy
                 </Link>
@@ -327,14 +295,7 @@ export default function Footer(): JSX.Element {
                   h="3px"
                   bg="brand.500"
                 />
-                <Text
-                  fontSize="10px"
-                  color="brand.400"
-                  textTransform="uppercase"
-                  letterSpacing="0.22em"
-                  fontWeight="700"
-                  mb="2"
-                >
+                <Text textStyle="badgeLabel" color="brand.400" mb="2">
                   Credits
                 </Text>
                 <Text fontSize="sm" color="gray.700" lineHeight="1.6">
@@ -343,10 +304,8 @@ export default function Footer(): JSX.Element {
                     href="https://github.com/AZOGOAT"
                     target="_blank"
                     rel="noopener noreferrer"
-                    color="brand.500"
+                    {...inlineLinkStyle}
                     fontWeight="600"
-                    {...linkUnderline}
-                    _hover={linkHover}
                   >
                     AZO
                   </Link>
@@ -355,10 +314,8 @@ export default function Footer(): JSX.Element {
                     href="https://github.com/EPFLiGHT"
                     target="_blank"
                     rel="noopener noreferrer"
-                    color="brand.500"
+                    {...inlineLinkStyle}
                     fontWeight="600"
-                    {...linkUnderline}
-                    _hover={linkHover}
                   >
                     LiGHT Lab
                   </Link>
@@ -378,14 +335,7 @@ export default function Footer(): JSX.Element {
             gap="4"
             flexWrap="wrap"
           >
-            <Text
-              fontSize="11px"
-              color="brand.500"
-              textTransform="uppercase"
-              letterSpacing="0.2em"
-              fontWeight="600"
-              className="tabular"
-            >
+            <Text textStyle="metaLabel" color="brand.500" className="tabular">
               © {new Date().getFullYear()} LiGHT Laboratory · All rights reserved
             </Text>
             <Flex gap="6" align="center">
@@ -393,13 +343,9 @@ export default function Footer(): JSX.Element {
                 href="https://github.com/EPFLiGHT/Conferences-Calendar"
                 target="_blank"
                 rel="noopener noreferrer"
-                fontSize="11px"
-                color="brand.500"
-                textTransform="uppercase"
-                letterSpacing="0.2em"
+                textStyle="metaLabel"
+                {...inlineLinkStyle}
                 fontWeight="600"
-                {...linkUnderline}
-                _hover={linkHover}
               >
                 Source
               </Link>
@@ -410,11 +356,8 @@ export default function Footer(): JSX.Element {
                 display="inline-flex"
                 alignItems="center"
                 gap="1.5"
-                fontSize="11px"
+                textStyle="metaLabel"
                 color="brand.500"
-                textTransform="uppercase"
-                letterSpacing="0.2em"
-                fontWeight="600"
                 border="1px solid"
                 borderColor="brand.500"
                 px="3"

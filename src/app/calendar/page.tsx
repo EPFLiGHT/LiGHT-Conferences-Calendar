@@ -173,14 +173,7 @@ function CalendarContent() {
             gap="3"
             flexWrap="wrap"
           >
-            <Text
-              fontSize="11px"
-              color="brand.500"
-              textTransform="uppercase"
-              letterSpacing="0.22em"
-              fontWeight="700"
-              className="tabular"
-            >
+            <Text textStyle="eyebrow" color="brand.500" className="tabular">
               {String(filteredConferences.length).padStart(2, '0')} conference{filteredConferences.length === 1 ? '' : 's'} tracked
             </Text>
             <Flex gap="2" flexWrap="wrap">

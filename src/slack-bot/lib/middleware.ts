@@ -4,13 +4,13 @@ import { verifySlackRequest } from './slackVerify';
 /**
  * Types for Slack request handlers
  */
-export type SlackRequestHandler<T = unknown> = (
+type SlackRequestHandler<T = unknown> = (
   parsedBody: T,
   request: NextRequest,
   teamId?: string
 ) => Promise<NextResponse> | NextResponse;
 
-export type SlackAuthConfig = {
+type SlackAuthConfig = {
   requireAuth?: boolean;
   authSecret?: string;
 };

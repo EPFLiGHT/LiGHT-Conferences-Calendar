@@ -3,75 +3,6 @@
  */
 
 /**
- * Slack slash command payload
- */
-export interface SlackCommand {
-  token: string;
-  team_id: string;
-  team_domain: string;
-  channel_id: string;
-  channel_name: string;
-  user_id: string;
-  user_name: string;
-  command: string; // e.g., "/conf"
-  text: string; // e.g., "upcoming" or "search CVPR"
-  api_app_id: string;
-  is_enterprise_install: string;
-  response_url: string;
-  trigger_id: string;
-}
-
-/**
- * Slack interaction payload (button clicks, menu selections)
- */
-export interface SlackInteraction {
-  type: string; // "block_actions", "view_submission", etc.
-  user: {
-    id: string;
-    username: string;
-    name: string;
-    team_id: string;
-  };
-  api_app_id: string;
-  token: string;
-  container: {
-    type: string;
-    message_ts: string;
-    channel_id: string;
-    is_ephemeral: boolean;
-  };
-  trigger_id: string;
-  team: {
-    id: string;
-    domain: string;
-  };
-  channel: {
-    id: string;
-    name: string;
-  };
-  message: {
-    type: string;
-    subtype?: string;
-    text: string;
-    ts: string;
-    bot_id?: string;
-  };
-  response_url: string;
-  actions: Array<{
-    action_id: string;
-    block_id: string;
-    text: {
-      type: string;
-      text: string;
-      emoji: boolean;
-    };
-    value?: string;
-    type: string;
-    action_ts: string;
-  }>;
-}
-
-/**
  * User preferences stored in Vercel KV
  */
 export interface UserPreferences {
@@ -110,7 +41,8 @@ export interface BlockKitMessage {
 }
 
 /**
- * Block Kit element types
+ * Block Kit element types. The builders in messageBuilder construct these,
+ * and the slackClient send helpers accept them.
  */
 export type BlockElement =
   | HeaderBlock
@@ -119,7 +51,7 @@ export type BlockElement =
   | ActionsBlock
   | ContextBlock;
 
-export interface HeaderBlock {
+interface HeaderBlock {
   type: 'header';
   text: {
     type: 'plain_text';
@@ -129,7 +61,7 @@ export interface HeaderBlock {
   block_id?: string;
 }
 
-export interface SectionBlock {
+interface SectionBlock {
   type: 'section';
   text?: {
     type: 'mrkdwn' | 'plain_text';
@@ -143,18 +75,18 @@ export interface SectionBlock {
   block_id?: string;
 }
 
-export interface DividerBlock {
+interface DividerBlock {
   type: 'divider';
   block_id?: string;
 }
 
-export interface ActionsBlock {
+interface ActionsBlock {
   type: 'actions';
   elements: Array<ButtonElement | SelectMenuElement>;
   block_id?: string;
 }
 
-export interface ContextBlock {
+interface ContextBlock {
   type: 'context';
   elements: Array<{
     type: 'mrkdwn' | 'plain_text' | 'image';
@@ -172,13 +104,13 @@ export interface ButtonElement {
     text: string;
     emoji?: boolean;
   };
-  action_id: string;
+  action_id?: string; // Optional: Slack auto-generates one for link buttons
   url?: string; // For link buttons
   value?: string; // For action buttons
   style?: 'primary' | 'danger';
 }
 
-export interface SelectMenuElement {
+interface SelectMenuElement {
   type: 'static_select' | 'multi_static_select';
   placeholder: {
     type: 'plain_text';
@@ -196,32 +128,4 @@ export interface SelectMenuElement {
   }>;
 }
 
-export type BlockAccessory = ButtonElement | SelectMenuElement;
-
-/**
- * Notification urgency levels
- */
-export enum NotificationUrgency {
-  CRITICAL = 'critical', // 24 hours or less
-  URGENT = 'urgent', // 3 days or less
-  UPCOMING = 'upcoming', // 7 days or less
-}
-
-/**
- * Command response types
- */
-export interface CommandResponse {
-  success: boolean;
-  message?: BlockKitMessage;
-  error?: string;
-}
-
-/**
- * Cron job result
- */
-export interface CronJobResult {
-  success: boolean;
-  notificationsSent: number;
-  errors: string[];
-  timestamp: string;
-}
+type BlockAccessory = ButtonElement | SelectMenuElement;

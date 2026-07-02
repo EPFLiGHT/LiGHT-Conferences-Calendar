@@ -30,10 +30,7 @@ const Chip = forwardRef<HTMLButtonElement, ChipProps>(
         onClick={onClick}
         px="3"
         py="1.5"
-        fontSize="10px"
-        fontWeight="700"
-        textTransform="uppercase"
-        letterSpacing="0.18em"
+        textStyle="badgeLabel"
         borderRadius="badge"
         border="1px solid"
         bg={selected ? 'brand.500' : 'white'}
@@ -74,10 +71,10 @@ function FilterGroup({ label, selectedLabel, children }: FilterGroupProps): JSX.
         gap="3"
         flexWrap="wrap"
       >
-        <Text fontSize="10px" fontWeight="700" color="brand.500" textTransform="uppercase" letterSpacing="0.22em">
+        <Text textStyle="badgeLabel" color="brand.500">
           {label}
         </Text>
-        <Text fontSize="10px" fontWeight="600" color="brand.400" textTransform="uppercase" letterSpacing="0.18em">
+        <Text textStyle="fieldLabel" color="brand.400">
           {selectedLabel}
         </Text>
       </Flex>

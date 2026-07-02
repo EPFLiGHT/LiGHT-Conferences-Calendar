@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import type { BlockElement } from '@/types/slack';
 import { withSlackMiddleware, SlackRequestType } from '@/slack-bot/lib/middleware';
 import { successResponse, errorResponse } from '@/slack-bot/lib/responses';
 import { getConferences } from '@/slack-bot/utils/conferenceCache';
@@ -79,7 +80,7 @@ async function handleDailyCheck(): Promise<NextResponse> {
 
         // Compose a single DM combining deadline reminders and event-start
         // reminders so users get at most one message per day.
-        const combinedBlocks: any[] = [];
+        const combinedBlocks: BlockElement[] = [];
         const fallbackParts: string[] = [];
 
         if (relevantDeadlines.length > 0) {

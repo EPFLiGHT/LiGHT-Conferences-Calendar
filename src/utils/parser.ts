@@ -18,7 +18,7 @@ export function toISOFormat(dateString: string): string {
   return dateString.replace(' ', 'T');
 }
 
-export function validateConference(conf: any, index: number): string[] {
+function validateConference(conf: any, index: number): string[] {
   const errors: string[] = [];
 
   // Check required fields
@@ -162,7 +162,7 @@ export function getNoDeadlineLabel(conference: Conference): string {
   }
 }
 
-export function getSubjectColor(subject: string) {
+function getSubjectColor(subject: string) {
   return SUBJECT_COLORS[subject] || DEFAULT_SUBJECT_COLOR;
 }
 

@@ -116,14 +116,7 @@ export default function Header(): JSX.Element {
               >
                 Conference Deadlines
               </Text>
-              <Text
-                fontSize="11px"
-                color="brand.400"
-                mt="1.5"
-                textTransform="uppercase"
-                letterSpacing="0.2em"
-                fontWeight="500"
-              >
+              <Text textStyle="metaLabel" color="brand.400" mt="1.5">
                 Track research deadlines
               </Text>
             </Box>

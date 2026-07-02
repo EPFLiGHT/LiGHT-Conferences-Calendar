@@ -56,13 +56,7 @@ export default function Countdown({ deadline, label }: CountdownProps): JSX.Elem
   return (
     <Flex direction="column" gap="0.5">
       {label && (
-        <Text
-          fontSize="10px"
-          fontWeight="600"
-          color="brand.400"
-          textTransform="uppercase"
-          letterSpacing="0.2em"
-        >
+        <Text textStyle="fieldLabel" color="brand.400">
           {label}
         </Text>
       )}

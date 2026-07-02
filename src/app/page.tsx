@@ -8,11 +8,12 @@ import PageShell from '@/components/PageShell';
 import ConferenceCard from '@/components/ConferenceCard';
 import ConferenceModal from '@/components/ConferenceModal';
 import ConferenceFiltersPanel from '@/components/ConferenceFiltersPanel';
+import SectionRule from '@/components/SectionRule';
 import LoadingState from '@/components/LoadingState';
 import ErrorState from '@/components/ErrorState';
 import { useConferences } from '@/hooks/useConferences';
 import { useConferenceFilters, type ConferenceFiltersState } from '@/hooks/useConferenceFilters';
-import { paginationContainerStyle } from '@/styles/containerStyles';
+import { cardSurfaceStyle } from '@/styles/containerStyles';
 import { primaryButtonStyle } from '@/styles/buttonStyles';
 import type { Conference } from '@/types/conference';
 
@@ -60,7 +61,7 @@ export default function Page() {
       <PageShell>
           <ConferenceFiltersPanel
             title="Research Conferences"
-            eyebrow=""
+            eyebrow="LiGHT · Index"
             description="Track upcoming conferences and never miss a deadline. Click on any entry for full details and to export."
             searchValue={searchQuery}
             onSearchChange={setSearchQuery}
@@ -69,37 +70,11 @@ export default function Page() {
             onFilterChange={handleFilterChange}
           />
 
-          <Flex
-            align="baseline"
-            justify="space-between"
-            mb="6"
-            pb="3"
-            borderBottom="1px solid"
-            borderColor="line.default"
-            gap="4"
-            flexWrap="wrap"
-          >
-            <Text
-              fontSize="11px"
-              color="brand.400"
-              textTransform="uppercase"
-              letterSpacing="0.22em"
-              fontWeight="600"
-              className="tabular"
-            >
-              Page {String(currentPage).padStart(2, '0')} / {String(totalPages || 1).padStart(2, '0')}
-            </Text>
-            <Text
-              fontSize="11px"
-              color="brand.400"
-              textTransform="uppercase"
-              letterSpacing="0.18em"
-              fontWeight="600"
-              className="tabular"
-            >
-              {paginatedConferences.length > 0 ? (currentPage - 1) * ITEMS_PER_PAGE + 1 : 0}–{Math.min(currentPage * ITEMS_PER_PAGE, filteredAndSortedConferences.length)} of {filteredAndSortedConferences.length} entries
-            </Text>
-          </Flex>
+          <SectionRule
+            labelColor="brand.400"
+            label={`Page ${String(currentPage).padStart(2, '0')} / ${String(totalPages || 1).padStart(2, '0')}`}
+            trailing={`${paginatedConferences.length > 0 ? (currentPage - 1) * ITEMS_PER_PAGE + 1 : 0}–${Math.min(currentPage * ITEMS_PER_PAGE, filteredAndSortedConferences.length)} of ${filteredAndSortedConferences.length} entries`}
+          />
 
           <Grid
             templateColumns={{ base: '1fr', md: 'repeat(auto-fill, minmax(350px, 1fr))' }}
@@ -125,7 +100,7 @@ export default function Page() {
           </Grid>
 
           {totalPages > 1 && (
-            <Box mt="12" {...paginationContainerStyle}>
+            <Box mt="12" {...cardSurfaceStyle}>
               <Flex
                 justify="center"
                 align="center"

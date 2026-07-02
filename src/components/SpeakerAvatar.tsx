@@ -1,9 +1,31 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, Flex, Image } from '@chakra-ui/react';
+import { Box, Flex, Image, type BoxProps } from '@chakra-ui/react';
 import { UserRound } from 'lucide-react';
 import { COLORS, brandAlpha } from '@/theme';
+
+interface PlaceholderCircleProps extends BoxProps {
+  size: 'sm' | 'md' | 'lg';
+  iconSize: number;
+}
+
+/** Circular no-photo fallback: person icon on a light disc. */
+function PlaceholderCircle({ size, iconSize, ...boxProps }: PlaceholderCircleProps): JSX.Element {
+  return (
+    <Box
+      bg={size === 'sm' ? 'gray.100' : 'white'}
+      borderRadius="full"
+      p="4"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      {...boxProps}
+    >
+      <UserRound size={iconSize} color={COLORS.brand[500]} strokeWidth={1.5} />
+    </Box>
+  );
+}
 
 interface SpeakerAvatarProps {
   imageUrl?: string | string[];
@@ -108,28 +130,22 @@ export default function SpeakerAvatar({
       >
         {/* Render placeholder icons for missing team members */}
         {Array.from({ length: Math.max(0, teamSize - imageUrl.length) }).map((_, idx) => (
-          <Box
+          <PlaceholderCircle
             key={`icon-${idx}`}
+            size={size}
+            iconSize={iconSize}
             position="absolute"
             left={`${idx * overlap}px`}
-            bg={size === 'sm' ? 'gray.100' : 'white'}
-            borderRadius="full"
-            p="4"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
             w={`${avatarSize}px`}
             h={`${avatarSize}px`}
-            border={size === 'sm' ? '3px solid white' : '3px solid white'}
+            border="3px solid white"
             boxShadow={
               size === 'sm'
                 ? '0 2px 8px rgba(0, 0, 0, 0.08)'
                 : '0 4px 12px rgba(0, 0, 0, 0.15)'
             }
             zIndex={teamSize - idx}
-          >
-            <UserRound size={iconSize} color={COLORS.brand[500]} strokeWidth={1.5} />
-          </Box>
+          />
         ))}
 
         {/* Render actual images */}
@@ -187,28 +203,22 @@ export default function SpeakerAvatar({
         onMouseLeave={handleMouseLeave}
       >
         {Array.from({ length: teamSize }).map((_, idx) => (
-          <Box
+          <PlaceholderCircle
             key={idx}
+            size={size}
+            iconSize={iconSize}
             position="absolute"
             left={`${idx * overlap}px`}
-            bg={size === 'sm' ? 'gray.100' : 'white'}
-            borderRadius="full"
-            p="4"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
             w={`${avatarSize}px`}
             h={`${avatarSize}px`}
-            border={size === 'sm' ? '3px solid white' : '3px solid white'}
+            border="3px solid white"
             boxShadow={
               size === 'sm'
                 ? '0 2px 8px rgba(0, 0, 0, 0.08)'
                 : '0 4px 12px rgba(0, 0, 0, 0.15)'
             }
             zIndex={teamSize - idx}
-          >
-            <UserRound size={iconSize} color={COLORS.brand[500]} strokeWidth={1.5} />
-          </Box>
+          />
         ))}
       </Flex>
     );
@@ -216,21 +226,15 @@ export default function SpeakerAvatar({
 
   // No image - single person
   return (
-    <Box
-      bg={size === 'sm' ? 'gray.100' : 'white'}
-      borderRadius="full"
-      p="4"
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
+    <PlaceholderCircle
+      size={size}
+      iconSize={iconSize}
       minW={`${avatarSize}px`}
       minH={`${avatarSize}px`}
       border={size === 'md' ? '3px solid white' : undefined}
       boxShadow={size === 'md' ? '0 4px 12px rgba(0, 0, 0, 0.15)' : undefined}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-    >
-      <UserRound size={size === 'lg' ? 36 : iconSize} color={COLORS.brand[500]} strokeWidth={1.5} />
-    </Box>
+    />
   );
 }

@@ -131,9 +131,3 @@ export function exportConference(conference: Conference): void {
   const content = createICSContent(events);
   downloadICS(content, `${conference.id}-deadlines.ics`);
 }
-
-export function exportAllConferences(conferences: Conference[]): void {
-  const allEvents = conferences.flatMap(conferenceToICSEvents);
-  const content = createICSContent(allEvents);
-  downloadICS(content, 'all-conference-deadlines.ics');
-}

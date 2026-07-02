@@ -29,14 +29,7 @@ export default function ConferenceFiltersPanel({
     <Box mb="10">
       {/* Masthead */}
       {eyebrow && (
-        <Text
-          fontSize="11px"
-          color="brand.400"
-          textTransform="uppercase"
-          letterSpacing="0.22em"
-          fontWeight="700"
-          mb="4"
-        >
+        <Text textStyle="eyebrow" color="brand.400" mb="4">
           {eyebrow}
         </Text>
       )}

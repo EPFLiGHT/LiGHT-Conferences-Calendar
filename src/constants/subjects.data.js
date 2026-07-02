@@ -10,7 +10,7 @@
 /**
  * Subject color palettes (Tailwind-inspired). Define once and reference below.
  */
-export const SUBJECT_COLOR_PALETTES = {
+const SUBJECT_COLOR_PALETTES = {
   blue: { bg: '#eff6ff', color: '#2563eb', border: '#bfdbfe' },      // ML
   purple: { bg: '#faf5ff', color: '#9333ea', border: '#e9d5ff' },    // CV
   green: { bg: '#f0fdf4', color: '#16a34a', border: '#bbf7d0' },     // NLP

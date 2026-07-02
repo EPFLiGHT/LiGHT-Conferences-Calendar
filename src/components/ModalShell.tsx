@@ -1,7 +1,64 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, Portal } from '@chakra-ui/react';
+import { Box, Portal, Text } from '@chakra-ui/react';
+import { X } from 'lucide-react';
+
+interface ModalHeaderProps {
+  /** Small uppercase label above the title, e.g. "Conference Dossier". */
+  eyebrow: string;
+  onClose: () => void;
+  /** Title area rendered below the eyebrow. */
+  children: React.ReactNode;
+}
+
+/**
+ * Shared sticky modal header: close button, eyebrow label, title slot.
+ * Single source for the header chrome of ConferenceModal and SpeakerModal.
+ */
+export function ModalHeader({ eyebrow, onClose, children }: ModalHeaderProps): JSX.Element {
+  return (
+    <Box
+      position="sticky"
+      top="0"
+      bg="white"
+      borderBottom="1px solid"
+      borderColor="line.strong"
+      px={{ base: '6', md: '8' }}
+      py={{ base: '5', md: '6' }}
+      zIndex="10"
+    >
+      <Box
+        as="button"
+        position="absolute"
+        top="5"
+        right="5"
+        w="32px"
+        h="32px"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        border="1px solid"
+        borderColor="line.strong"
+        borderRadius="control"
+        bg="white"
+        color="brand.500"
+        cursor="pointer"
+        transition="all 0.2s ease"
+        _hover={{ bg: 'brand.500', color: 'white', borderColor: 'brand.500' }}
+        onClick={onClose}
+        aria-label="Close"
+      >
+        <X size={16} strokeWidth={2} />
+      </Box>
+
+      <Text textStyle="eyebrow" color="brand.400" mb="3">
+        {eyebrow}
+      </Text>
+      {children}
+    </Box>
+  );
+}
 
 interface ModalShellProps {
   onClose: () => void;

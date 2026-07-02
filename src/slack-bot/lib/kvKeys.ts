@@ -28,17 +28,12 @@
  *                                    entities without scanning all keys.
  */
 
-export const KV_ROOT = 'slackbot';
+const KV_ROOT = 'slackbot';
 
 export const kvKeys = {
   team: {
     token: (teamId: string) => `${KV_ROOT}:team:${teamId}:token`,
     metadata: (teamId: string) => `${KV_ROOT}:team:${teamId}:metadata`,
-    metadataPattern: `${KV_ROOT}:team:*:metadata`,
-    metadataIdFromKey: (key: string): string | null => {
-      const match = key.match(/^slackbot:team:([^:]+):metadata$/);
-      return match ? match[1] : null;
-    },
   },
   channel: {
     record: (channelId: string) => `${KV_ROOT}:channel:${channelId}`,

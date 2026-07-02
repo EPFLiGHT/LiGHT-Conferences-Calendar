@@ -48,30 +48,12 @@ export function textResponse(
 }
 
 /**
- * Create an unauthorized response
- */
-export function unauthorizedResponse(
-  message = 'Unauthorized'
-): NextResponse {
-  return errorResponse(message, 401);
-}
-
-/**
  * Create a bad request response
  */
 export function badRequestResponse(
   message = 'Bad request'
 ): NextResponse {
   return errorResponse(message, 400);
-}
-
-/**
- * Create a not found response
- */
-export function notFoundResponse(
-  message = 'Not found'
-): NextResponse {
-  return errorResponse(message, 404);
 }
 
 /**

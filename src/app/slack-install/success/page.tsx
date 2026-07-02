@@ -2,10 +2,18 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Box, Container, Flex, Text, Heading, Grid, Link as ChakraLink, Spinner } from '@chakra-ui/react';
+import { Box, Container, Flex, Grid, Heading, Text, Link as ChakraLink, Spinner } from '@chakra-ui/react';
+import { ArrowUpRight } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { COLORS, SHADOWS, brandAlpha } from '@/theme';
+import SectionRule from '@/components/SectionRule';
+import { inlineLinkStyle } from '@/styles/linkStyles';
+
+const FIRST_STEPS = [
+  { num: '01', cmd: '/conf-help', desc: 'See every command the bot understands.' },
+  { num: '02', cmd: '/conf-upcoming', desc: 'Show the next five conference deadlines.' },
+  { num: '03', cmd: '/conf-subscribe', desc: 'Get deadline reminders in your DMs.' },
+];
 
 /**
  * Inner component that uses useSearchParams
@@ -22,173 +30,140 @@ function SuccessContent() {
 
   return (
     <>
-      <style>
-        {`
-          @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-          }
-        `}
-      </style>
       <Header />
-      <Box py={{ base: '12', md: '20' }} minH="calc(100vh - 200px)">
-        <Container maxW="900px" px={{ base: '4', md: '6' }} mx="auto">
-          {/* Success Card */}
-          <Box
-            bg="white"
-            borderRadius="pill"
-            border="2px solid"
-            borderColor="brand.200"
-            boxShadow={`0 8px 32px ${brandAlpha(0.15)}`}
-            p={{ base: '8', md: '12' }}
-            textAlign="center"
+      <Box py={{ base: '10', md: '16' }} minH="calc(100vh - 200px)" bg="white">
+        <Container maxW="960px" px={{ base: '4', md: '6' }} mx="auto">
+          {/* Masthead */}
+          <Text textStyle="eyebrow" color="brand.400" mb="5">
+            LiGHT · Slack Integration
+          </Text>
+
+          <Heading
+            as="h1"
+            fontSize={{ base: '4xl', md: '6xl' }}
+            fontWeight="600"
+            color="brand.500"
+            letterSpacing="-0.025em"
+            lineHeight="1"
+            mb="6"
           >
-            {/* Animated Emoji */}
-            <Flex justify="center" mb="6">
-              <Box
-                fontSize="8xl"
-                lineHeight="1"
-                as="span"
-                display="inline-block"
-                style={{
-                  animation: 'bounce 1s ease infinite',
-                }}
-              >
-                🎉
-              </Box>
-            </Flex>
+            Installation complete.
+          </Heading>
 
-            {/* Title */}
-            <Heading
-              as="h1"
-              fontSize={{ base: '3xl', md: '4xl' }}
-              fontWeight="800"
-              mb="6"
-              bgGradient="to-r"
-              gradientFrom="brand.600"
-              gradientTo="brand.400"
-              bgClip="text"
-              lineHeight="1.2"
-            >
-              Installation Successful!
-            </Heading>
-
-            {/* Description */}
-            <Text fontSize={{ base: 'lg', md: 'xl' }} color="gray.700" mb="2">
-              The Conferences Calendar Bot has been successfully installed to
+          <Flex
+            align="baseline"
+            justify="space-between"
+            pb="4"
+            mb="10"
+            borderBottom="1px solid"
+            borderColor="brand.500"
+            gap="4"
+            flexWrap="wrap"
+          >
+            <Text fontSize="sm" color="gray.600" maxW="640px" lineHeight="1.6">
+              The Conferences Calendar bot can now post deadline reminders in your workspace.
             </Text>
-            <Box
-              display="inline-block"
-              px="4"
-              py="2"
-              bg="brand.50"
-              borderRadius="sheet"
-              border="1px solid"
-              borderColor="brand.200"
-              mb="10"
-            >
-              <Text fontSize="xl" fontWeight="700" color="brand.600">
-                {teamName}
-              </Text>
-            </Box>
+          </Flex>
 
-            {/* Quick Start Commands */}
-            <Box
-              p={{ base: '6', md: '8' }}
-              bg={`linear-gradient(135deg, ${COLORS.brand[50]} 0%, ${COLORS.brand[100]} 100%)`}
-              borderRadius="hero"
-              border="1px solid"
-              borderColor="brand.200"
-              mb="8"
-            >
-              <Heading
-                as="h2"
-                fontSize={{ base: 'lg', md: 'xl' }}
-                fontWeight="700"
-                color="gray.800"
-                mb="6"
+          {/* Installation receipt */}
+          <Box
+            border="1px solid"
+            borderColor="line.strong"
+            position="relative"
+            maxW="640px"
+            mb="14"
+          >
+            <Box position="absolute" top="-1px" left="-1px" w="24px" h="3px" bg="brand.500" />
+            <Grid templateColumns={{ base: '1fr', sm: '1fr 1fr' }}>
+              <Box p="5" borderRight={{ base: 'none', sm: '1px solid' }} borderBottom={{ base: '1px solid', sm: 'none' }} borderColor="line.default">
+                <Text textStyle="fieldLabel" color="brand.400" mb="2">
+                  Workspace
+                </Text>
+                <Text fontSize="md" fontWeight="600" color="brand.500">
+                  {teamName}
+                </Text>
+              </Box>
+              <Box p="5">
+                <Text textStyle="fieldLabel" color="brand.400" mb="2">
+                  Status
+                </Text>
+                <Flex align="center" gap="2">
+                  <Box w="7px" h="7px" borderRadius="full" bg="brand.500" />
+                  <Text fontSize="md" fontWeight="600" color="brand.500">
+                    Active
+                  </Text>
+                </Flex>
+              </Box>
+            </Grid>
+          </Box>
+
+          {/* First steps */}
+          <SectionRule label="First steps" trailing="01 – 03" />
+
+          <Box mb="12" maxW="640px">
+            {FIRST_STEPS.map((step, index) => (
+              <Flex
+                key={step.cmd}
+                align="center"
+                gap={{ base: '4', md: '6' }}
+                py="4"
+                borderBottom={index < FIRST_STEPS.length - 1 ? '1px solid' : 'none'}
+                borderColor="line.subtle"
+                flexWrap="wrap"
               >
-                🚀 Quick Start - Try These Commands:
-              </Heading>
+                <Text textStyle="metaLabel" color="brand.400" className="tabular">
+                  {step.num}
+                </Text>
+                <Box
+                  as="code"
+                  px="3"
+                  py="1.5"
+                  fontFamily="mono"
+                  fontSize="xs"
+                  fontWeight="500"
+                  color="brand.500"
+                  border="1px solid"
+                  borderColor="line.strong"
+                  borderRadius="control"
+                  whiteSpace="nowrap"
+                  className="tabular"
+                >
+                  {step.cmd}
+                </Box>
+                <Text fontSize="sm" color="gray.600" flex="1" lineHeight="1.5">
+                  {step.desc}
+                </Text>
+              </Flex>
+            ))}
+          </Box>
 
-              <Grid
-                templateColumns={{ base: '1fr', md: '1fr' }}
-                gap="4"
-                textAlign="left"
-              >
-                {[
-                  { cmd: '/conf-help', desc: 'See all available commands', emoji: '📚' },
-                  { cmd: '/conf-upcoming', desc: 'Show next 5 deadlines', emoji: '📅' },
-                  { cmd: '/conf-subscribe', desc: 'Enable personalized notifications', emoji: '🔔' },
-                  { cmd: '/conf-search <name>', desc: 'Search for a conference', emoji: '🔍' },
-                ].map((command, index) => (
-                  <Flex
-                    key={index}
-                    align="center"
-                    gap="4"
-                    p="4"
-                    bg="white"
-                    borderRadius="sheet"
-                    border="1px solid"
-                    borderColor="brand.100"
-                    transition="all 0.2s ease"
-                    _hover={{
-                      borderColor: 'brand.300',
-                      transform: 'translateX(4px)',
-                      boxShadow: SHADOWS.md,
-                    }}
-                  >
-                    <Text fontSize="2xl">{command.emoji}</Text>
-                    <Box
-                      as="code"
-                      px="3"
-                      py="2"
-                      bg="brand.50"
-                      borderRadius="panel"
-                      fontFamily="mono"
-                      fontSize="sm"
-                      fontWeight="600"
-                      color="brand.600"
-                      border="1px solid"
-                      borderColor="brand.200"
-                      whiteSpace="nowrap"
-                    >
-                      {command.cmd}
-                    </Box>
-                    <Text fontSize="sm" color="gray.600" flex="1">
-                      {command.desc}
-                    </Text>
-                  </Flex>
-                ))}
-              </Grid>
-            </Box>
-
-            {/* Open Slack Button */}
+          {/* Actions */}
+          <Flex align="center" gap="6" flexWrap="wrap" mb="4">
             <ChakraLink
               href="slack://open"
-              display="inline-block"
-              px="10"
-              py="4"
-              bg="brand.500"
-              color="white"
-              borderRadius="sheet"
-              fontWeight="600"
-              fontSize="lg"
-              textDecoration="none"
-              transition="all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)"
-              boxShadow={`0 4px 12px ${brandAlpha(0.3)}`}
-              _hover={{
-                bg: 'brand.600',
-                transform: 'translateY(-2px) scale(1.05)',
-                boxShadow: `0 8px 20px ${brandAlpha(0.4)}`,
-              }}
-              _active={{
-                transform: 'scale(0.98)',
-              }}
+              display="inline-flex"
+              alignItems="center"
+              gap="2"
+              textStyle="metaLabel"
+              color="brand.500"
+              border="1px solid"
+              borderColor="brand.500"
+              px="5"
+              py="2.5"
+              transition="all 0.2s ease"
+              _hover={{ bg: 'brand.500', color: 'white', textDecoration: 'none' }}
             >
-              Open Slack →
+              Open Slack
+              <ArrowUpRight size={12} strokeWidth={2} />
             </ChakraLink>
-          </Box>
+            <ChakraLink href="/" fontSize="sm" {...inlineLinkStyle}>
+              Browse the conference calendar
+            </ChakraLink>
+          </Flex>
+
+          <Text fontSize="xs" color="gray.500" lineHeight="1.6">
+            The bot also posts a daily digest to any channel you invite it to.
+          </Text>
         </Container>
       </Box>
       <Footer />

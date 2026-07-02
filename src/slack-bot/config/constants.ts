@@ -2,11 +2,6 @@
  * Slack Bot Configuration Constants
  */
 
-export const BOT_CONFIG = {
-  NAME: 'ConferenceBot',
-  EMOJI: '📅',
-  VERSION: '1.0.0',
-} as const;
 export const NOTIFICATION_CONFIG = {
   DEFAULT_REMINDER_DAYS: [30, 7, 3],
   DEFAULT_TIMEZONE: 'UTC',
@@ -36,6 +31,3 @@ export const URGENCY_EMOJIS = {
   urgent: '🟡',
   upcoming: '🟢',
 } as const;
-
-// Re-export SUBJECT_EMOJIS from unified constants for convenience
-export { SUBJECT_EMOJIS } from '@/constants/subjects';

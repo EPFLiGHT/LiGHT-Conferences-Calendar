@@ -15,7 +15,6 @@
   "dependencies": {
     "@chakra-ui/react": "^3.0.0-next.32",
     "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
     "@fullcalendar/core": "^6.1.19",
     "@fullcalendar/daygrid": "^6.1.10",
     "@fullcalendar/list": "^6.1.10",
@@ -25,7 +24,6 @@
     "@slack/web-api": "^7.11.0",
     "@vercel/kv": "^3.0.0",
     "framer-motion": "^12.23.22",
-    "ics": "^3.7.0",
     "js-yaml": "^4.1.1",
     "lucide-react": "^0.553.0",
     "luxon": "^3.4.4",

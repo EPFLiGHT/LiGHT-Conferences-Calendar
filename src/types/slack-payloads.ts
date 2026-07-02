@@ -37,7 +37,7 @@ export interface SlackEventPayload {
 /**
  * Generic Slack event
  */
-export interface SlackEvent {
+interface SlackEvent {
   type: string;
   user?: string;
   text?: string;
@@ -100,7 +100,7 @@ export interface SlackInteractionPayload {
 /**
  * Slack action (button, select menu, etc.)
  */
-export interface SlackAction {
+interface SlackAction {
   type: string;
   action_id: string;
   block_id: string;
@@ -116,7 +116,7 @@ export interface SlackAction {
 /**
  * Slack modal view
  */
-export interface SlackView {
+interface SlackView {
   id: string;
   team_id: string;
   type: 'modal' | 'home';

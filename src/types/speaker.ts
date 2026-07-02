@@ -1,4 +1,4 @@
-export interface Presentation {
+interface Presentation {
   topic: string;
   event: string;
   eventType: 'conference' | 'workshop' | 'summit' | 'seminar';

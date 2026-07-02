@@ -49,13 +49,7 @@ export default function DeadlineCard({
             {deadline.label}
           </Text>
           {isExpired && (
-            <Text
-              fontSize="11px"
-              fontWeight="600"
-              color="gray.500"
-              textTransform="uppercase"
-              letterSpacing="0.18em"
-            >
+            <Text textStyle="metaLabel" color="gray.500">
               Passed
             </Text>
           )}
@@ -83,15 +77,7 @@ export default function DeadlineCard({
             >
               {detailDay}
             </Text>
-            <Text
-              fontSize="11px"
-              color="brand.400"
-              textTransform="uppercase"
-              letterSpacing="0.2em"
-              fontWeight="600"
-              mt="2"
-              className="tabular"
-            >
+            <Text textStyle="metaLabel" color="brand.400" mt="2" className="tabular">
               {detailMonth}
             </Text>
           </Flex>
@@ -157,28 +143,14 @@ export default function DeadlineCard({
         >
           {day}
         </Text>
-        <Text
-          fontSize="10px"
-          color="brand.400"
-          textTransform="uppercase"
-          letterSpacing="0.2em"
-          fontWeight="600"
-          mt="1.5"
-          className="tabular"
-        >
+        <Text textStyle="fieldLabel" color="brand.400" mt="1.5" className="tabular">
           {monthYear}
         </Text>
       </Flex>
 
       {/* Detail */}
       <VStack align="stretch" gap="1.5" flex="1" justify="center">
-        <Text
-          fontSize="10px"
-          fontWeight="600"
-          color="brand.500"
-          textTransform="uppercase"
-          letterSpacing="0.2em"
-        >
+        <Text textStyle="fieldLabel" color="brand.500">
           {deadline.label}
         </Text>
         <Text fontSize="xs" color="gray.600" className="tabular" lineHeight="1.5">

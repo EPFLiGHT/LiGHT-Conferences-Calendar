@@ -28,7 +28,7 @@ export async function storeTeamToken(teamId: string, botToken: string): Promise<
 /**
  * Retrieve a bot token for a specific team
  */
-export async function getTeamToken(teamId: string): Promise<string | null> {
+async function getTeamToken(teamId: string): Promise<string | null> {
   const key = kvKeys.team.token(teamId);
   const token = await kv.get<string>(key);
 
@@ -79,16 +79,6 @@ export async function removeTeamData(teamId: string): Promise<void> {
   ]);
 
   console.log(`🗑️  Removed all data for team: ${teamId}`);
-}
-
-/**
- * List all installed teams (for admin purposes)
- */
-export async function listInstalledTeams(): Promise<string[]> {
-  const keys = await kv.keys(kvKeys.team.metadataPattern);
-  return keys
-    .map(key => kvKeys.team.metadataIdFromKey(key) ?? '')
-    .filter(Boolean);
 }
 
 /**

@@ -33,19 +33,28 @@ export function searchConferences(
 }
 
 /**
- * Filter conferences by subject
- * Handles both string and array subject fields
+ * Filter conferences matching any of the given subjects (multi-select).
+ * Handles both string and array subject fields; empty list means no filter.
+ */
+export function filterBySubjects(
+  conferences: Conference[],
+  subjects: string[]
+): Conference[] {
+  if (subjects.length === 0) return conferences;
+  return conferences.filter(conf => {
+    const confSubjects = Array.isArray(conf.sub) ? conf.sub : [conf.sub];
+    return confSubjects.some(subject => subjects.includes(subject));
+  });
+}
+
+/**
+ * Filter conferences by a single subject
  */
 export function filterBySubject(
   conferences: Conference[],
   subject: string
 ): Conference[] {
-  return conferences.filter(conf => {
-    if (Array.isArray(conf.sub)) {
-      return conf.sub.includes(subject);
-    }
-    return conf.sub === subject;
-  });
+  return filterBySubjects(conferences, [subject]);
 }
 
 /**
@@ -132,7 +141,7 @@ export function getEventStartsOnDays(
 /**
  * Get conferences expiring within N days
  */
-export function getDeadlinesWithinDays(
+function getDeadlinesWithinDays(
   conferences: Conference[],
   days: number
 ): Array<{ conference: Conference; deadline: DeadlineInfo; daysLeft: number }> {

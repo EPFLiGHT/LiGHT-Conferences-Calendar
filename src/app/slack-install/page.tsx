@@ -4,8 +4,10 @@ import { Box, Container, Flex, Text, Heading, Grid, Image, Link as ChakraLink } 
 import { Bell, Search, SlidersHorizontal } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import SectionRule from '@/components/SectionRule';
 import { COMMAND_DESCRIPTIONS } from '@/slack-bot/config/constants';
 import { ROUTES, EXTERNAL_URLS } from '@/constants/routes';
+import { inlineLinkStyle } from '@/styles/linkStyles';
 import Link from 'next/link';
 
 /**
@@ -37,15 +39,7 @@ export default function SlackInstallPage() {
       <Box py={{ base: '12', md: '20' }} minH="calc(100vh - 200px)" bg="white">
         <Container maxW="960px" px={{ base: '4', md: '6' }} mx="auto">
           {/* Eyebrow */}
-          <Text
-            fontSize="11px"
-            color="brand.400"
-            textTransform="uppercase"
-            letterSpacing="0.22em"
-            fontWeight="600"
-            textAlign="center"
-            mb="6"
-          >
+          <Text textStyle="eyebrow" color="brand.400" textAlign="center" mb="6">
             LiGHT · Slack Integration
           </Text>
 
@@ -104,13 +98,7 @@ export default function SlackInstallPage() {
               </ChakraLink>
             </Flex>
 
-            <Text
-              fontSize="11px"
-              color="brand.400"
-              textTransform="uppercase"
-              letterSpacing="0.2em"
-              fontWeight="500"
-            >
+            <Text textStyle="metaLabel" color="brand.400">
               Free for all Slack workspaces
             </Text>
 
@@ -119,48 +107,15 @@ export default function SlackInstallPage() {
               <ChakraLink
                 as={Link}
                 href={ROUTES.slackPrivacy}
-                color="brand.500"
+                {...inlineLinkStyle}
                 fontWeight="600"
-                borderBottom="1px solid"
-                borderColor="brand.500"
-                pb="0.5"
-                transition="all 0.2s ease"
-                _hover={{ color: 'brand.700', borderColor: 'brand.700', textDecoration: 'none' }}
               >
                 Privacy Policy
               </ChakraLink>
             </Text>
           </Box>
 
-          {/* Section rule */}
-          <Flex
-            align="baseline"
-            justify="space-between"
-            mb="6"
-            pb="3"
-            borderBottom="1px solid"
-            borderColor="line.default"
-          >
-            <Text
-              fontSize="11px"
-              color="brand.500"
-              textTransform="uppercase"
-              letterSpacing="0.22em"
-              fontWeight="600"
-            >
-              What you get
-            </Text>
-            <Text
-              fontSize="11px"
-              color="brand.400"
-              textTransform="uppercase"
-              letterSpacing="0.22em"
-              fontWeight="600"
-              className="tabular"
-            >
-              01 / 02
-            </Text>
-          </Flex>
+          <SectionRule label="What you get" trailing="01 / 02" />
 
           {/* Features Grid */}
           <Grid templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }} gap="0" mb="16">
@@ -192,35 +147,7 @@ export default function SlackInstallPage() {
             ))}
           </Grid>
 
-          {/* Section rule */}
-          <Flex
-            align="baseline"
-            justify="space-between"
-            mb="6"
-            pb="3"
-            borderBottom="1px solid"
-            borderColor="line.default"
-          >
-            <Text
-              fontSize="11px"
-              color="brand.500"
-              textTransform="uppercase"
-              letterSpacing="0.22em"
-              fontWeight="600"
-            >
-              Available commands
-            </Text>
-            <Text
-              fontSize="11px"
-              color="brand.400"
-              textTransform="uppercase"
-              letterSpacing="0.22em"
-              fontWeight="600"
-              className="tabular"
-            >
-              02 / 02
-            </Text>
-          </Flex>
+          <SectionRule label="Available commands" trailing="02 / 02" />
 
           <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap="0" mb="16">
             {Object.entries(COMMAND_DESCRIPTIONS).map(([cmd, desc], idx, arr) => {

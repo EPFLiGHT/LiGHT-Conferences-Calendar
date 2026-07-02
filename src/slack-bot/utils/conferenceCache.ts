@@ -108,39 +108,3 @@ async function cacheConferences(conferences: Conference[]): Promise<void> {
     // Non-fatal error - continue without caching
   }
 }
-
-/**
- * Invalidate conference cache (force refresh)
- */
-export async function invalidateCache(): Promise<void> {
-  try {
-    await kv.del(CACHE_KEY);
-    await kv.del(CACHE_TIMESTAMP_KEY);
-    logger.info('Conference cache invalidated');
-  } catch (error) {
-    logger.error('Failed to invalidate cache', error);
-  }
-}
-
-/**
- * Get cache status
- */
-export async function getCacheStatus(): Promise<{
-  cached: boolean;
-  timestamp: string | null;
-  count: number;
-}> {
-  try {
-    const data = await kv.get<Conference[]>(CACHE_KEY);
-    const timestamp = await kv.get<string>(CACHE_TIMESTAMP_KEY);
-
-    return {
-      cached: data !== null,
-      timestamp,
-      count: data?.length || 0,
-    };
-  } catch (error) {
-    logger.error('Failed to get cache status', error);
-    return { cached: false, timestamp: null, count: 0 };
-  }
-}

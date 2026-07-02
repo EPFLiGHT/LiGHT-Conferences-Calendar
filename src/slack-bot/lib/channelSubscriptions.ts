@@ -14,7 +14,7 @@ const CHANNELS_LIST_KEY = kvKeys.idx.channel;
 /**
  * Get channel subscription info
  */
-export async function getChannelSubscription(
+async function getChannelSubscription(
   channelId: string
 ): Promise<ChannelSubscription | null> {
   try {
@@ -129,7 +129,7 @@ export async function getAllActiveChannels(): Promise<ChannelSubscription[]> {
 /**
  * Get all subscribed channels for a specific team
  */
-export async function getTeamChannels(teamId: string): Promise<ChannelSubscription[]> {
+async function getTeamChannels(teamId: string): Promise<ChannelSubscription[]> {
   try {
     const allChannels = await getAllActiveChannels();
     return allChannels.filter(channel => channel.teamId === teamId);
@@ -154,19 +154,6 @@ export async function unsubscribeTeamChannels(teamId: string): Promise<number> {
     return channels.length;
   } catch (error) {
     logger.error('Failed to unsubscribe team channels', error, { teamId });
-    return 0;
-  }
-}
-
-/**
- * Get total channel subscription count
- */
-export async function getChannelCount(): Promise<number> {
-  try {
-    const count = await kv.scard(CHANNELS_LIST_KEY);
-    return count || 0;
-  } catch (error) {
-    logger.error('Failed to get channel count', error);
     return 0;
   }
 }
