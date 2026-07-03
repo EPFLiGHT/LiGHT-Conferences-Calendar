@@ -11,7 +11,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning style={{ overflowX: 'clip' }}>
       <head>
         {/* Manrope = body, Playfair Display = headings (Ivy Presto Headline stand-in). */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -21,7 +21,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body style={{ margin: 0, padding: 0, background: '#ffffff' }} suppressHydrationWarning>
+      <body style={{ margin: 0, padding: 0, background: '#ffffff', overflowX: 'clip' }} suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>

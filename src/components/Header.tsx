@@ -123,7 +123,7 @@ export default function Header(): JSX.Element {
           </Flex>
 
           {/* Navigation */}
-          <HStack gap={{ base: '1.5', sm: '3' }}>
+          <HStack gap={{ base: '1.5', lg: '3' }} flexShrink="0">
             {[
               { href: '/', label: 'Home', Icon: Home },
               { href: '/calendar', label: 'Calendar', Icon: Calendar },
@@ -135,7 +135,7 @@ export default function Header(): JSX.Element {
                   key={href}
                   as={NextLink}
                   href={href}
-                  px={{ base: '2.5', sm: '4' }}
+                  px={{ base: '2.5', lg: '4' }}
                   py="2"
                   fontWeight="500"
                   fontSize="sm"
@@ -154,8 +154,8 @@ export default function Header(): JSX.Element {
                   _after={{
                     content: '""',
                     position: 'absolute',
-                    left: { base: '10px', sm: '16px' },
-                    right: { base: '10px', sm: '16px' },
+                    left: { base: '10px', lg: '16px' },
+                    right: { base: '10px', lg: '16px' },
                     bottom: '4px',
                     height: '1px',
                     bg: isActive ? 'brand.500' : 'transparent',
@@ -163,7 +163,7 @@ export default function Header(): JSX.Element {
                 >
                   <Flex align="center" gap="2">
                     <Icon size={14} strokeWidth={1.5} />
-                    <Text as="span" display={{ base: 'none', sm: 'inline' }}>{label}</Text>
+                    <Text as="span" display={{ base: 'none', lg: 'inline' }}>{label}</Text>
                   </Flex>
                 </Link>
               );
