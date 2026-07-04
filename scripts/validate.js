@@ -1,5 +1,5 @@
 import fs from 'fs';
-import yaml from 'js-yaml';
+import { load, JSON_SCHEMA } from 'js-yaml';
 import { DateTime } from 'luxon';
 import {
   REQUIRED_FIELDS,
@@ -163,7 +163,7 @@ function validateFile(filePath, fileType) {
 
   // Read and parse YAML with schema that preserves strings
   const yamlContent = fs.readFileSync(filePath, 'utf8');
-  const conferences = yaml.load(yamlContent, { schema: yaml.JSON_SCHEMA });
+  const conferences = load(yamlContent, { schema: JSON_SCHEMA });
 
   if (!Array.isArray(conferences)) {
     error(`${filePath}: YAML file must contain an array of conferences`);

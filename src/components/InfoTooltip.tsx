@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { Portal, Tooltip } from '@chakra-ui/react';
 
 interface InfoTooltipProps {

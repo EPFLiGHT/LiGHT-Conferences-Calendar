@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { Badge, BadgeProps } from '@chakra-ui/react';
 
 interface NoteBadgeProps extends Omit<BadgeProps, 'children'> {

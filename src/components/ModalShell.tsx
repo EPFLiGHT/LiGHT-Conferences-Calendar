@@ -1,5 +1,6 @@
 'use client';
 
+import type { JSX } from 'react';
 import { useState, useEffect } from 'react';
 import { Box, Portal, Text } from '@chakra-ui/react';
 import { X } from 'lucide-react';

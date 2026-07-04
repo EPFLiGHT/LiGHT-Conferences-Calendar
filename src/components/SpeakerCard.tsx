@@ -1,5 +1,6 @@
 'use client';
 
+import type { JSX } from 'react';
 import { useState, useEffect } from 'react';
 import { Box, Flex, Heading, Text, VStack } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';

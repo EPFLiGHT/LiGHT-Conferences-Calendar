@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { Spinner } from '@chakra-ui/react';
 import StatusMessage from './StatusMessage';
 

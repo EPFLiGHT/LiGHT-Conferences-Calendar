@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { forwardRef, useMemo } from 'react';
 import { Box, Flex, Grid, Text } from '@chakra-ui/react';
 import { NativeSelectRoot, NativeSelectField } from '@chakra-ui/react';

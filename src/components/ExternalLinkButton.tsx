@@ -6,6 +6,7 @@
  * Supports primary and secondary variants with configurable sizes.
  */
 
+import type { JSX } from 'react';
 import { Button, Link, ButtonProps } from '@chakra-ui/react';
 import { primaryButtonStyle, secondaryButtonStyle } from '@/styles/buttonStyles';
 

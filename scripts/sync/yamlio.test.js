@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import yaml from 'js-yaml';
+import { load, JSON_SCHEMA } from 'js-yaml';
 import { serializeEntries } from './yamlio.js';
 
 const entry = {
@@ -22,7 +22,7 @@ const entry = {
 describe('serializeEntries', () => {
   it('keeps date-like strings as strings for default-schema loaders', () => {
     const text = serializeEntries([entry]);
-    const parsed = yaml.load(text); // DEFAULT schema, like src/utils/parser.ts
+    const parsed = load(text); // DEFAULT schema, like src/utils/parser.ts
     expect(parsed[0].start).toBe('2026-10-06');
     expect(parsed[0].year).toBe(2026);
   });
@@ -30,7 +30,7 @@ describe('serializeEntries', () => {
   it('round-trips values exactly and is idempotent', () => {
     const second = { ...entry, id: 'colm27', year: 2027 };
     const text = serializeEntries([entry, second]);
-    const reloaded = yaml.load(text, { schema: yaml.JSON_SCHEMA });
+    const reloaded = load(text, { schema: JSON_SCHEMA });
     expect(reloaded).toEqual([entry, second]);
     expect(serializeEntries(reloaded)).toBe(text);
   });

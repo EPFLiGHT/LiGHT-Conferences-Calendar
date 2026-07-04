@@ -6,6 +6,7 @@
  * Shows both original timezone and local timezone, plus countdown or expired state.
  */
 
+import type { JSX } from 'react';
 import { Box, VStack, Text, Flex } from '@chakra-ui/react';
 import { DateTime } from 'luxon';
 import Countdown from './Countdown';

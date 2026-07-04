@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { Box, Flex, Heading, Text } from '@chakra-ui/react';
 import { RotateCcw } from 'lucide-react';
 import Search from './Search';

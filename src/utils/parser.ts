@@ -1,4 +1,4 @@
-import yaml from 'js-yaml';
+import { load } from 'js-yaml';
 import { DateTime } from 'luxon';
 import { SUBJECT_COLORS, DEFAULT_SUBJECT_COLOR } from '@/constants/subjects';
 import {
@@ -62,7 +62,7 @@ function validateConference(conf: any, index: number): string[] {
 
 export function parseConferences(yamlString: string): Conference[] {
   try {
-    const conferences = yaml.load(yamlString) as any[];
+    const conferences = load(yamlString) as any[];
 
     if (!Array.isArray(conferences)) {
       throw new Error('YAML must contain an array of conferences');

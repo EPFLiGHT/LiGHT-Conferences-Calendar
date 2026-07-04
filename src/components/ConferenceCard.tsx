@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { Box, Flex, Heading, Text, VStack } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import DeadlineCard from './DeadlineCard';

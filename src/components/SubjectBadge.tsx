@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { Flex, FlexProps, Text } from '@chakra-ui/react';
 import InfoTooltip from './InfoTooltip';
 import { getSubjectsArray } from '@/utils/parser';

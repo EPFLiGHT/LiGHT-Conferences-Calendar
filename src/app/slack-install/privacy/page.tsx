@@ -1,5 +1,6 @@
 'use client';
 
+import type { JSX } from 'react';
 import { Box, Container, Text, Heading, Flex, Grid, Link as ChakraLink } from '@chakra-ui/react';
 import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 import Header from '@/components/Header';

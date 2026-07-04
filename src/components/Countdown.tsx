@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { useState, useEffect } from 'react';
 import { DateTime } from 'luxon';
 import { Flex, Text } from '@chakra-ui/react';

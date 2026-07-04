@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { Flex, Text, type FlexProps } from '@chakra-ui/react';
 
 interface SectionRuleProps extends Omit<FlexProps, 'children'> {

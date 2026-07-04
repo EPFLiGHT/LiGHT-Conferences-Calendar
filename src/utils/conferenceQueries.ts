@@ -97,9 +97,7 @@ export function getUpcomingEvents(
       if (daysLeft < 0) return null;
       return { conference: conf, start, daysLeft };
     })
-    .filter((item): item is { conference: Conference; start: DateTime; daysLeft: number } =>
-      item !== null
-    )
+    .filter(item => item !== null)
     .sort((a, b) => a.start.toMillis() - b.start.toMillis());
 
   return limit ? upcoming.slice(0, limit) : upcoming;
@@ -134,7 +132,7 @@ export function getEventStartsOnDays(
       if (!reminderDays.includes(daysLeft)) return null;
       return { conference: conf, start, daysLeft };
     })
-    .filter((item): item is { conference: Conference; start: DateTime; daysLeft: number } => item !== null)
+    .filter(item => item !== null)
     .sort((a, b) => a.daysLeft - b.daysLeft);
 }
 

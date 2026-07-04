@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { Box, Flex, Input, Text } from '@chakra-ui/react';
 import { Search as SearchIcon, X } from 'lucide-react';
 

@@ -5,7 +5,7 @@
  * must stay quoted when this module writes the file back.
  */
 import fs from 'fs';
-import yaml from 'js-yaml';
+import { load, dump, JSON_SCHEMA } from 'js-yaml';
 
 /**
  * Load a data file as plain objects (JSON schema: every scalar stays a string,
@@ -14,7 +14,7 @@ import yaml from 'js-yaml';
  * @returns {object[]} The entries.
  */
 export function loadEntries(filePath) {
-  return yaml.load(fs.readFileSync(filePath, 'utf8'), { schema: yaml.JSON_SCHEMA });
+  return load(fs.readFileSync(filePath, 'utf8'), { schema: JSON_SCHEMA });
 }
 
 /**
@@ -26,7 +26,7 @@ export function serializeEntries(entries) {
   // Dump entry by entry so the file keeps a blank line between entries.
   // Default dump schema quotes scalars that would re-parse as timestamps.
   return entries
-    .map((entry) => yaml.dump([entry], { lineWidth: -1, noRefs: true }))
+    .map((entry) => dump([entry], { lineWidth: -1, noRefs: true }))
     .join('\n');
 }
 

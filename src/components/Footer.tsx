@@ -1,5 +1,6 @@
 'use client';
 
+import type { JSX } from 'react';
 import { Box, Container, Flex, Grid, Heading, Text, Link, Image } from '@chakra-ui/react';
 import { MapPin, Mail, Linkedin, Github, ArrowUpRight, ArrowUp } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';

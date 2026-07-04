@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { Flex, Grid, Text, VStack } from '@chakra-ui/react';
 import { MapPin, Calendar as CalendarIcon, BarChart3, type LucideIcon } from 'lucide-react';
 import SubjectBadge from './SubjectBadge';

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Box, Flex, Grid, Heading, Text } from '@chakra-ui/react';
-import yaml from 'js-yaml';
+import { load } from 'js-yaml';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PageShell from '@/components/PageShell';
@@ -26,7 +26,7 @@ export default function SpeakersPage() {
           throw new Error('Failed to fetch speakers data');
         }
         const yamlText = await response.text();
-        const data = yaml.load(yamlText) as Speaker[];
+        const data = load(yamlText) as Speaker[];
         setSpeakers(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
