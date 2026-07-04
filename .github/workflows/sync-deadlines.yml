@@ -33,7 +33,7 @@ jobs:
       - name: Validate YAML data
         run: pnpm validate
       - name: Open or update PR
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           branch: auto/openreview-sync
           add-paths: public/data/conferences.yaml
