@@ -67,8 +67,8 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1
       '@types/node':
-        specifier: ^24.6.2
-        version: 24.6.2
+        specifier: ^26.1.0
+        version: 26.1.0
       '@types/react':
         specifier: ^18.3.25
         version: 18.3.25
@@ -80,7 +80,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^4.1.9
-        version: 4.1.9(@types/node@24.6.2)(vite@8.0.16(@types/node@24.6.2))
+        version: 4.1.9(@types/node@26.1.0)(vite@8.0.16(@types/node@26.1.0))
 
 packages:
 
@@ -585,8 +585,8 @@ packages:
   '@types/luxon@3.7.1':
     resolution: {integrity: sha512-H3iskjFIAn5SlJU7OuxUmTEpebK6TKB8rxZShDslBMZJ5u9S//KM1sbdAisiSrqwLQncVjnpi2OK2J51h+4lsg==}
 
-  '@types/node@24.6.2':
-    resolution: {integrity: sha512-d2L25Y4j+W3ZlNAeMKcy7yDsK425ibcAOO2t7aPTz6gNMH0z2GThtwENCDc0d/Pw9wgyRqE5Px1wkV7naz8ang==}
+  '@types/node@26.1.0':
+    resolution: {integrity: sha512-O0A1G3xPGy4w7AgQdAQYUlQ+BKk2Oovw8eRpofyp5KdBZULnbe+WqaOVNrm705SHphCiG4XHsACrSmPu1f+Kgw==}
 
   '@types/parse-json@4.0.2':
     resolution: {integrity: sha512-dISoDXWWQwUquiKsyZ4Ng+HX2KsPL7LyHKHQwgGFEA3IaKac4Obd+h2a/a6waisAoepJlBcx9paWqjA8/HVjCw==}
@@ -611,6 +611,7 @@ packages:
   '@vercel/kv@3.0.0':
     resolution: {integrity: sha512-pKT8fRnfyYk2MgvyB6fn6ipJPCdfZwiKDdw7vB+HL50rjboEBHDVBEcnwfkEpVSp2AjNtoaOUH7zG+bVC/rvSg==}
     engines: {node: '>=14.6'}
+    deprecated: 'Vercel KV is deprecated. If you had an existing KV store, it should have moved to Upstash Redis which you will see under Vercel Integrations. For new projects, install a Redis integration from Vercel Marketplace: https://vercel.com/marketplace?category=storage&search=redis'
 
   '@vitest/expect@4.1.9':
     resolution: {integrity: sha512-vl/rYsUKcBr3SnQn166+XR5ZQcgMx3DQhFWdfli/cWpLnLUmbxZvyrJZotLFUryib+LtArYMSTJ5RbQ57ZqrlA==}
@@ -1412,8 +1413,8 @@ packages:
   uncrypto@0.1.3:
     resolution: {integrity: sha512-Ql87qFHB3s/De2ClA9e0gsnS6zXG27SkTiSJwjCc9MebbfapQfuPzumMIUMi38ezPZVNFcHI9sUIepeQfw8J8Q==}
 
-  undici-types@7.13.0:
-    resolution: {integrity: sha512-Ov2Rr9Sx+fRgagJ5AX0qvItZG/JKKoBRAVITs1zk7IqZGTJUwgUr7qoYBpWwakpWilTZFM98rG/AFRocu10iIQ==}
+  undici-types@8.3.0:
+    resolution: {integrity: sha512-j375ScV60dom+YkPFIfTLcOiPxkN/buHz5GobjLhixFuANaNs3C9l4GmrWqejgXWJ7BbJcFYpTEUkS1Ge8bpZQ==}
 
   uqr@0.1.2:
     resolution: {integrity: sha512-MJu7ypHq6QasgF5YRTjqscSzQp/W11zoUk6kvmlH+fmWEs63Y0Eib13hYFwAzagRJcVY8WVnlV+eBDUGMJ5IbA==}
@@ -1981,7 +1982,7 @@ snapshots:
 
   '@slack/logger@4.0.0':
     dependencies:
-      '@types/node': 24.6.2
+      '@types/node': 26.1.0
 
   '@slack/types@2.17.0': {}
 
@@ -1989,7 +1990,7 @@ snapshots:
     dependencies:
       '@slack/logger': 4.0.0
       '@slack/types': 2.17.0
-      '@types/node': 24.6.2
+      '@types/node': 26.1.0
       '@types/retry': 0.12.0
       axios: 1.18.1
       eventemitter3: 5.0.1
@@ -2031,9 +2032,9 @@ snapshots:
 
   '@types/luxon@3.7.1': {}
 
-  '@types/node@24.6.2':
+  '@types/node@26.1.0':
     dependencies:
-      undici-types: 7.13.0
+      undici-types: 8.3.0
 
   '@types/parse-json@4.0.2': {}
 
@@ -2067,13 +2068,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.9(vite@8.0.16(@types/node@24.6.2))':
+  '@vitest/mocker@4.1.9(vite@8.0.16(@types/node@26.1.0))':
     dependencies:
       '@vitest/spy': 4.1.9
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 8.0.16(@types/node@24.6.2)
+      vite: 8.0.16(@types/node@26.1.0)
 
   '@vitest/pretty-format@4.1.9':
     dependencies:
@@ -3106,11 +3107,11 @@ snapshots:
 
   uncrypto@0.1.3: {}
 
-  undici-types@7.13.0: {}
+  undici-types@8.3.0: {}
 
   uqr@0.1.2: {}
 
-  vite@8.0.16(@types/node@24.6.2):
+  vite@8.0.16(@types/node@26.1.0):
     dependencies:
       lightningcss: 1.32.0
       picomatch: 4.0.5
@@ -3118,13 +3119,13 @@ snapshots:
       rolldown: 1.0.3
       tinyglobby: 0.2.17
     optionalDependencies:
-      '@types/node': 24.6.2
+      '@types/node': 26.1.0
       fsevents: 2.3.3
 
-  vitest@4.1.9(@types/node@24.6.2)(vite@8.0.16(@types/node@24.6.2)):
+  vitest@4.1.9(@types/node@26.1.0)(vite@8.0.16(@types/node@26.1.0)):
     dependencies:
       '@vitest/expect': 4.1.9
-      '@vitest/mocker': 4.1.9(vite@8.0.16(@types/node@24.6.2))
+      '@vitest/mocker': 4.1.9(vite@8.0.16(@types/node@26.1.0))
       '@vitest/pretty-format': 4.1.9
       '@vitest/runner': 4.1.9
       '@vitest/snapshot': 4.1.9
@@ -3141,10 +3142,10 @@ snapshots:
       tinyexec: 1.2.4
       tinyglobby: 0.2.17
       tinyrainbow: 3.1.0
-      vite: 8.0.16(@types/node@24.6.2)
+      vite: 8.0.16(@types/node@26.1.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 24.6.2
+      '@types/node': 26.1.0
     transitivePeerDependencies:
       - msw
 
