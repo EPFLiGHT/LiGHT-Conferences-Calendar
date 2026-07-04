@@ -25,6 +25,7 @@ pnpm dev        # dev server
 pnpm validate   # check the YAML data
 pnpm test       # run tests
 pnpm build      # production build
+pnpm sync       # pull deadline updates from OpenReview (see below)
 ```
 
 ## Conference data
@@ -63,6 +64,26 @@ presentations). It has its own format and is not checked by `pnpm validate`.
 Only `title`, `year`, `id`, `type`, and `timezone` are required. Missing fields show as "TBA".
 
 See the [list of IANA timezones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
+
+### Automated updates from OpenReview
+
+Deadlines for venues hosted on OpenReview (NeurIPS, ICML, ICLR, COLM, AAAI,
+CVPR, WACV, ECCV, LoG, UAI, MIDL, MLHC, CHIL) are kept fresh automatically. A
+GitHub Action runs `pnpm sync` weekly: it reads each venue's deadlines, dates
+and location from the [OpenReview API](https://docs.openreview.net/) and opens
+a pull request with the changes for review, so nothing lands on the site
+unreviewed. The sync only writes factual fields (`deadline`,
+`abstract_deadline`, `full_name`, `place`, `start`, `end`, `date`); curated
+fields like `sub`, `note`, and `link` are never touched.
+
+Two things to know:
+
+- Hand edits to the synced fields of these venues will be overwritten by the
+  next weekly PR. For everything else (global health conferences, summits,
+  workshops), the YAML files remain the source of truth.
+- To put another OpenReview venue under sync, add one line to
+  `scripts/sync/venues.json` (the format is documented at the top of
+  `scripts/sync/main.js`).
 
 ## Stack
 
