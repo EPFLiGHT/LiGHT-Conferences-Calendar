@@ -943,9 +943,9 @@
 - title: UAI
   year: 2026
   id: uai26
-  full_name: Conference on Uncertainty in Artificial Intelligence
+  full_name: Forty-Second Annual Conference on Uncertainty in Artificial Intelligence
   link: https://www.auai.org/uai2026/
-  deadline: '2026-02-25 23:59:59'
+  deadline: 2026-02-25 23:59
   timezone: UTC-12
   place: Amsterdam, Netherlands
   date: August 17-21, 2026
@@ -1019,10 +1019,10 @@
   id: midl26
   full_name: Medical Imaging with Deep Learning
   link: https://2026.midl.io/
-  abstract_deadline: 2025-11-07 23:59
-  deadline: 2025-11-13 23:59
+  abstract_deadline: 2025-12-04 00:01
+  deadline: 2025-12-11 00:01
   timezone: UTC-12
-  place: Taipei, Taiwan
+  place: Taipei, Taiwan, ROC
   date: July 8-10, 2026
   start: '2026-07-08'
   end: '2026-07-10'
