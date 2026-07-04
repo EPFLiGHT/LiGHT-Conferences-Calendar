@@ -12,9 +12,13 @@ import SectionRule from '@/components/SectionRule';
 import LoadingState from '@/components/LoadingState';
 import ErrorState from '@/components/ErrorState';
 import { useConferences } from '@/hooks/useConferences';
-import { useConferenceFilters, type ConferenceFiltersState } from '@/hooks/useConferenceFilters';
+import {
+  useConferenceFilters,
+  hasActiveConferenceFilters,
+  type ConferenceFiltersState,
+} from '@/hooks/useConferenceFilters';
 import { cardSurfaceStyle } from '@/styles/containerStyles';
-import { primaryButtonStyle } from '@/styles/buttonStyles';
+import { primaryButtonStyle, secondaryButtonStyle } from '@/styles/buttonStyles';
 import type { Conference } from '@/types/conference';
 
 const ITEMS_PER_PAGE = 12;
@@ -42,6 +46,17 @@ export default function Page() {
     setCurrentPage(1);
   };
 
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1);
+  };
+
+  const handleResetAll = () => {
+    setSearchQuery('');
+    setFilters(prev => ({ ...prev, year: '', subject: [], type: [] }));
+    setCurrentPage(1);
+  };
+
   const filteredAndSortedConferences = useConferenceFilters(conferences, searchQuery, filters);
 
   const paginatedConferences = useMemo(() => {
@@ -64,10 +79,11 @@ export default function Page() {
             eyebrow="LiGHT · Index"
             description="Track upcoming conferences and never miss a deadline. Click on any entry for full details and to export."
             searchValue={searchQuery}
-            onSearchChange={setSearchQuery}
+            onSearchChange={handleSearchChange}
             conferences={conferences}
             filters={filters}
             onFilterChange={handleFilterChange}
+            onReset={handleResetAll}
           />
 
           <SectionRule
@@ -86,6 +102,17 @@ export default function Page() {
                 <Text fontSize="lg" color="gray.500">
                   No conferences found matching your criteria.
                 </Text>
+                {hasActiveConferenceFilters(searchQuery, filters) && (
+                  <Button
+                    onClick={handleResetAll}
+                    mt="5"
+                    size="sm"
+                    px="5"
+                    {...secondaryButtonStyle}
+                  >
+                    Reset all
+                  </Button>
+                )}
               </Box>
             ) : (
               paginatedConferences.map((conference, index) => (

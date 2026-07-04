@@ -57,6 +57,13 @@ function CalendarContent() {
     syncSearchToURL(query, filters);
   };
 
+  const handleResetAll = () => {
+    const cleared = { ...filters, year: '', subject: [], type: [] };
+    setSearchQuery('');
+    setFilters(cleared);
+    syncFiltersToURL('', cleared);
+  };
+
   // Use the centralized filtering hook instead of duplicating logic
   const filteredConferences = useConferenceFilters(conferences, searchQuery, filters);
 
@@ -161,6 +168,7 @@ function CalendarContent() {
             conferences={conferences}
             filters={filters}
             onFilterChange={handleFilterChange}
+            onReset={handleResetAll}
           />
 
           <Flex

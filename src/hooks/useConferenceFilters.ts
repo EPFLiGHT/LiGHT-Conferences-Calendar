@@ -23,6 +23,22 @@ export interface ConferenceFiltersState {
   type: string[];
 }
 
+/**
+ * True when the search query or any narrowing filter is active.
+ * Sort order is excluded: it reorders results but never hides any.
+ */
+export function hasActiveConferenceFilters(
+  searchQuery: string,
+  filters: ConferenceFiltersState
+): boolean {
+  return (
+    searchQuery.trim() !== '' ||
+    filters.year !== '' ||
+    filters.subject.length > 0 ||
+    filters.type.length > 0
+  );
+}
+
 export function useConferenceFilters(
   conferences: Conference[],
   searchQuery: string,

@@ -1,5 +1,5 @@
 import { Box, Flex, Input, Text } from '@chakra-ui/react';
-import { Search as SearchIcon } from 'lucide-react';
+import { Search as SearchIcon, X } from 'lucide-react';
 
 interface SearchProps {
   value: string;
@@ -26,6 +26,13 @@ export default function Search({ value, onChange }: SearchProps): JSX.Element {
           placeholder="conference name, organization, keyword..."
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape' && value) {
+              e.preventDefault();
+              onChange('');
+            }
+          }}
+          aria-label="Search conferences"
           variant="outline"
           border="none"
           outline="none"
@@ -36,7 +43,31 @@ export default function Search({ value, onChange }: SearchProps): JSX.Element {
           _placeholder={{ color: 'gray.400' }}
           _focus={{ outline: 'none', boxShadow: 'none' }}
           px="0"
+          css={{
+            '&::-webkit-search-cancel-button': {
+              WebkitAppearance: 'none',
+              display: 'none',
+            },
+          }}
         />
+        {value && (
+          <Box
+            as="button"
+            aria-label="Clear search"
+            onClick={() => onChange('')}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            p="1"
+            borderRadius="badge"
+            color="brand.400"
+            cursor="pointer"
+            transition="all 0.18s ease"
+            _hover={{ color: 'brand.700', bg: 'brand.50' }}
+          >
+            <X size={14} strokeWidth={2} />
+          </Box>
+        )}
       </Flex>
     </Box>
   );

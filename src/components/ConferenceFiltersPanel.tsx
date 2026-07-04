@@ -1,8 +1,9 @@
 import { Box, Flex, Heading, Text } from '@chakra-ui/react';
+import { RotateCcw } from 'lucide-react';
 import Search from './Search';
 import Filters from './Filters';
 import type { Conference } from '@/types/conference';
-import type { ConferenceFiltersState } from '@/hooks/useConferenceFilters';
+import { hasActiveConferenceFilters, type ConferenceFiltersState } from '@/hooks/useConferenceFilters';
 
 interface ConferenceFiltersPanelProps {
   title: string;
@@ -13,6 +14,7 @@ interface ConferenceFiltersPanelProps {
   conferences: Conference[];
   filters: ConferenceFiltersState;
   onFilterChange: (newFilters: Partial<ConferenceFiltersState>) => void;
+  onReset?: () => void;
 }
 
 export default function ConferenceFiltersPanel({
@@ -24,7 +26,9 @@ export default function ConferenceFiltersPanel({
   conferences,
   filters,
   onFilterChange,
+  onReset,
 }: ConferenceFiltersPanelProps): JSX.Element {
+  const showReset = Boolean(onReset) && hasActiveConferenceFilters(searchValue, filters);
   return (
     <Box mb="10">
       {/* Masthead */}
@@ -59,6 +63,24 @@ export default function ConferenceFiltersPanel({
         <Text fontSize="sm" color="gray.600" maxW="640px" lineHeight="1.55">
           {description}
         </Text>
+        {showReset && (
+          <Box
+            as="button"
+            onClick={onReset}
+            display="inline-flex"
+            alignItems="center"
+            gap="1.5"
+            textStyle="badgeLabel"
+            color="brand.400"
+            cursor="pointer"
+            whiteSpace="nowrap"
+            transition="color 0.18s ease"
+            _hover={{ color: 'brand.700' }}
+          >
+            <RotateCcw size={12} strokeWidth={1.75} />
+            Reset all
+          </Box>
+        )}
       </Flex>
 
       <Search value={searchValue} onChange={onSearchChange} />
