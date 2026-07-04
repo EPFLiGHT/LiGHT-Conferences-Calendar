@@ -2,7 +2,8 @@
 
 import type { JSX } from 'react';
 import { Box, Container, Flex, Grid, Heading, Text, Link, Image } from '@chakra-ui/react';
-import { MapPin, Mail, Linkedin, Github, ArrowUpRight, ArrowUp } from 'lucide-react';
+import { MapPin, Mail, ArrowUpRight, ArrowUp } from 'lucide-react';
+import { GitHubIcon, LinkedInIcon, SlackIcon } from '@/components/BrandIcons';
 import { ROUTES } from '@/constants/routes';
 import { inlineLinkStyle } from '@/styles/linkStyles';
 
@@ -217,7 +218,7 @@ export default function Footer(): JSX.Element {
 
                 <Box>
                   <Flex align="center" gap="2" mb="2">
-                    <Linkedin size={14} strokeWidth={1.75} color="var(--chakra-colors-brand-500)" />
+                    <LinkedInIcon size={14} strokeWidth={1.75} color="var(--chakra-colors-brand-500)" />
                     <Text fontSize="xs" fontWeight="700" color="brand.500" textTransform="uppercase" letterSpacing="0.16em">
                       LinkedIn
                     </Text>
@@ -255,7 +256,7 @@ export default function Footer(): JSX.Element {
                   alignSelf="flex-start"
                   {...inlineLinkStyle}
                 >
-                  <Github size={14} strokeWidth={1.75} />
+                  <GitHubIcon size={14} strokeWidth={1.75} />
                   Contribute on GitHub
                   <ArrowUpRight size={12} strokeWidth={2} />
                 </Link>
@@ -263,9 +264,13 @@ export default function Footer(): JSX.Element {
                 <Link
                   href={ROUTES.slackInstall}
                   fontSize="sm"
+                  display="inline-flex"
+                  alignItems="center"
+                  gap="2"
                   alignSelf="flex-start"
                   {...inlineLinkStyle}
                 >
+                  <SlackIcon size={14} strokeWidth={1.75} />
                   Add the Slack bot →
                 </Link>
 
