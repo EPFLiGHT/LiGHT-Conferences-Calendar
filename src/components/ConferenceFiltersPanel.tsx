@@ -69,13 +69,22 @@ export default function ConferenceFiltersPanel({
             onClick={onReset}
             display="inline-flex"
             alignItems="center"
+            justifyContent="center"
             gap="1.5"
             textStyle="badgeLabel"
             color="brand.400"
             cursor="pointer"
             whiteSpace="nowrap"
-            transition="color 0.18s ease"
+            ml="auto"
+            minH={{ base: '44px', md: 'auto' }}
+            py="2"
+            px="3"
+            my="-2"
+            mr="-3"
+            borderRadius="badge"
+            transition="color 0.18s ease, background 0.18s ease"
             _hover={{ color: 'brand.700' }}
+            _active={{ color: 'brand.700', bg: 'brand.50' }}
           >
             <RotateCcw size={12} strokeWidth={1.75} />
             Reset all
