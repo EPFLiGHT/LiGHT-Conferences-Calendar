@@ -9,6 +9,7 @@
     "build:vercel": "cp next.config.vercel.mjs next.config.mjs && next build",
     "start": "next start",
     "validate": "node scripts/validate.js",
+    "sync": "node scripts/sync/main.js",
     "test": "vitest run",
     "test:watch": "vitest"
   },

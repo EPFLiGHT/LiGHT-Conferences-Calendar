@@ -1,0 +1,15 @@
+{
+  "NeurIPS": { "prefix": "NeurIPS.cc", "multiEntry": true },
+  "ICML": { "prefix": "ICML.cc" },
+  "ICLR": { "prefix": "ICLR.cc" },
+  "COLM": { "prefix": "colmweb.org/COLM" },
+  "AAAI": { "prefix": "AAAI.org" },
+  "CVPR": { "prefix": "thecvf.com/CVPR" },
+  "WACV": { "prefix": "thecvf.com/WACV" },
+  "ECCV": { "prefix": "thecvf.com/ECCV" },
+  "LoG": { "prefix": "logconference.io/LOG" },
+  "UAI": { "prefix": "auai.org/UAI" },
+  "MIDL": { "prefix": "MIDL.io" },
+  "MLHC": { "prefix": "mlforhc.org/MLHC" },
+  "CHIL": { "prefix": "chilconference.org/CHIL" }
+}

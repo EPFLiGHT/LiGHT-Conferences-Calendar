@@ -1,0 +1,43 @@
+name: Sync deadlines from OpenReview
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 9
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install
+      - name: Sync from OpenReview
+        run: pnpm sync
+        env:
+          SYNC_REPORT_PATH: ${{ runner.temp }}/sync-report.md
+      - name: Validate YAML data
+        run: pnpm validate
+      - name: Open or update PR
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: auto/openreview-sync
+          add-paths: public/data/conferences.yaml
+          commit-message: "chore(data): sync deadlines from OpenReview"
+          title: "chore(data): sync deadlines from OpenReview"
+          body-path: ${{ runner.temp }}/sync-report.md
+          delete-branch: true
