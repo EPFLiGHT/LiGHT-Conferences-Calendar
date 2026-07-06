@@ -108,13 +108,34 @@ describe('updateEntry', () => {
     expect(entry.link).toBe('https://neurips.cc/');
     expect(entry.note).toBe('Main site; satellite sites in Atlanta and Paris.');
   });
+
+  it('leaves a pinned field untouched and flags the divergence', () => {
+    const entry = { ...sydneyEntry(), sync_pin: ['deadline'] };
+    const { changes, flags } = updateEntry(entry, buildFacts(group), { deadlinesOnly: true });
+    expect(entry.deadline).toBe('2026-05-06 23:59');
+    expect(changes.map((c) => c.field)).not.toContain('deadline');
+    expect(flags.some((f) => f.includes('neuripssy26') && f.includes('deadline pinned') && f.includes('2026-05-07 21:59'))).toBe(true);
+  });
+
+  it('still updates unpinned fields when another field is pinned', () => {
+    const entry = { ...sydneyEntry(), sync_pin: ['deadline'] };
+    updateEntry(entry, buildFacts(group), { deadlinesOnly: true });
+    expect(entry.abstract_deadline).toBe('2026-05-05 21:59');
+  });
+
+  it('does not flag a pinned field when OpenReview agrees with it', () => {
+    const entry = { ...sydneyEntry(), deadline: '2026-05-07 21:59', sync_pin: ['deadline'] };
+    const { flags } = updateEntry(entry, buildFacts(group), { deadlinesOnly: true });
+    expect(flags).toEqual([]);
+  });
 });
 
 describe('draftEntry', () => {
   it('clones the previous edition, drops stale fields, fills facts', () => {
-    const prev = sydneyEntry();
+    const prev = { ...sydneyEntry(), sync_pin: ['deadline'] };
     const facts = buildFacts(group);
     const { entry, flags } = draftEntry(prev, { ...facts, startIso: '2027-12-05' }, 2027);
+    expect(entry.sync_pin).toBeUndefined();
     expect(entry.id).toBe('neuripssy27');
     expect(entry.year).toBe(2027);
     expect(entry.sub).toBe('ML');

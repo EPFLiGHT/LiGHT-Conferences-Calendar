@@ -3,7 +3,11 @@
  * entry. Only "factual" fields are ever touched (deadline, abstract_deadline,
  * full_name, place, start, end, date); curated fields (sub, type, note, link,
  * paperslink, id, timezone, deadline_status, hindex, pwclink) are protected by
- * construction because they are never passed to the setter.
+ * construction because they are never passed to the setter. An entry can also
+ * pin individual factual fields via `sync_pin` (a list of field names) when a
+ * curated value should win over OpenReview, e.g. a venue whose announced
+ * deadline differs from the portal cutoff; pinned fields are never written,
+ * and any divergence is flagged in the report instead.
  */
 import {
   parseVenueDateString,
@@ -15,6 +19,11 @@ import {
 } from './parse.js';
 
 const PLACEHOLDER_RE = /^(tbd|tba)$/i;
+
+/** Fields the sync may write into an entry, i.e. the ones `sync_pin` accepts. */
+export const SYNC_PINNABLE_FIELDS = [
+  'deadline', 'abstract_deadline', 'full_name', 'place', 'start', 'end', 'date',
+];
 
 /**
  * Distill an OpenReview venue group's `content` into the facts the sync uses.
@@ -58,10 +67,15 @@ export function buildFacts(content) {
 export function updateEntry(entry, facts, { deadlinesOnly = false } = {}) {
   const changes = [];
   const flags = [];
+  const pinned = new Set(entry.sync_pin ?? []);
   const set = (field, next) => {
     if (next == null) return;
     const old = entry[field];
     if (old === next) return;
+    if (pinned.has(field)) {
+      flags.push(`${entry.id}: ${field} pinned; OpenReview reports ${next}`);
+      return;
+    }
     entry[field] = next;
     changes.push({ id: entry.id, field, old: old ?? null, new: next });
   };
@@ -96,8 +110,9 @@ export function updateEntry(entry, facts, { deadlinesOnly = false } = {}) {
   return { changes, flags };
 }
 
-// Fields that are edition-specific and would be stale on a cloned draft.
-const DRAFT_DROPPED_FIELDS = ['note', 'paperslink', 'deadline_status'];
+// Fields that are edition-specific and would be stale on a cloned draft
+// (sync_pin included: a pin records a judgment about one edition's data).
+const DRAFT_DROPPED_FIELDS = ['note', 'paperslink', 'deadline_status', 'sync_pin'];
 
 /**
  * Draft a new edition by cloning the previous one and overwriting it with

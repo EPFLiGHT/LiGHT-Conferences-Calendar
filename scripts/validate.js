@@ -13,11 +13,12 @@ import {
 } from '../src/utils/conferenceSchema.js';
 import { DATA_FILES } from '../src/constants/dataFiles.js';
 import { SUBJECT_CODES as VALID_SUBJECTS } from '../src/constants/subjects.data.js';
+import { SYNC_PINNABLE_FIELDS } from './sync/merge.js';
 
 const OPTIONAL_FIELDS = [
   'full_name', 'link', 'deadline', 'abstract_deadline',
   'place', 'date', 'start', 'end', 'paperslink', 'pwclink',
-  'hindex', 'sub', 'note', 'deadline_status'
+  'hindex', 'sub', 'note', 'deadline_status', 'sync_pin'
 ];
 
 const ALL_FIELDS = [...REQUIRED_FIELDS, ...OPTIONAL_FIELDS];
@@ -80,6 +81,19 @@ function validateConference(conf, index) {
   // Validate deadline_status
   if (conf.deadline_status && !VALID_DEADLINE_STATUS.includes(conf.deadline_status)) {
     error(`${confId}: Invalid deadline_status '${conf.deadline_status}' (use one of: ${VALID_DEADLINE_STATUS.join(', ')})`);
+  }
+
+  // Validate sync_pin (fields the OpenReview sync must not overwrite)
+  if (conf.sync_pin !== undefined) {
+    if (!Array.isArray(conf.sync_pin) || conf.sync_pin.length === 0) {
+      error(`${confId}: sync_pin must be a non-empty array of field names`);
+    } else {
+      conf.sync_pin.forEach(field => {
+        if (!SYNC_PINNABLE_FIELDS.includes(field)) {
+          error(`${confId}: sync_pin field '${field}' is not synced (use one of: ${SYNC_PINNABLE_FIELDS.join(', ')})`);
+        }
+      });
+    }
   }
 
   // Validate year
