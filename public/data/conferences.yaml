@@ -488,11 +488,11 @@
 - title: CHIL
   year: 2026
   id: chil26
-  full_name: 7th Annual Conference on Health, Inference, and Learning
+  full_name: Conference on Health, Inference, and Learning
   link: https://chil.ahli.cc/
-  deadline: 2026-02-04 23:59
+  deadline: 2026-02-05 16:59
   timezone: UTC-12
-  place: Seattle, Washington, USA
+  place: Seattle, Washington, United States
   date: June 28-30, 2026
   start: '2026-06-28'
   end: '2026-06-30'
