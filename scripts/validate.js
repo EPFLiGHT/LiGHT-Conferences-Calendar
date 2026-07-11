@@ -13,7 +13,7 @@ import {
 } from '../src/utils/conferenceSchema.js';
 import { DATA_FILES } from '../src/constants/dataFiles.js';
 import { SUBJECT_CODES as VALID_SUBJECTS } from '../src/constants/subjects.data.js';
-import { SYNC_PINNABLE_FIELDS } from './sync/merge.js';
+import { SYNC_PINNABLE_FIELDS } from './sync-shared/merge.js';
 
 const OPTIONAL_FIELDS = [
   'full_name', 'link', 'deadline', 'abstract_deadline',

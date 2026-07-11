@@ -1,7 +1,6 @@
 /**
  * Renders a sync run's outcome as markdown. The output is printed to the
- * console and becomes the body of the automated pull request, so it must
- * stay plain, human-readable markdown with no attribution of any kind.
+ * console and becomes the body of the automated pull request.
  */
 
 /**
@@ -14,10 +13,11 @@
  * @param {string[]} [run.flags] Items needing human attention (inferred end
  *   dates, year mismatches, fallback deadlines).
  * @param {string[]} [run.skipped] Venues skipped due to errors or missing data.
+ * @param {string} [run.title] Report heading; each sync passes its own.
  * @returns {string} Markdown report; says "No changes." when nothing was written.
  */
-export function renderReport({ updates = [], drafts = [], flags = [], skipped = [] }) {
-  const lines = ['## OpenReview sync report', ''];
+export function renderReport({ updates = [], drafts = [], flags = [], skipped = [], title = 'Sync report' }) {
+  const lines = [`## ${title}`, ''];
   if (updates.length === 0 && drafts.length === 0) {
     lines.push('No changes.', '');
   }
@@ -35,7 +35,8 @@ export function renderReport({ updates = [], drafts = [], flags = [], skipped = 
   }
   if (flags.length > 0) {
     lines.push('### Needs attention', '');
-    for (const f of flags) lines.push(`- ${f}`);
+    // A venue reporting the same year twice raises the same flag twice.
+    for (const f of new Set(flags)) lines.push(`- ${f}`);
     lines.push('');
   }
   if (skipped.length > 0) {

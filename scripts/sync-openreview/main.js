@@ -1,6 +1,6 @@
 /**
- * Orchestrator for the OpenReview deadline sync, run as `pnpm sync` (locally
- * or by .github/workflows/sync-deadlines.yml). For each venue in venues.json
+ * Orchestrator for the OpenReview deadline sync, run as `pnpm sync:openreview`
+ * (locally or by .github/workflows/sync-openreview.yml). For each venue in venues.json
  * and each of the next three years it fetches the venue group, updates the
  * matching entries in public/data/conferences.yaml (or drafts a new edition),
  * rewrites the file only when something changed, and prints a markdown report
@@ -21,9 +21,10 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { DateTime } from 'luxon';
 import { createApi } from './api.js';
-import { buildFacts, updateEntry, draftEntry } from './merge.js';
-import { renderReport } from './report.js';
-import { loadEntries, serializeEntries } from './yamlio.js';
+import { buildFacts } from './facts.js';
+import { updateEntry, draftEntry } from '../sync-shared/merge.js';
+import { renderReport } from '../sync-shared/report.js';
+import { loadEntries, serializeEntries } from '../sync-shared/yamlio.js';
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const DATA_PATH = path.join(DIR, '../../public/data/conferences.yaml');
@@ -112,7 +113,7 @@ async function main() {
     fs.writeFileSync(DATA_PATH, after);
   }
 
-  const report = renderReport({ updates, drafts, flags, skipped });
+  const report = renderReport({ updates, drafts, flags, skipped, title: 'OpenReview sync report' });
   console.log(report);
   if (process.env.SYNC_REPORT_PATH) {
     fs.writeFileSync(process.env.SYNC_REPORT_PATH, report);

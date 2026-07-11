@@ -9,7 +9,8 @@
     "build:vercel": "cp next.config.vercel.mjs next.config.mjs && next build",
     "start": "next start",
     "validate": "node scripts/validate.js",
-    "sync": "node scripts/sync/main.js",
+    "sync:openreview": "node scripts/sync-openreview/main.js",
+    "sync:llm": "node scripts/sync-llm/main.js",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -38,6 +39,7 @@
     "@types/node": "^26.1.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "openai": "^6.45.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9"
   }

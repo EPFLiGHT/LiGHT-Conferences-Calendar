@@ -25,7 +25,8 @@ pnpm dev        # dev server
 pnpm validate   # check the YAML data
 pnpm test       # run tests
 pnpm build      # production build
-pnpm sync       # pull deadline updates from OpenReview (see below)
+pnpm sync:openreview  # pull deadline updates from OpenReview (see below)
+pnpm sync:llm         # pull health-venue deadlines from their websites (see below)
 ```
 
 ## Conference data
@@ -69,7 +70,7 @@ See the [list of IANA timezones](https://en.wikipedia.org/wiki/List_of_tz_databa
 
 Deadlines for venues hosted on OpenReview (NeurIPS, ICML, ICLR, COLM, AAAI,
 CVPR, WACV, ECCV, LoG, UAI, MIDL, MLHC, CHIL) are kept fresh automatically. A
-GitHub Action runs `pnpm sync` weekly: it reads each venue's deadlines, dates
+GitHub Action runs `pnpm sync:openreview` weekly: it reads each venue's deadlines, dates
 and location from the [OpenReview API](https://docs.openreview.net/) and opens
 a pull request with the changes for review, so nothing lands on the site
 unreviewed. The sync only writes factual fields (`deadline`,
@@ -79,11 +80,37 @@ fields like `sub`, `note`, and `link` are never touched.
 Two things to know:
 
 - Hand edits to the synced fields of these venues will be overwritten by the
-  next weekly PR. For everything else (global health conferences, summits,
-  workshops), the YAML files remain the source of truth.
+  next weekly PR. For everything not covered by either sync (summits,
+  workshops, venues in neither config), the YAML files remain the source of
+  truth.
 - To put another OpenReview venue under sync, add one line to
-  `scripts/sync/venues.json` (the format is documented at the top of
-  `scripts/sync/main.js`).
+  `scripts/sync-openreview/venues.json` (the format is documented at the top of
+  `scripts/sync-openreview/main.js`).
+
+### Automated updates from venue websites
+
+Most health conferences aren't on OpenReview, so there's no API to sync
+from. For those, a second weekly Action (`pnpm sync:llm`) goes straight to
+the source: it fetches each venue's important-dates page, asks a small
+OpenAI model to pull out the deadlines, and opens a PR with whatever
+changed. The covered venues live in `scripts/sync-llm/venues.json`.
+
+The model isn't trusted blindly. Every deadline it reports must come with
+the exact sentence it found it in; that quote is checked against the page
+and shown in the PR body, so you can eyeball each change in seconds. And
+when a venue moves its dates page (they love doing this every year), a small
+fallback agent clicks around from the homepage, searches the web if it has
+to, finds the new page, and fixes `venues.json` in the same PR.
+
+To run it locally, drop an OpenAI key into `.env.local`
+(`OPENAI_API_KEY=...`). `--venue "<title>"` syncs a single venue,
+`--dry-run` shows what would change without writing anything. In CI the key
+comes from the repo secret of the same name.
+
+If a synced value keeps coming out wrong (say the website's own name for the
+conference is "uglier" haha than the curated one), pin it: add
+`sync_pin: [full_name]` to the entry and both syncs will leave that field
+alone, flagging any disagreement in the PR instead of overwriting it.
 
 ## Stack
 

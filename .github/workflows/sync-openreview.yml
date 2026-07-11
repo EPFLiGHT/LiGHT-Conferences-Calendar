@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Sync from OpenReview
-        run: pnpm sync
+        run: pnpm sync:openreview
         env:
           SYNC_REPORT_PATH: ${{ runner.temp }}/sync-report.md
       - name: Validate YAML data
@@ -35,7 +35,7 @@ jobs:
       - name: Open or update PR
         uses: peter-evans/create-pull-request@v8
         with:
-          branch: auto/openreview-sync
+          branch: auto/sync-openreview
           add-paths: public/data/conferences.yaml
           commit-message: "chore(data): sync deadlines from OpenReview"
           title: "chore(data): sync deadlines from OpenReview"

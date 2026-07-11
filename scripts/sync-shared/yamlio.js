@@ -29,13 +29,3 @@ export function serializeEntries(entries) {
     .map((entry) => dump([entry], { lineWidth: -1, noRefs: true }))
     .join('\n');
 }
-
-/**
- * Serialize entries and write them to disk.
- * @param {string} filePath Path to the YAML file.
- * @param {object[]} entries The entries to write.
- * @returns {void}
- */
-export function saveEntries(filePath, entries) {
-  fs.writeFileSync(filePath, serializeEntries(entries));
-}

@@ -29,5 +29,8 @@ coverage
 .env.local
 .env.*.local
 
+# LLM sync dev cache
+scripts/sync-llm/.cache
+
 # Vercel
 .vercel

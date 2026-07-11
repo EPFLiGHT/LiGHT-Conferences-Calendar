@@ -20,4 +20,20 @@ describe('renderReport', () => {
     expect(md).toContain('### Skipped');
     expect(md).not.toContain('No changes.');
   });
+
+  it('prints an identical flag only once', () => {
+    // A venue page listing two same-year editions flags the same pin twice.
+    const flag = 'embc26: full_name pinned; source reports IEEE EMBC 2026';
+    const md = renderReport({ flags: [flag, flag] });
+    expect(md.match(/full_name pinned/g)).toHaveLength(1);
+  });
+
+  it('renders a custom title when given', () => {
+    const report = renderReport({ title: 'LLM web sync report' });
+    expect(report.startsWith('## LLM web sync report')).toBe(true);
+  });
+
+  it('falls back to a source-neutral title', () => {
+    expect(renderReport({}).startsWith('## Sync report')).toBe(true);
+  });
 });

@@ -1,0 +1,35 @@
+{
+  "ESMycobacteriology": {
+    "url": "https://www.esmycobacteriology.eu/event-home",
+    "home": "https://www.esmycobacteriology.eu"
+  },
+  "AMIA": {
+    "url": "https://amia.org/education-events/amia-2026-annual-symposium",
+    "home": "https://amia.org",
+    "note": "site returns 403 to bots; deadlines may need manual updates"
+  },
+  "MICCAI": {
+    "url": "https://conferences.miccai.org/2026/en/IMPORTANT-DATES.html",
+    "home": "https://conferences.miccai.org/2026/en/default.asp"
+  },
+  "AIME": {
+    "url": "https://aime26.aimedicine.info/call-for-papers/",
+    "home": "https://aime26.aimedicine.info/"
+  },
+  "IEEE EMBC": {
+    "url": "https://embc.embs.org/2026/papers",
+    "home": "https://embc.embs.org/2026/"
+  },
+  "PSB": {
+    "url": "https://psb.stanford.edu/keydates",
+    "home": "https://psb.stanford.edu/"
+  },
+  "Global Digital Health Forum": {
+    "url": "https://www.gdhf.digital/abstracts2026",
+    "home": "https://www.gdhf.digital/"
+  },
+  "Geneva Health Forum": {
+    "url": "https://conference2026.genevahealthforum.com/call-for-posters/",
+    "home": "https://genevahealthforum.com"
+  }
+}

@@ -1,10 +1,9 @@
 - title: ESMycobacteriology
   year: 2026
   id: esmyco26
-  full_name: 46th ANNUAL CONGRESS of the European Society of Mycobacteriology
+  full_name: The 46th Annual Congress of the European Society of Mycobacteriology
   link: https://www.esmycobacteriology.eu/event-home
-  abstract_deadline: 2026-01-15 23:59
-  deadline: 2026-05-06 23:59
+  abstract_deadline: 2026-05-10 23:59
   timezone: UTC-12
   place: Verona, Italy
   date: June 22-25, 2026
@@ -12,6 +11,8 @@
   end: '2026-06-25'
   sub: Global Health
   type: conference
+  sync_pin:
+    - full_name
 
 - title: NDSS Symposium
   year: 2026
@@ -1015,6 +1016,9 @@
   end: '2026-10-01'
   sub: Health AI
   type: conference
+  sync_pin:
+    - full_name
+    - place
 
 - title: MIDL
   year: 2026
@@ -1036,7 +1040,7 @@
   id: aime26
   full_name: International Conference on Artificial Intelligence in Medicine
   link: https://aime26.aimedicine.info/
-  deadline: 2026-03-17 23:59
+  deadline: 2026-02-17 23:59
   timezone: UTC-12
   place: Ottawa, Canada
   date: July 7-10, 2026
@@ -1044,6 +1048,9 @@
   end: '2026-07-10'
   sub: Health AI
   type: conference
+  abstract_deadline: 2026-02-10 23:59
+  sync_pin:
+    - full_name
 
 - title: IEEE EMBC
   year: 2026
@@ -1057,6 +1064,9 @@
   end: '2026-07-30'
   sub: Health AI
   type: conference
+  abstract_deadline: 2026-04-30 23:59
+  sync_pin:
+    - full_name
 
 - title: AMIA
   year: 2026
@@ -1086,6 +1096,9 @@
   end: '2027-01-07'
   sub: Health AI
   type: conference
+  sync_pin:
+    - full_name
+    - place
   note: Paper deadline Aug 3, 2026; separate abstract track deadline Dec 1, 2026.
 
 - title: MEDINFO
@@ -1108,7 +1121,7 @@
   id: gdhf26
   full_name: Global Digital Health Forum
   link: https://www.gdhf.digital/
-  abstract_deadline: 2026-06-30 23:59
+  abstract_deadline: 2026-07-07 23:59
   timezone: America/New_York
   place: Bangkok, Thailand
   date: December 2-4, 2026
@@ -1116,6 +1129,8 @@
   end: '2026-12-04'
   sub: Global Health
   type: conference
+  sync_pin:
+    - full_name
 
 - title: World Health Summit
   year: 2026
@@ -1134,7 +1149,6 @@
 - title: Geneva Health Forum
   year: 2026
   id: ghf26
-  deadline_status: tba
   full_name: Geneva Health Forum
   link: https://genevahealthforum.com/
   timezone: UTC-12
@@ -1144,3 +1158,7 @@
   end: '2026-11-12'
   sub: Global Health
   type: conference
+  abstract_deadline: 2026-09-01 23:59
+  sync_pin:
+    - full_name
+    - place
