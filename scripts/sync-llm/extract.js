@@ -57,6 +57,9 @@ export const PAGE_RULES = `Rules:
 - Extract submission deadlines only: kind "abstract" for submitting an abstract, kind
   "paper" for submitting a full paper or manuscript. Classify by the page's own label,
   not by how many dates it lists: a lone abstract deadline is still kind "abstract".
+- When a label names both, classify by the thing actually being submitted, not by the
+  words around it: "Paper Abstract Registration" and "Abstract submission for full
+  papers" are both kind "abstract". Never give two deadlines of one edition the same kind.
 - Ignore every other date, including registration, early bird pricing, travel grants,
   award or bursary applications, notification of acceptance, camera ready, and the
   conference dates themselves. If the page has no submission deadline, say so.
