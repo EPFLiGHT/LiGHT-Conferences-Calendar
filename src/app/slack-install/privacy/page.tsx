@@ -281,7 +281,7 @@ export default function PrivacyPolicyPage() {
               </Text>
               <Flex direction="column" gap="2.5">
                 <ChakraLink
-                  href="mailto:omar.azgaoui@epfl.ch"
+                  href="mailto:omarziyad.azgaoui2005@gmail.com"
                   fontSize="sm"
                   display="inline-flex"
                   alignItems="center"
@@ -289,7 +289,7 @@ export default function PrivacyPolicyPage() {
                   {...inlineLinkStyle}
                   alignSelf="flex-start"
                 >
-                  omar.azgaoui@epfl.ch
+                  omarziyad.azgaoui2005@gmail.com
                 </ChakraLink>
                 <ChakraLink
                   href="https://github.com/EPFLiGHT/Conferences-Calendar"

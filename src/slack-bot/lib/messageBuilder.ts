@@ -327,7 +327,7 @@ export function buildUserDeadlineNotification(
     {
       type: 'context',
       elements: [
-        { type: 'mrkdwn', text: '💡 Manage these with `/conf-settings` · stop with `/conf-unsubscribe`' },
+        { type: 'mrkdwn', text: '💡 View your settings with `/conf-settings` · stop with `/conf-unsubscribe`' },
       ],
     }
   );

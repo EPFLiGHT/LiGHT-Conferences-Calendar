@@ -1,16 +1,14 @@
 # Slack bot
 
-A Slack bot that tracks academic conference deadlines and sends reminders.
-
-- Workspace: [light-laboratory.slack.com](https://light-laboratory.slack.com/)
-- Production: [conferences.light-laboratory.org](https://conferences.light-laboratory.org/)
+The Slack side of [Conference Deadlines](README.md): slash commands to look up deadlines, plus daily
+reminders in DMs and channels.
 
 ## What it does
 
 - Slash commands to search conferences and view upcoming deadlines
-- Per-user reminders (default: 30, 7, 3 days before each deadline)
+- Opt-in DM reminders 30, 7 and 3 days before each deadline
+- Deadline posts in any channel the bot is added to
 - Subject filters (ML, CV, NLP, SEC, etc.)
-- Reminders shown in the user's local timezone
 - Multi-workspace install via OAuth
 
 ## Installing
@@ -37,8 +35,8 @@ commands           # slash commands
 channels:read      # detect when the bot joins/leaves public channels
 groups:read        # same, for private channels
 mpim:read          # same, for group DMs
-users:read         # look up user timezones
-users:read.email   # optional
+users:read
+users:read.email
 ```
 
 ### 3. Install to the workspace
@@ -60,7 +58,7 @@ Under **Slash Commands**, create one command per entry below. They all share the
 /conf-info          Details for one conference
 /conf-subscribe     Turn reminders on
 /conf-unsubscribe   Turn reminders off
-/conf-settings      Change preferences
+/conf-settings      View your settings
 /conf-help          List commands
 ```
 
@@ -109,7 +107,7 @@ After the first deploy, update the request URLs in the Slack app config to point
 - `/conf-info <id>`: details for one conference
 - `/conf-subscribe`: turn reminders on
 - `/conf-unsubscribe`: turn them off
-- `/conf-settings`: change preferences
+- `/conf-settings`: view your settings and toggle reminders
 - `/conf-help`: list commands
 
 Subject codes are ML, CV, NLP, DM, HCI, SEC, SE, AI, Global Health, and Health AI. Run `/conf-subject` with no argument to see the list.
@@ -118,7 +116,7 @@ Subject codes are ML, CV, NLP, DM, HCI, SEC, SE, AI, Global Health, and Health A
 
 Two cron jobs run each morning at 9:00 UTC (configured in `vercel.json`):
 
-- **Personal reminders** (`cron/daily-check`): subscribed users get a DM on the days they selected (default 30 / 7 / 3 days out), filtered by their subscribed subjects if they set any, and in their Slack timezone.
+- **Personal reminders** (`cron/daily-check`): subscribed users get a DM when a deadline or event start is exactly 30, 7 or 3 days away.
 - **Channel reminders** (`cron/channel-reminders`): any channel the bot is a member of gets a post when a deadline or event start is exactly `CHANNEL_REMINDER_DAYS` days away (default 30 / 7 / 3).
 
 ## Local development

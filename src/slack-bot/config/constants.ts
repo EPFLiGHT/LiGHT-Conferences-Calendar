@@ -16,7 +16,7 @@ export const COMMAND_DESCRIPTIONS = {
   '/conf-info <id-or-name>': 'Get detailed information about a specific conference',
   '/conf-subscribe': 'Enable deadline notifications (DMs)',
   '/conf-unsubscribe': 'Disable deadline notifications',
-  '/conf-settings': 'View and update your notification preferences',
+  '/conf-settings': 'View your notification settings',
   '/conf-help': 'Show all available commands',
 } as const;
 
