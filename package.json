@@ -15,7 +15,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@chakra-ui/react": "^3.36.0",
+    "@chakra-ui/react": "^3.36.1",
     "@emotion/react": "^11.14.0",
     "@fullcalendar/core": "^6.1.21",
     "@fullcalendar/daygrid": "^6.1.21",
@@ -27,7 +27,7 @@
     "@vercel/kv": "^3.0.0",
     "framer-motion": "^12.42.2",
     "js-yaml": "^5.2.1",
-    "lucide-react": "^1.24.0",
+    "lucide-react": "^1.25.0",
     "luxon": "^3.4.4",
     "next": "^16.2.10",
     "react": "^19.2.7",
@@ -39,7 +39,7 @@
     "@types/node": "^26.1.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "openai": "^6.46.0",
+    "openai": "^6.48.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"
   }
