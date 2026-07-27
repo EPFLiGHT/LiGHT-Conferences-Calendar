@@ -26,12 +26,12 @@
     "@slack/web-api": "^8.0.0",
     "@vercel/kv": "^3.0.0",
     "framer-motion": "^12.42.2",
-    "js-yaml": "^5.2.1",
-    "lucide-react": "^1.25.0",
+    "js-yaml": "^5.2.2",
+    "lucide-react": "^1.27.0",
     "luxon": "^3.4.4",
-    "next": "^16.2.10",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "next": "^16.2.12",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
@@ -39,7 +39,7 @@
     "@types/node": "^26.1.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "openai": "^6.48.0",
+    "openai": "^6.49.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"
   }
