@@ -48,6 +48,8 @@ jobs:
         run: pnpm install
       - name: Validate YAML data
         run: pnpm validate
+      - name: Generate Next.js types
+        run: npx next typegen
       - name: Typecheck
         run: npx tsc --noEmit
       - name: Run tests
