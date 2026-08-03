@@ -176,6 +176,16 @@
   sub: CV
   type: conference
 
+- title: CVPR
+  year: 2027
+  id: cvpr27
+  full_name: Conference on Computer Vision and Pattern Recognition 2027
+  link: https://cvpr.thecvf.com/
+  timezone: UTC-12
+  place: Seattle, WA, United States
+  sub: CV
+  type: conference
+
 - title: ICLR
   year: 2026
   id: iclr26
@@ -188,6 +198,16 @@
   date: April 23-27, 2026
   start: '2026-04-23'
   end: '2026-04-27'
+  sub: ML
+  type: conference
+
+- title: ICLR
+  year: 2027
+  id: iclr27
+  full_name: The Fifteenth International Conference on Learning Representations
+  link: https://iclr.cc/
+  timezone: UTC-12
+  place: San Francisco, CA, USA
   sub: ML
   type: conference
 
@@ -227,7 +247,7 @@
   full_name: The Fifth Learning on Graphs Conference
   link: https://logconference.org/
   abstract_deadline: 2026-07-29 23:59
-  deadline: 2026-07-28 00:00
+  deadline: 2026-08-06 00:00
   timezone: UTC-12
   place: Boston, Massachusetts, USA
   date: November 20-22, 2026
@@ -760,14 +780,14 @@
 - title: MLHC
   year: 2026
   id: mlhc26
-  full_name: Machine Learning for Healthcare
+  full_name: Machine Learning for Healthcare 2026
   link: https://www.mlforhc.org/2026-conference
-  deadline: 2026-04-17 23:59
+  deadline: 2026-04-18 00:59
   timezone: UTC-12
-  place: Baltimore, Maryland, USA
-  date: August 13-14, 2026
-  start: '2026-08-13'
-  end: '2026-08-14'
+  place: Baltimore, Maryland, United States
+  date: Aug 12-13, 2026
+  start: '2026-08-12'
+  end: '2026-08-13'
   paperslink: https://www.mlforhc.org/paper-submission
   sub: Health AI
   type: conference
