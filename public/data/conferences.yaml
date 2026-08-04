@@ -1068,6 +1068,17 @@
   sync_pin:
     - full_name
 
+- title: IEEE EMBC
+  year: 2027
+  id: embc27
+  full_name: Annual International Conference of the IEEE Engineering in Medicine and Biology Society
+  link: https://embc.embs.org/2026/
+  timezone: UTC-12
+  place: Toronto, Canada
+  sub: Health AI
+  type: conference
+  deadline: 2026-11-01 23:59
+
 - title: AMIA
   year: 2026
   id: amia26
