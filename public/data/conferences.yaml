@@ -1088,6 +1088,20 @@
   sync_pin:
     - full_name
 
+- title: IEEE EMBC
+  year: 2027
+  id: embc27
+  full_name: 49th Annual International Conference of the IEEE Engineering in Medicine and Biology Society (EMBC 2027)
+  link: https://embc.embs.org/2026/
+  timezone: UTC-12
+  place: Suntec Singapore Convention & Exhibition Centre, Singapore
+  date: Jul 11-15, 2027
+  start: '2027-07-11'
+  end: '2027-07-15'
+  sub: Health AI
+  type: conference
+  deadline: 2027-04-16 23:59
+
 - title: AMIA
   year: 2026
   id: amia26
@@ -1141,7 +1155,7 @@
   id: gdhf26
   full_name: Global Digital Health Forum
   link: https://www.gdhf.digital/
-  abstract_deadline: 2026-07-07 23:59
+  abstract_deadline: 2026-07-07 11:59
   timezone: America/New_York
   place: Bangkok, Thailand
   date: December 2-4, 2026
