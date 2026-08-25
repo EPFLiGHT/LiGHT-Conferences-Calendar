@@ -50,7 +50,7 @@ CI on every PR, so malformed data never reaches either consumer.
 
 ### Keeping deadlines fresh
 
-Deadlines change all the time and updating them by hand gets old fast. Two weekly GitHub Actions handle it
+Deadlines change all the time and updating them by hand gets old fast. Two monthly GitHub Actions handle it
 instead. Neither one writes to the site directly: both open a pull request that a human merges.
 
 ```mermaid
@@ -124,15 +124,15 @@ Only `title`, `year`, `id`, `type` and `timezone` are required. Missing fields s
 ### Automated updates from OpenReview
 
 Venues hosted on OpenReview (NeurIPS, ICML, ICLR, COLM, AAAI, CVPR, WACV, ECCV, LoG, UAI, MIDL, MLHC, CHIL)
-are kept fresh by the weekly `pnpm sync:openreview` Action, which reads deadlines, dates and location from the
+are kept fresh by the monthly `pnpm sync:openreview` Action, which reads deadlines, dates and location from the
 [OpenReview API](https://docs.openreview.net/). Hand edits to the synced fields of these venues get overwritten
-by the next weekly PR; anything not covered by a sync (summits, workshops, venues in neither config) is
+by the next sync PR; anything not covered by a sync (summits, workshops, venues in neither config) is
 hand-maintained in the YAML. To sync another OpenReview venue, add one line to
 `scripts/sync-openreview/venues.json`.
 
 ### Automated updates from venue websites
 
-Most health conferences are not on OpenReview, so a second weekly Action (`pnpm sync:llm`) fetches each
+Most health conferences are not on OpenReview, so a second monthly Action (`pnpm sync:llm`) fetches each
 venue's important-dates page and asks a small OpenAI model to pull out the deadlines. Every deadline has to
 come with the exact sentence it was found in; the quote is checked against the page and shown in the PR body.
 When a venue moves its dates page (they love doing this every year), a fallback agent finds the new one and

@@ -1,5 +1,5 @@
 /**
- * Entry point for `pnpm sync:llm`, run weekly by sync-llm.yml. For each venue
+ * Entry point for `pnpm sync:llm`, run monthly by sync-llm.yml. For each venue
  * in venues.json it tries the cheapest route first and only escalates when the
  * cheaper one comes back without evidence-backed deadlines: read the configured
  * dates page (tier 0), let the agent follow links from the venue homepage
