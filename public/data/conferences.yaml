@@ -11,8 +11,6 @@
   end: '2026-06-25'
   sub: Global Health
   type: conference
-  sync_pin:
-    - full_name
 
 - title: NDSS Symposium
   year: 2026
@@ -163,7 +161,7 @@
 - title: CVPR
   year: 2026
   id: cvpr26
-  full_name: Conference on Computer Vision and Pattern Recognition 2026
+  full_name: Conference on Computer Vision and Pattern Recognition
   link: https://cvpr.thecvf.com/
   abstract_deadline: 2025-11-07 23:59
   deadline: 2025-11-13 23:59
@@ -179,7 +177,7 @@
 - title: CVPR
   year: 2027
   id: cvpr27
-  full_name: Conference on Computer Vision and Pattern Recognition 2027
+  full_name: Conference on Computer Vision and Pattern Recognition
   link: https://cvpr.thecvf.com/
   timezone: UTC-12
   place: Seattle, WA, United States
@@ -277,7 +275,7 @@
 - title: WACV
   year: 2026
   id: wacv26
-  full_name: Winter Conference on Applications of Computer Vision 2026
+  full_name: Winter Conference on Applications of Computer Vision
   link: https://wacv.thecvf.com/
   deadline: 2025-09-19 23:59
   timezone: UTC-12
@@ -1037,7 +1035,6 @@
   sub: Health AI
   type: conference
   sync_pin:
-    - full_name
     - place
 
 - title: MIDL
@@ -1069,8 +1066,6 @@
   sub: Health AI
   type: conference
   abstract_deadline: 2026-02-10 23:59
-  sync_pin:
-    - full_name
 
 - title: IEEE EMBC
   year: 2026
@@ -1085,13 +1080,11 @@
   sub: Health AI
   type: conference
   abstract_deadline: 2026-04-30 23:59
-  sync_pin:
-    - full_name
 
 - title: IEEE EMBC
   year: 2027
   id: embc27
-  full_name: 49th Annual International Conference of the IEEE Engineering in Medicine and Biology Society (EMBC 2027)
+  full_name: 49th Annual International Conference of the IEEE Engineering in Medicine and Biology Society
   link: https://embc.embs.org/2026/
   timezone: UTC-12
   place: Suntec Singapore Convention & Exhibition Centre, Singapore
@@ -1131,7 +1124,6 @@
   sub: Health AI
   type: conference
   sync_pin:
-    - full_name
     - place
   note: Paper deadline Aug 3, 2026; separate abstract track deadline Dec 1, 2026.
 
@@ -1163,8 +1155,6 @@
   end: '2026-12-04'
   sub: Global Health
   type: conference
-  sync_pin:
-    - full_name
 
 - title: World Health Summit
   year: 2026
@@ -1194,5 +1184,4 @@
   type: conference
   abstract_deadline: 2026-09-01 23:59
   sync_pin:
-    - full_name
     - place

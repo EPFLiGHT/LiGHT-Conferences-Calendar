@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { DateTime } from 'luxon';
-import { updateEntry, draftEntry } from './merge.js';
+import { updateEntry, draftEntry, SYNC_PINNABLE_FIELDS } from './merge.js';
 
 // The facts a source hands in, using the values scripts/sync-openreview
 // produces for the NeurIPS 2026 Sydney edition (see its facts.test.js).
@@ -153,6 +153,52 @@ describe('updateEntry', () => {
     const { flags } = updateEntry(entry, neuripsFacts(), { deadlinesOnly: true });
     expect(flags).toEqual([]);
   });
+
+  it('full_name is not pinnable', () => {
+    expect(SYNC_PINNABLE_FIELDS).not.toContain('full_name');
+  });
+});
+
+describe('updateEntry full_name', () => {
+  const nameOnly = (fullName) => ({ fullName, location: null, startIso: null, deadline: null, abstractDeadline: null });
+
+  it('fills a missing full_name from the source', () => {
+    const entry = { ...sydneyEntry(), full_name: undefined };
+    const { changes } = updateEntry(entry, nameOnly('The Fortieth Annual Conference on Neural Information Processing Systems'));
+    expect(entry.full_name).toBe('The Fortieth Annual Conference on Neural Information Processing Systems');
+    expect(changes.map((c) => c.field)).toEqual(['full_name']);
+  });
+
+  it('strips edition decoration before filling', () => {
+    const entry = { ...sydneyEntry(), title: 'MLHC', full_name: undefined };
+    updateEntry(entry, nameOnly('Machine Learning for Healthcare 2026'));
+    expect(entry.full_name).toBe('Machine Learning for Healthcare');
+  });
+
+  it('never overwrites a curated full_name, and stays quiet on a decoration difference', () => {
+    const entry = sydneyEntry();
+    const { changes, flags } = updateEntry(entry, nameOnly('The Fortieth Annual Conference on Neural Information Processing Systems'));
+    expect(entry.full_name).toBe('40th Annual Conference on Neural Information Processing Systems');
+    expect(changes).toEqual([]);
+    expect(flags).toEqual([]);
+  });
+
+  it('flags a source name whose core differs from the curated one', () => {
+    const entry = sydneyEntry();
+    const { changes, flags } = updateEntry(entry, nameOnly('Conference on Neural Information Processing'));
+    expect(entry.full_name).toBe('40th Annual Conference on Neural Information Processing Systems');
+    expect(changes).toEqual([]);
+    expect(flags).toEqual([
+      'neuripssy26: full_name kept as "40th Annual Conference on Neural Information Processing Systems"; source names it "Conference on Neural Information Processing"',
+    ]);
+  });
+
+  it('ignores a source name that is only the title and year', () => {
+    const entry = sydneyEntry();
+    const { changes, flags } = updateEntry(entry, nameOnly('NeurIPS 2026'));
+    expect(changes).toEqual([]);
+    expect(flags).toEqual([]);
+  });
 });
 
 describe('draftEntry', () => {
@@ -196,5 +242,27 @@ describe('draftEntry', () => {
     expect(entry.end).toBeUndefined();
     expect(entry.date).toBeUndefined();
     expect(flags.some((f) => f.includes('2025') && f.includes('2027'))).toBe(true);
+  });
+
+  it('takes the source full_name with the edition year stripped', () => {
+    const prev = { ...sydneyEntry(), title: 'CVPR', full_name: 'Conference on Computer Vision and Pattern Recognition' };
+    const facts = { ...neuripsFacts(), fullName: 'Conference on Computer Vision and Pattern Recognition 2027' };
+    const { entry, flags } = draftEntry(prev, facts, 2027);
+    expect(entry.full_name).toBe('Conference on Computer Vision and Pattern Recognition');
+    expect(flags.some((f) => f.includes('full_name'))).toBe(false);
+  });
+
+  it('keeps the previous full_name and flags it when the source name is only the title', () => {
+    const prev = sydneyEntry();
+    const { entry, flags } = draftEntry(prev, { ...neuripsFacts(), fullName: 'NeurIPS 2027' }, 2027);
+    expect(entry.full_name).toBe('40th Annual Conference on Neural Information Processing Systems');
+    expect(flags).toContain('full_name kept from neuripssy26 (the source reports "NeurIPS 2027"); check its edition ordinal');
+  });
+
+  it('flags a full_name cloned without any source name', () => {
+    const prev = sydneyEntry();
+    const { entry, flags } = draftEntry(prev, { ...neuripsFacts(), fullName: null }, 2027);
+    expect(entry.full_name).toBe('40th Annual Conference on Neural Information Processing Systems');
+    expect(flags).toContain('full_name kept from neuripssy26 (the source has none); check its edition ordinal');
   });
 });

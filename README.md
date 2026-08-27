@@ -67,9 +67,11 @@ flowchart TB
 ```
 
 The merge step is deliberately narrow. It writes only factual fields (`deadline`, `abstract_deadline`,
-`full_name`, `place`, `start`, `end`, `date`) and never touches curated ones like `sub`, `note` or `link`.
+`place`, `start`, `end`, `date`) and never touches curated ones like `sub`, `note` or `link`.
 Anything a venue's config pins with `sync_pin` is left alone, and a disagreement is reported in the PR body
-rather than overwritten.
+rather than overwritten. `full_name` is only filled in when an entry has none or a new edition is
+drafted, with any trailing year or acronym stripped; an existing one is never rewritten, and a source
+that names the conference differently is reported instead.
 
 ## Quickstart
 
@@ -139,8 +141,8 @@ When a venue moves its dates page (they love doing this every year), a fallback 
 fixes `scripts/sync-llm/venues.json` in the same PR.
 
 To run it locally, put `OPENAI_API_KEY=...` in `.env.local`. `--venue "<title>"` syncs a single venue,
-`--dry-run` writes nothing. If a synced value keeps coming out wrong, pin it with `sync_pin: [full_name]` and
-both syncs will leave that field alone.
+`--dry-run` writes nothing. If a synced value keeps coming out wrong, pin it with `sync_pin: [place]` (or
+`deadline`, `start`, `end`, `date`, `abstract_deadline`) and both syncs will leave that field alone.
 
 ## Stack
 

@@ -1,13 +1,18 @@
 /**
  * Merge rules shared by every sync: decides what a source may write into a
  * conference entry. Only "factual" fields are ever touched (deadline,
- * abstract_deadline, full_name, place, start, end, date); curated fields (sub,
- * type, note, link, paperslink, id, timezone, deadline_status, hindex, pwclink)
- * are protected by construction because they are never passed to the setter.
+ * abstract_deadline, place, start, end, date, and full_name when the entry has
+ * none); curated fields (sub, type, note, link, paperslink, id, timezone,
+ * deadline_status, hindex, pwclink) are protected by construction because they
+ * are never passed to the setter.
  * An entry can also pin individual factual fields via `sync_pin` (a list of
  * field names) when a curated value should win over the source, e.g. a venue
  * whose announced deadline differs from the portal cutoff; pinned fields are
  * never written, and any divergence is flagged in the report instead.
+ *
+ * full_name passes through the gate in names.js and is only filled when
+ * missing or drafted; a curated one is kept, and flagged when the source's
+ * core name differs.
  *
  * Sources hand in a `facts` object: {fullName, location, startIso,
  * abstractDeadline, deadline}, with the deadlines as Luxon UTC instants.
@@ -15,10 +20,11 @@
  * scripts/sync-openreview/facts.js and scripts/sync-llm/facts.js).
  */
 import { toZoneString, formatDateRange, nextId, inferEndDate } from './dates.js';
+import { cleanFullName, sameConferenceName } from './names.js';
 
 /** Fields a sync may write into an entry, i.e. the ones `sync_pin` accepts. */
 export const SYNC_PINNABLE_FIELDS = [
-  'deadline', 'abstract_deadline', 'full_name', 'place', 'start', 'end', 'date',
+  'deadline', 'abstract_deadline', 'place', 'start', 'end', 'date',
 ];
 
 /**
@@ -57,7 +63,12 @@ export function updateEntry(entry, facts, { deadlinesOnly = false } = {}) {
   set('abstract_deadline', facts.abstractDeadline && toZoneString(facts.abstractDeadline, entry.timezone));
 
   if (!deadlinesOnly) {
-    set('full_name', facts.fullName);
+    const fullName = cleanFullName(facts.fullName, entry);
+    if (!entry.full_name) {
+      set('full_name', fullName);
+    } else if (fullName && !sameConferenceName(entry.full_name, fullName)) {
+      flags.push(`${entry.id}: full_name kept as "${entry.full_name}"; source names it "${fullName}"`);
+    }
     set('place', facts.location);
     if (facts.startIso && facts.startIso !== entry.start) {
       const startYear = Number(facts.startIso.slice(0, 4));
@@ -99,7 +110,8 @@ const DRAFT_DROPPED_FIELDS = ['note', 'paperslink', 'deadline_status', 'sync_pin
  * Draft a new edition by cloning the previous one and overwriting it with
  * facts. Curated fields (sub, type, timezone, link) carry over from the clone;
  * edition-specific fields (note, paperslink, deadline_status) are dropped; the
- * end date is inferred from the previous edition's duration and flagged.
+ * end date is inferred from the previous edition's duration and flagged; the
+ * full_name comes from the source when it passes the gate, else from the clone.
  * @param {object} prevEntry The venue's latest existing entry (not mutated).
  * @param {object} facts Facts from the source's own facts builder.
  * @param {number} year Edition year of the draft.
@@ -113,7 +125,13 @@ export function draftEntry(prevEntry, facts, year) {
   entry.year = year;
   entry.id = nextId(prevEntry.id, year);
 
-  if (facts.fullName) entry.full_name = facts.fullName;
+  const fullName = cleanFullName(facts.fullName, entry);
+  if (fullName) {
+    entry.full_name = fullName;
+  } else {
+    const why = facts.fullName ? `the source reports "${facts.fullName}"` : 'the source has none';
+    flags.push(`full_name kept from ${prevEntry.id} (${why}); check its edition ordinal`);
+  }
   if (facts.location) entry.place = facts.location;
   else flags.push(`place kept from ${prevEntry.id}; the source has none yet`);
 
