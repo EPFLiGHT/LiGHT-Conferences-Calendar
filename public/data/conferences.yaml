@@ -1094,6 +1094,7 @@
   sub: Health AI
   type: conference
   deadline: 2027-04-16 23:59
+  abstract_deadline: 2027-02-28 23:59
 
 - title: AMIA
   year: 2026
