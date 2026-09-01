@@ -208,6 +208,7 @@
   place: San Francisco, CA, USA
   sub: ML
   type: conference
+  deadline: 2026-09-18 23:59
 
 - title: EACL
   year: 2026
@@ -247,7 +248,7 @@
   abstract_deadline: 2026-07-29 23:59
   deadline: 2026-08-06 00:00
   timezone: UTC-12
-  place: Boston, Massachusetts, USA
+  place: Northeastern University, Boston
   date: November 20-22, 2026
   start: '2026-11-20'
   end: '2026-11-22'
@@ -780,12 +781,12 @@
   id: mlhc26
   full_name: Machine Learning for Healthcare
   link: https://www.mlforhc.org/2026-conference
-  deadline: 2026-04-17 23:59
+  deadline: 2026-04-18 00:59
   timezone: UTC-12
-  place: Baltimore, Maryland, USA
-  date: August 13-14, 2026
-  start: '2026-08-13'
-  end: '2026-08-14'
+  place: Baltimore, Maryland, United States
+  date: Aug 12-13, 2026
+  start: '2026-08-12'
+  end: '2026-08-13'
   paperslink: https://www.mlforhc.org/paper-submission
   sub: Health AI
   type: conference
