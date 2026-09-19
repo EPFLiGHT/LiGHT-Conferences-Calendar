@@ -71,7 +71,7 @@ interface ModalShellProps {
 
 /**
  * Shared modal scaffolding: portal, dimmed backdrop, blur, Escape-to-close,
- * body scroll-lock, backdrop-click-to-close, and the white card with its top
+ * page scroll-lock, backdrop-click-to-close, and the white card with its top
  * accent rule. Single source for modal behavior so ConferenceModal and
  * SpeakerModal cannot drift.
  */
@@ -95,11 +95,28 @@ export default function ModalShell({
     };
 
     document.addEventListener('keydown', handleEscapeKey);
-    document.body.style.overflow = 'hidden';
+
+    // html has overflow-x: clip, so body's overflow never reaches the viewport.
+    const html = document.documentElement;
+    const { body } = document;
+    const previous = {
+      htmlOverflowY: html.style.overflowY,
+      bodyOverflowY: body.style.overflowY,
+      bodyPaddingRight: body.style.paddingRight,
+    };
+    const scrollbarWidth = window.innerWidth - html.clientWidth;
+
+    html.style.overflowY = 'hidden';
+    body.style.overflowY = 'hidden';
+    if (scrollbarWidth > 0) {
+      body.style.paddingRight = `${scrollbarWidth}px`;
+    }
 
     return () => {
       document.removeEventListener('keydown', handleEscapeKey);
-      document.body.style.overflow = 'unset';
+      html.style.overflowY = previous.htmlOverflowY;
+      body.style.overflowY = previous.bodyOverflowY;
+      body.style.paddingRight = previous.bodyPaddingRight;
     };
   }, []);
 

@@ -461,3 +461,61 @@
   end: "2026-11-13"
   sub: Global Health
   type: summit
+
+- title: IPHCC
+  year: 2026
+  id: iphcc26
+  full_name: Second International Primary Health Care Conference
+  link: https://dailynews.co.tz/tanzania-to-host-second-international-primary-health-care-conference-in-arusha/
+  timezone: Africa/Dar_es_Salaam
+  place: "Arusha, Tanzania"
+  date: "September 9-11, 2026"
+  start: "2026-09-09"
+  end: "2026-09-11"
+  sub: Global Health
+  type: summit
+  note: "Hosted by TAMISEMI with the Ministry of Health; no official conference website published."
+
+- title: WHO Regional Committee for Africa
+  year: 2026
+  id: whoafrorc26
+  deadline_status: attendance
+  full_name: Seventy-sixth session of the WHO Regional Committee for Africa (RC76)
+  link: https://www.afro.who.int/about-us/governance/sessions/seventy-sixth-session-who-regional-committee-africa
+  timezone: Africa/Addis_Ababa
+  place: "Addis Ababa, Ethiopia"
+  date: "August 25-28, 2026"
+  start: "2026-08-25"
+  end: "2026-08-28"
+  sub: Global Health
+  type: summit
+  note: "Ministerial dialogue preceded the session on August 24; RC77 host and dates not yet announced."
+
+- title: DIHAD
+  year: 2027
+  id: dihad27
+  deadline_status: attendance
+  full_name: Dubai International Humanitarian Aid & Development Conference & Exhibition
+  link: https://dihad.org/event/
+  timezone: Asia/Dubai
+  place: "Dubai, United Arab Emirates"
+  date: "May 4-6, 2027"
+  start: "2027-05-04"
+  end: "2027-05-06"
+  sub: Global Health
+  type: summit
+  note: "Dates per dihad.org/event; the site homepage still lists the past August 2026 edition."
+
+- title: Digital Health Show
+  year: 2027
+  id: digitalhealthshow27
+  deadline_status: attendance
+  full_name: Digital Health Show (10-Year Anniversary Edition)
+  link: https://digitalhealthshow.com/
+  timezone: Africa/Johannesburg
+  place: "Johannesburg, South Africa"
+  date: "March 17-18, 2027"
+  start: "2027-03-17"
+  end: "2027-03-18"
+  sub: Health AI
+  type: summit
