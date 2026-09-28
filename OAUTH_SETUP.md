@@ -4,7 +4,7 @@ How to configure the Slack bot for multi-workspace installs.
 
 With OAuth, anyone can add the bot to their workspace through an "Add to Slack" button, and the bot keeps track of each workspace's token.
 
-You'll need a deployed app (Vercel), access to the Slack app config at [api.slack.com/apps](https://api.slack.com/apps), and Vercel KV set up for token storage.
+You'll need a deployed app (Vercel), access to the Slack app config at [api.slack.com/apps](https://api.slack.com/apps), and an Upstash Redis database (from the Vercel Marketplace) for token storage.
 
 ## 1. Configure OAuth in the Slack app
 
@@ -46,7 +46,7 @@ CONFERENCES_DATA_URL=https://your-app-domain.vercel.app
 # Channel reminders: bot tracks channels automatically when added
 CHANNEL_REMINDER_DAYS=30,7,3
 
-# Vercel KV
+# Upstash Redis (or UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN)
 KV_URL=rediss://...
 KV_REST_API_URL=https://...
 KV_REST_API_TOKEN=...
@@ -100,7 +100,7 @@ When someone installs the bot:
 2. Slack hits `/api/slack/install`, then redirects them to authorize
 3. Slack redirects back to `/api/slack/oauth/callback` with a code
 4. The app exchanges the code for a bot token
-5. The token is stored in Vercel KV under `slack:team:{teamId}:token`
+5. The token is stored in Upstash Redis under `slackbot:team:{teamId}:token`
 
 For each incoming request, middleware reads `team_id` from the payload and `slackClient.ts` looks up that workspace's token. If there's no stored token, it falls back to `SLACK_BOT_TOKEN`.
 
@@ -110,11 +110,11 @@ When a workspace uninstalls the app, Slack sends an `app_uninstalled` (or `token
 
 **"Invalid redirect_uri"**: the URL in Slack settings must match exactly, including `/api/slack/oauth/callback`.
 
-**"No token found for team"**: check Vercel KV is connected, confirm the team finished the OAuth flow, and check logs for storage errors.
+**"No token found for team"**: check the Upstash Redis integration is connected, confirm the team finished the OAuth flow, and check logs for storage errors.
 
 **Commands not working after OAuth**: make sure the slash command URLs point at the deployment (not localhost) and that signature verification is still passing.
 
-**Multiple installs misbehaving**: check that `teamId` is being extracted correctly and that KV is storing tokens under the expected key.
+**Multiple installs misbehaving**: check that `teamId` is being extracted correctly and that Redis is storing tokens under the expected key.
 
 ## Migrating from a single-workspace install
 
@@ -122,4 +122,4 @@ When a workspace uninstalls the app, Slack sends an `app_uninstalled` (or `token
 2. Add `SLACK_CLIENT_ID` and `SLACK_CLIENT_SECRET`.
 3. Deploy.
 4. The original workspace keeps working via the token fallback.
-5. Optionally, re-install the original workspace via OAuth so its token lives in KV too.
+5. Optionally, re-install the original workspace via OAuth so its token lives in Redis too.

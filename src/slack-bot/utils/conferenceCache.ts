@@ -1,9 +1,9 @@
 /**
  * Conference Data Cache
- * Caches conference data in Vercel KV to reduce YAML parsing overhead
+ * Caches conference data in Upstash Redis to reduce YAML parsing overhead
  */
 
-import { kv } from '@vercel/kv';
+import { kv } from '../lib/kv';
 import type { Conference } from '@/types/conference';
 import { parseConferences } from '@/utils/parser';
 import { DATA_FILES } from '@/constants/dataFiles';
@@ -19,18 +19,15 @@ const CACHE_TIMESTAMP_KEY = kvKeys.cache.conferencesTimestamp;
  */
 export async function getConferences(): Promise<Conference[]> {
   try {
-    // Try cache first
     const cached = await kv.get<Conference[]>(CACHE_KEY);
     if (cached && cached.length > 0) {
       logger.debug('Conferences loaded from cache', { count: cached.length });
       return cached;
     }
 
-    // Cache miss - fetch and parse YAML
     logger.info('Cache miss - fetching conferences from YAML');
     const conferences = await fetchAndParseYAML();
 
-    // Cache the result
     await cacheConferences(conferences);
 
     return conferences;

@@ -1,5 +1,5 @@
 /**
- * Centralized Vercel KV key builders for the Slack bot.
+ * Centralized Redis key builders for the Slack bot.
  *
  * All keys live under the `slackbot:` root so the Upstash/Vercel data
  * browser groups them together and supports prefix filtering.

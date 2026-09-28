@@ -3,7 +3,7 @@
  */
 
 /**
- * User preferences stored in Vercel KV
+ * User preferences stored in Upstash Redis
  */
 export interface UserPreferences {
   slackUserId: string;
@@ -18,7 +18,7 @@ export interface UserPreferences {
 }
 
 /**
- * Channel subscription stored in Vercel KV
+ * Channel subscription stored in Upstash Redis
  * Tracks which channels should receive automated deadline reminders
  */
 export interface ChannelSubscription {

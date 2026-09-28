@@ -95,7 +95,7 @@ Notes:
 - `CRON_SECRET` authenticates the cron jobs.
 - `CHANNEL_REMINDER_DAYS` sets which days before a deadline channel reminders fire (defaults to `30,7,3`).
 
-Then create a Vercel KV (Redis) database, name it `conferences-slack-bot-kv`, and link it to the project. Credentials are injected automatically.
+Then add an Upstash Redis database from the Vercel Marketplace, name it `conferences-slack-bot-kv`, and link it to the project. Credentials are injected automatically.
 
 After the first deploy, update the request URLs in the Slack app config to point at your Vercel URL.
 
@@ -127,7 +127,7 @@ cp .env.example .env.local   # fill in credentials
 pnpm dev
 ```
 
-For `.env.local` you'll need the same variables as production. For `CONFERENCES_DATA_URL` and `APP_URL`, use `http://localhost:3000`. You'll also need Vercel KV credentials (pull them from the Vercel dashboard or Upstash).
+For `.env.local` you'll need the same variables as production. For `CONFERENCES_DATA_URL` and `APP_URL`, use `http://localhost:3000`. You'll also need the Redis credentials, `KV_REST_API_URL` and `KV_REST_API_TOKEN` (pull them from the Vercel dashboard or the Upstash console).
 
 To let Slack reach your local server:
 
@@ -183,7 +183,7 @@ Vercel logs: `vercel logs --follow`. Slack event logs are under your app at api.
 
 ## Cost
 
-Fits in the free tiers for Vercel, Vercel KV, and Slack. Fine for small to medium teams.
+Fits in the free tiers for Vercel, Upstash Redis, and Slack. Fine for small to medium teams.
 
 ## License
 

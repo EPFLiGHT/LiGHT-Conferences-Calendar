@@ -1,10 +1,9 @@
 /**
  * User Preferences Management
- * Uses Vercel KV (Redis) for storing user settings
+ * Uses Upstash Redis for storing user settings
  */
 
-// @ts-ignore - @vercel/kv will be installed when deploying to Vercel
-import { kv } from '@vercel/kv';
+import { kv } from './kv';
 import type { UserPreferences } from '@/types/slack';
 import { logger } from '../utils/logger';
 import { NOTIFICATION_CONFIG } from '../config/constants';
@@ -90,17 +89,14 @@ export async function enableNotifications(
 ): Promise<UserPreferences> {
   const existing = await getUserPreferences(userId);
 
-  // If user is enabling notifications (not already enabled), reset reminderDays to defaults
   const updates: Partial<Omit<UserPreferences, 'slackUserId' | 'createdAt'>> = {
     notificationsEnabled: true
   };
 
-  // Store teamId for multi-workspace support
   if (teamId) {
     updates.teamId = teamId;
   }
 
-  // Reset reminderDays to defaults if user was previously disabled or is new
   if (!existing || !existing.notificationsEnabled) {
     updates.reminderDays = [...NOTIFICATION_CONFIG.DEFAULT_REMINDER_DAYS];
   }

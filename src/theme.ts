@@ -132,29 +132,33 @@ export const system = createSystem(defaultConfig, defineConfig({
       transform: 'scale(0.98)',
     },
 
-    /* FullCalendar Custom Styles */
-    '.fc': {
+    /* FullCalendar v7 (classic theme). Classes are attached through the *Class
+       props in src/app/calendar/page.tsx. The theme stylesheet is unlayered and
+       beats Chakra's layered globalCss, so contested properties need !important. */
+    '.cal': {
       fontFamily: 'inherit',
       fontVariantNumeric: 'tabular-nums',
+      '--fc-classic-primary': brand(1),
+      '--fc-classic-today': brand(0.04),
+      '--fc-classic-foreground': '#041634',
     },
 
     /* Toolbar buttons */
-    '.fc .fc-button': {
+    '.cal .cal-button': {
       background: 'white !important',
-      borderColor: `${brand(0.35)} !important`,
-      textTransform: 'uppercase',
-      fontWeight: '600',
-      letterSpacing: '0.16em',
-      fontSize: '0.7rem',
-      padding: '0.4rem 0.85rem',
-      borderRadius: '2px',
+      border: `1px solid ${brand(0.35)} !important`,
       color: '{colors.brand.500} !important',
+      fontSize: '1rem !important',
+      lineHeight: '1.5 !important',
+      letterSpacing: '0.16em !important',
+      textTransform: 'lowercase',
+      padding: '0.4em 0.65em !important',
       outline: 'none !important',
       boxShadow: 'none !important',
       transition: 'all 0.18s ease',
     },
 
-    '.fc .fc-button:hover': {
+    '.cal .cal-button:hover': {
       background: '{colors.brand.50} !important',
       borderColor: '{colors.brand.500} !important',
       color: '{colors.brand.500} !important',
@@ -162,69 +166,72 @@ export const system = createSystem(defaultConfig, defineConfig({
       boxShadow: 'none !important',
     },
 
-    '.fc .fc-button:active': {
+    '.cal .cal-button:active': {
       background: '{colors.brand.50} !important',
       transform: 'none !important',
       boxShadow: 'none !important',
     },
 
-    '.fc .fc-button:focus, .fc .fc-button:focus-visible': {
+    '.cal .cal-button:focus, .cal .cal-button:focus-visible': {
       outline: 'none !important',
       boxShadow: 'none !important',
     },
 
-    '.fc .fc-button-active': {
+    '.cal .cal-button-active': {
       background: '{colors.brand.500} !important',
       borderColor: '{colors.brand.500} !important',
       color: 'white !important',
       boxShadow: 'none !important',
     },
 
-    '.fc .fc-button-active:hover': {
+    '.cal .cal-button-active:hover': {
       background: '{colors.brand.700} !important',
       borderColor: '{colors.brand.700} !important',
       color: 'white !important',
     },
 
-    '.fc .fc-button-active:focus, .fc .fc-button-active:focus-visible': {
+    '.cal .cal-button-active:focus, .cal .cal-button-active:focus-visible': {
       outline: 'none !important',
       boxShadow: 'none !important',
       background: '{colors.brand.500} !important',
       borderColor: '{colors.brand.500} !important',
     },
 
-    '.fc .fc-button:disabled': {
-      opacity: '0.35',
-      cursor: 'not-allowed',
-    },
-
     /* Title */
-    '.fc .fc-toolbar-title': {
-      fontSize: '1.5rem',
-      fontWeight: '600',
+    '.cal .cal-title': {
+      fontSize: '1.75rem !important',
+      fontWeight: '600 !important',
+      lineHeight: '1.5 !important',
       color: '{colors.brand.500}',
       letterSpacing: '-0.015em',
     },
 
-    /* Grid borders */
-    '.fc-theme-standard td, .fc-theme-standard th': {
-      borderColor: brand(0.14),
+    /* Column headers */
+    '.cal .cal-day-header': {
+      background: 'white',
     },
 
-    '.fc-theme-standard .fc-scrollgrid': {
-      borderColor: brand(0.22),
+    '.cal .cal-day-header-text': {
+      color: '{colors.brand.500}',
+      fontWeight: '700',
+      fontSize: '0.7rem !important',
+      lineHeight: '1.5 !important',
+      letterSpacing: '0.18em !important',
+      textTransform: 'uppercase',
+      padding: '2px 4px !important',
+      margin: '0 !important',
     },
 
     /* Day numbers */
-    '.fc .fc-daygrid-day-number': {
+    '.cal .cal-day-number': {
       color: '{colors.brand.400}',
-      padding: '0.5rem',
-      fontSize: '0.8rem',
+      fontSize: '0.8rem !important',
+      lineHeight: '1.5 !important',
       fontWeight: '600',
       fontVariantNumeric: 'tabular-nums',
     },
 
-    '.fc .fc-day-today .fc-daygrid-day-number': {
+    '.cal .cal-day-number-today': {
       background: '{colors.brand.500}',
       color: 'white',
       borderRadius: '2px',
@@ -233,108 +240,99 @@ export const system = createSystem(defaultConfig, defineConfig({
       display: 'inline-flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '0 0.4rem',
-    },
-
-    /* Column headers */
-    '.fc .fc-col-header-cell-cushion': {
-      color: '{colors.brand.500}',
-      fontWeight: '700',
-      fontSize: '0.7rem',
-      letterSpacing: '0.18em',
-      textTransform: 'uppercase',
-      padding: '0.7rem 0.5rem',
-    },
-
-    '.fc .fc-col-header-cell': {
-      background: 'white',
-      borderColor: brand(0.22),
-      borderBottomWidth: '2px',
-    },
-
-    /* Today background */
-    '.fc .fc-day-today': {
-      background: `${brand(0.04)} !important`,
+      padding: '4px !important',
     },
 
     /* Events */
-    '.fc .fc-event': {
+    '.cal .cal-event': {
       cursor: 'pointer',
-      borderRadius: '2px',
-      padding: '2px 6px',
-      fontSize: '0.78rem',
       fontWeight: '500',
-      border: '1px solid transparent',
       transition: 'opacity 0.18s ease',
     },
 
-    '.fc .fc-event:hover': {
-      transform: 'none',
+    '.cal .cal-event:hover': {
       opacity: '0.85',
-      boxShadow: 'none',
     },
 
-    '.fc .fc-event-time': {
-      display: 'none !important',
+    /* Month bars, all-day bars and week-view blocks (not list rows) */
+    '.cal .cal-block-event': {
+      fontSize: '0.85rem !important',
+      lineHeight: '1.5 !important',
+      padding: '2px 6px !important',
+      border: '1px solid var(--fc-event-color) !important',
+      borderRadius: '3px !important',
+      marginBottom: '4px !important',
     },
 
-    '.fc-timegrid-event .fc-event-time': {
-      display: 'block !important',
+    '.cal .cal-event-inner': {
+      fontSize: 'inherit !important',
+      lineHeight: '1.5 !important',
+    },
+
+    '.cal .cal-column-event-text': {
+      fontSize: '0.85em !important',
+      lineHeight: '1.5 !important',
+    },
+
+    '.cal .cal-column-event-time': {
       fontWeight: '600',
       fontVariantNumeric: 'tabular-nums',
     },
 
     /* List view */
-    '.fc-list-day-cushion, .fc-list-day-cushion.fc-cell-shaded': {
+    '.cal .cal-list-day': {
       background: 'white !important',
-      borderTop: `1px solid ${brand(0.22)}`,
-      borderBottom: `1px solid ${brand(0.14)}`,
+      borderTop: `1px solid ${brand(0.22)} !important`,
+      borderBottom: `1px solid ${brand(0.14)} !important`,
     },
 
-    '.fc-list-day-text, .fc-list-day-side-text': {
+    '.cal .cal-list-day-text': {
       color: '{colors.brand.500}',
       fontWeight: '700',
-      fontSize: '0.7rem',
-      letterSpacing: '0.18em',
+      fontSize: '0.7rem !important',
+      lineHeight: '1.5 !important',
+      letterSpacing: '0.18em !important',
       textTransform: 'uppercase',
       textDecoration: 'none !important',
+      padding: '8px 14px !important',
     },
 
-    '.fc-list-event:hover td': {
+    '.cal .cal-list-event': {
+      fontSize: '0.78rem !important',
+      padding: '8px 14px !important',
+      borderRadius: '0 !important',
+      borderBottom: '1px solid var(--fc-classic-border)',
+    },
+
+    '.cal .cal-list-event:hover': {
       background: `${brand(0.04)} !important`,
     },
 
-    '.fc-list-event-time, .fc-list-event-title': {
+    '.cal .cal-list-event-text': {
+      fontSize: 'inherit !important',
+      lineHeight: '1.5 !important',
       fontVariantNumeric: 'tabular-nums',
+    },
+
+    '.cal .cal-list-event-time': {
+      width: '7em !important',
     },
 
     /* Mobile responsive */
     '@media screen and (max-width: 768px)': {
-      '.fc .fc-toolbar': {
-        flexDirection: 'column',
-        gap: '0.75rem',
-        alignItems: 'stretch',
+      '.cal .cal-toolbar': {
+        flexDirection: 'column !important',
+        gap: '0.75rem !important',
+        alignItems: 'stretch !important',
       },
 
-      '.fc .fc-toolbar-chunk': {
-        display: 'flex',
-        justifyContent: 'center',
-      },
-
-      '.fc .fc-toolbar-title': {
-        fontSize: '1.25rem',
-      },
-
-      '.fc .fc-button': {
-        padding: '0.375rem 0.75rem',
-        fontSize: '0.875rem',
+      '.cal .cal-toolbar-section': {
+        display: 'flex !important',
+        justifyContent: 'center !important',
       },
     } as any,
   },
 }))
-
-// Plain-value tokens for inline usage (e.g. inside SVG icon props
-// or style strings that can't reference Chakra tokens).
 
 // Plain-value exports for contexts that can't reference Chakra tokens
 // (SVG props, gradient/shadow strings). All derived from BRAND_RGB above so the
