@@ -11,6 +11,7 @@
   end: "2027-04-08"
   sub: Health AI
   type: summit
+  note: Call for posters closes Oct 11, 2026, 5 PM EST.
 
 - title: HLTH
   year: 2026
@@ -54,6 +55,21 @@
   sub: Global Health
   type: summit
 
+- title: World Health Assembly
+  year: 2027
+  id: worldhealthassembly27
+  deadline_status: attendance
+  full_name: Eightieth World Health Assembly (WHA80)
+  link: https://www.who.int/about/governance/world-health-assembly
+  timezone: Europe/Zurich
+  place: "Geneva, Switzerland"
+  date: "May 23-30, 2027"
+  start: "2027-05-23"
+  end: "2027-05-30"
+  sub: Global Health
+  type: summit
+  note: Closes no later than May 30, 2027.
+
 - title: AI4Good
   year: 2026
   id: ai4good26
@@ -65,6 +81,20 @@
   date: "July 7-10, 2026"
   start: "2026-07-07"
   end: "2026-07-10"
+  sub: AI
+  type: summit
+
+- title: AI4Good
+  year: 2027
+  id: ai4good27
+  deadline_status: attendance
+  full_name: AI for Good Global Summit
+  link: https://aiforgood.itu.int/summit27/
+  timezone: America/New_York
+  place: Geneva, Switzerland
+  date: "June 21-24, 2027"
+  start: "2027-06-21"
+  end: "2027-06-24"
   sub: AI
   type: summit
 
@@ -236,6 +266,20 @@
   sub: Global Health
   type: summit
 
+- title: EDCTP Forum
+  year: 2027
+  id: edctpforum27
+  full_name: European & Developing Countries Clinical Trials Partnership Forum
+  link: https://edctpforum.eu/
+  abstract_deadline: "2026-09-02 17:00"
+  timezone: Europe/Brussels
+  place: Madrid, Spain
+  date: April 5-9, 2027
+  start: "2027-04-05"
+  end: "2027-04-09"
+  sub: Global Health
+  type: summit
+
 - title: World Health Assembly
   year: 2025
   id: worldhealthassembly25
@@ -287,9 +331,9 @@
   deadline: "2026-06-15 23:59"
   timezone: UTC
   place: Dar es Salaam, Tanzania
-  date: October 7-9, 2026
-  start: "2026-10-07"
-  end: "2026-10-09"
+  date: October 5-7, 2026
+  start: "2026-10-05"
+  end: "2026-10-07"
   sub: Global Health
   type: summit
 
@@ -307,6 +351,22 @@
   paperslink: "https://2026.appliedmldays.org/media-90-posters"
   sub: ML
   type: summit
+
+- title: AMLD
+  year: 2027
+  id: amld27
+  full_name: AMLD Intelligence Summit
+  link: "https://www.appliedmldays.org/amld/2027/overview"
+  deadline: "2026-09-29 23:59"
+  timezone: Europe/Zurich
+  place: "Lausanne, Switzerland"
+  date: "Mar 9-11, 2027"
+  start: "2027-03-09"
+  end: "2027-03-11"
+  paperslink: "https://www.appliedmldays.org/collaborate/call-for-posters"
+  sub: ML
+  type: summit
+  note: Poster deadline; track proposals close Dec 1, 2026.
 
 - title: Africa Health ExCon
   year: 2026
@@ -363,6 +423,7 @@
   end: "2026-08-27"
   sub: Global Health
   type: summit
+  note: In-person 2026 edition cancelled; replaced by a virtual session series.
 
 - title: WCPH
   year: 2026
@@ -389,6 +450,20 @@
   date: "September 16-18, 2026"
   start: "2026-09-16"
   end: "2026-09-18"
+  sub: Global Health
+  type: summit
+
+- title: WHX Nairobi
+  year: 2027
+  id: whxnairobi27
+  deadline_status: attendance
+  full_name: World Health Expo Nairobi (formerly Medic East Africa)
+  link: https://www.worldhealthexpo.com/events/healthcare/nairobi/
+  timezone: Africa/Nairobi
+  place: "Nairobi, Kenya"
+  date: "September 15-17, 2027"
+  start: "2027-09-15"
+  end: "2027-09-17"
   sub: Global Health
   type: summit
 

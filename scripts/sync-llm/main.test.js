@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { DateTime } from 'luxon';
-import { syncVenue, urlNeedsUpdate, renderExtraSections } from './main.js';
+import { syncVenue, urlNeedsUpdate, renderExtraSections, nextHome } from './main.js';
 import { createBudget } from './budget.js';
 
 const TODAY = DateTime.fromISO('2026-07-08T12:00:00Z', { zone: 'utc' });
@@ -59,6 +59,36 @@ describe('syncVenue tiering', () => {
     expect(out.tier).toBe(0);
     expect(out.outcome).toBe('submitted');
     expect(out.editions[0].deadlines).toHaveLength(1);
+  });
+
+  it('reads the configured page moved to the next year first, where a site that moved on keeps its new dates', async () => {
+    const out = await syncVenue(
+      ctx({
+        fetcher: fetcherFor({
+          'https://hc.example/2026/dates': 'Important dates. Paper submission deadline: May 6, 2026.',
+          'https://hc.example/2027/dates': GOOD_PAGE,
+        }),
+        llm: llmReturning({ output: [], output_text: JSON.stringify(RESULT), usage: {} }),
+      }),
+      'HealthConf',
+      { url: 'https://hc.example/2026/dates' },
+    );
+    expect(out.tier).toBe(0);
+    expect(out.sourceUrl).toBe('https://hc.example/2027/dates');
+  });
+
+  it('falls back to the configured page when the next year has none', async () => {
+    const out = await syncVenue(
+      ctx({
+        fetcher: fetcherFor({ 'https://hc.example/2027/dates-old': GOOD_PAGE }),
+        llm: llmReturning({ output: [], output_text: JSON.stringify(RESULT), usage: {} }),
+      }),
+      'HealthConf',
+      { url: 'https://hc.example/2027/dates-old' },
+    );
+    expect(out.tier).toBe(0);
+    expect(out.sourceUrl).toBe('https://hc.example/2027/dates-old');
+    expect(out.flags).toEqual([]);
   });
 
   it('escalates to tier 1 when the configured URL 404s', async () => {
@@ -186,6 +216,19 @@ describe('syncVenue tiering', () => {
     // reason as tier 1's stale "budget turns".
     expect(respondCalls).toBe(3);
     expect(out.reason).toBe('still nothing');
+  });
+});
+
+describe('nextHome', () => {
+  const fetcher = { fetchPage: async (url) => (url === 'https://hc.example/2027/' ? { ok: true, finalUrl: url } : { ok: false }) };
+
+  it('moves a year-specific home to the year the deadlines were found for, once it loads', async () => {
+    expect(await nextHome({ home: 'https://hc.example/2026/' }, 'https://hc.example/2027/dates', fetcher)).toBe('https://hc.example/2027/');
+  });
+
+  it('keeps an evergreen home, or one whose new-year page does not load', async () => {
+    expect(await nextHome({ home: 'https://hc.example/' }, 'https://hc.example/2027/dates', fetcher)).toBeNull();
+    expect(await nextHome({ home: 'https://hc.example/2025/' }, 'https://hc.example/2026/dates', fetcher)).toBeNull();
   });
 });
 

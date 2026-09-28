@@ -2,9 +2,10 @@
  * Entry point for `pnpm sync:llm`, run monthly by sync-llm.yml. For each venue
  * in venues.json it tries the cheapest route first and only escalates when the
  * cheaper one comes back without evidence-backed deadlines: read the configured
- * dates page (tier 0), let the agent follow links from the venue homepage
- * (tier 1), then let it search the web as well (tier 2). Whatever survives
- * validation is merged into conferences.yaml.
+ * dates page, first as it would be for the next edition's year (tier 0), let
+ * the agent follow links from the venue homepage (tier 1), then let it search
+ * the web as well (tier 2). Whatever survives validation is merged into
+ * conferences.yaml.
  *
  * The report it prints lists every change, the page quote behind it, and the
  * tokens each venue cost. When $SYNC_REPORT_PATH is set the report is written
@@ -25,7 +26,8 @@ import { createBudget, createRunBudget } from './budget.js';
 import { extractFromPage } from './extract.js';
 import { validateEditions } from './facts.js';
 import { runAgent } from './agent.js';
-import { applyEditions } from './apply.js';
+import { applyEditions, resolveDraftLinks } from './apply.js';
+import { rollUrl, urlYear } from '../sync-shared/dates.js';
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.join(DIR, '../..');
@@ -33,8 +35,9 @@ const DATA_PATH = path.join(REPO_ROOT, 'public/data/conferences.yaml');
 const CONFIG_PATH = path.join(DIR, 'venues.json');
 const OPENREVIEW_CONFIG_PATH = path.join(DIR, '../sync-openreview/venues.json');
 
-const INPUT_PRICE_PER_M = 0.75;
-const OUTPUT_PRICE_PER_M = 4.5;
+// gpt-5.6-sol list prices, USD per million tokens.
+const INPUT_PRICE_PER_M = 5;
+const OUTPUT_PRICE_PER_M = 30;
 
 /**
  * Climb the tiers for one venue, stopping at the first that yields deadlines
@@ -59,6 +62,20 @@ export async function syncVenue(ctx, title, cfg) {
     const hasDeadlines = valid.some((e) => e.deadlines.length > 0);
     return hasDeadlines ? valid : null;
   };
+
+  // Try next year's version of the URL first: old edition pages stay up with stale dates.
+  const year = urlYear(cfg.url);
+  const nextUrl = year && year < today.year + 2 ? rollUrl(cfg.url, year, year + 1) : null;
+  if (nextUrl) {
+    const next = await fetcher.fetchPage(nextUrl);
+    if (next.ok && !next.tooShort) {
+      const result = await extractFromPage(llm, { venueTitle: title, pageText: next.text, url: nextUrl, today });
+      if (result?.page_has_dates) {
+        const valid = validate(result.editions, next.finalUrl);
+        if (valid) return { outcome: 'submitted', tier: 0, editions: valid, sourceUrl: next.finalUrl, flags };
+      }
+    }
+  }
 
   // Tier 0: guided extraction from the configured URL.
   const page = await fetcher.fetchPage(cfg.url);
@@ -116,6 +133,21 @@ export function urlNeedsUpdate(configuredUrl, sourceUrl) {
   } catch {
     return true;
   }
+}
+
+/**
+ * The venue home moved to the year the deadlines were found for, if that page
+ * loads, so the agent starts from the current edition. Exported for tests.
+ * @returns {Promise<string|null>} The new home, or null to keep the old one.
+ */
+export async function nextHome(cfg, sourceUrl, fetcher) {
+  const from = cfg.home ? urlYear(cfg.home) : null;
+  const to = urlYear(sourceUrl);
+  if (!from || !to || to <= from) return null;
+  const home = rollUrl(cfg.home, from, to);
+  if (!home) return null;
+  const page = await fetcher.fetchPage(home);
+  return page.ok ? home : null;
 }
 
 /** Exported for tests. */
@@ -241,12 +273,18 @@ async function main() {
       flags.push(`${title}: no deadlines found (${out.reason}); check the venue site and venues.json`);
       continue;
     }
+    const multiEntry = Boolean(cfg.multiEntry);
+    const links = await resolveDraftLinks({
+      entries, title, editions: out.editions, multiEntry, sourceUrl: out.sourceUrl, fetcher,
+    });
     const applied = applyEditions({
       entries,
       title,
       editions: out.editions,
-      multiEntry: Boolean(cfg.multiEntry),
+      multiEntry,
       sourceUrl: out.sourceUrl,
+      today,
+      links,
     });
     updates.push(...applied.updates);
     drafts.push(...applied.drafts);
@@ -257,6 +295,11 @@ async function main() {
       flags.push(`${title}: deadlines found at ${out.sourceUrl}, not the configured URL; venues.json updated`);
       cfg.url = out.sourceUrl;
       configChanged = true;
+      const home = await nextHome(cfg, out.sourceUrl, fetcher);
+      if (home) {
+        flags.push(`${title}: venue home moved to ${home}`);
+        cfg.home = home;
+      }
     }
   }
 

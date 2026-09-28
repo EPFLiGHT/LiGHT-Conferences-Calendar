@@ -54,21 +54,45 @@ describe('updateEntry', () => {
     expect(entry.full_name).toBe('40th Annual Conference on Neural Information Processing Systems');
   });
 
-  it('a moved start shifts end by the same delta and regenerates date', () => {
+  it('a moved start with a stated end rewrites start, end and date', () => {
     const entry = sydneyEntry();
-    const facts = { ...neuripsFacts(), startIso: '2026-12-08', deadline: null, abstractDeadline: null, fullName: null, location: null };
-    const { changes } = updateEntry(entry, facts);
+    const facts = { ...neuripsFacts(), startIso: '2026-12-08', endIso: '2026-12-13', deadline: null, abstractDeadline: null, fullName: null, location: null };
+    const { changes, flags } = updateEntry(entry, facts);
     expect(entry.start).toBe('2026-12-08');
-    expect(entry.end).toBe('2026-12-14');
-    expect(entry.date).toBe('Dec 8-14, 2026');
+    expect(entry.end).toBe('2026-12-13');
+    expect(entry.date).toBe('Dec 8-13, 2026');
     expect(changes.map((c) => c.field)).toEqual(['start', 'end', 'date']);
+    expect(flags).toEqual([]);
   });
 
-  it('flags the end-shift when a moved start shifts the end', () => {
+  // OpenReview states a start but never an end.
+  it('a moved start with no stated end leaves start, end and date alone and flags it', () => {
     const entry = sydneyEntry();
     const facts = { ...neuripsFacts(), startIso: '2026-12-08', deadline: null, abstractDeadline: null, fullName: null, location: null };
-    const { flags } = updateEntry(entry, facts);
-    expect(flags.some((f) => f.includes('neuripssy26') && f.includes('end shifted'))).toBe(true);
+    const { changes, flags } = updateEntry(entry, facts);
+    expect(entry.start).toBe('2026-12-06');
+    expect(entry.end).toBe('2026-12-12');
+    expect(entry.date).toBe('Dec 6-12, 2026');
+    expect(changes).toEqual([]);
+    expect(flags).toEqual([
+      'neuripssy26: source moved start to 2026-12-08 but states no end; start, end and date left untouched, fix them by hand',
+    ]);
+  });
+
+  it('a stated end alone rewrites end and date', () => {
+    const entry = sydneyEntry();
+    const facts = { ...neuripsFacts(), endIso: '2026-12-11', deadline: null, abstractDeadline: null, fullName: null, location: null };
+    updateEntry(entry, facts);
+    expect(entry.end).toBe('2026-12-11');
+    expect(entry.date).toBe('Dec 6-11, 2026');
+  });
+
+  it('drops a source range that ends before it starts', () => {
+    const entry = sydneyEntry();
+    const facts = { ...neuripsFacts(), startIso: '2026-12-08', endIso: '2026-12-01', deadline: null, abstractDeadline: null, fullName: null, location: null };
+    const { changes, flags } = updateEntry(entry, facts);
+    expect(changes).toEqual([]);
+    expect(flags.some((f) => f.includes('ends before it starts'))).toBe(true);
   });
 
   it('leaves start/end/date untouched and flags when the source start year is not the edition year', () => {
@@ -90,6 +114,22 @@ describe('updateEntry', () => {
     const { changes: again, flags } = updateEntry(entry, neuripsFacts(), { deadlinesOnly: true });
     expect(again).toEqual([]);
     expect(flags).toEqual([]);
+  });
+
+  it('leaves a deadline alone when the old and new values have both passed', () => {
+    const entry = sydneyEntry();
+    const today = DateTime.fromISO('2026-09-28T12:00:00Z', { zone: 'utc' });
+    const { changes } = updateEntry(entry, neuripsFacts(), { deadlinesOnly: true, today });
+    expect(entry.deadline).toBe('2026-05-06 23:59');
+    expect(changes).toEqual([]);
+  });
+
+  it('still corrects a passed deadline to a later one that is open', () => {
+    const entry = sydneyEntry();
+    const today = DateTime.fromISO('2026-05-07T00:00:00Z', { zone: 'utc' });
+    const { changes } = updateEntry(entry, neuripsFacts(), { deadlinesOnly: true, today });
+    expect(entry.deadline).toBe('2026-05-07 21:59');
+    expect(changes.map((c) => c.field)).toContain('deadline');
   });
 
   it('never writes curated fields', () => {
@@ -116,29 +156,27 @@ describe('updateEntry', () => {
 
   it('a pinned start leaves end and date alone', () => {
     const entry = { ...sydneyEntry(), sync_pin: ['start'] };
-    const facts = { ...neuripsFacts(), startIso: '2026-12-08', deadline: null, abstractDeadline: null, fullName: null, location: null };
+    const facts = { ...neuripsFacts(), startIso: '2026-12-08', endIso: '2026-12-14', deadline: null, abstractDeadline: null, fullName: null, location: null };
     const { changes, flags } = updateEntry(entry, facts);
     expect(entry.start).toBe('2026-12-06');
     expect(entry.end).toBe('2026-12-12');
     expect(entry.date).toBe('Dec 6-12, 2026');
     expect(changes).toEqual([]);
     expect(flags.some((f) => f.includes('start pinned'))).toBe(true);
-    expect(flags.some((f) => f.includes('end shifted'))).toBe(false);
   });
 
   // The start move is large enough that reusing the pinned end would invert the
   // range; a two-day move would hide the bug behind a still-plausible date.
   it('a pinned end freezes start and date too, never inverting the range', () => {
     const entry = { ...sydneyEntry(), sync_pin: ['end'] };
-    const facts = { ...neuripsFacts(), startIso: '2026-12-20', deadline: null, abstractDeadline: null, fullName: null, location: null };
+    const facts = { ...neuripsFacts(), startIso: '2026-12-20', endIso: '2026-12-26', deadline: null, abstractDeadline: null, fullName: null, location: null };
     const { changes, flags } = updateEntry(entry, facts);
     expect(entry.start).toBe('2026-12-06');
     expect(entry.end).toBe('2026-12-12');
     expect(entry.date).toBe('Dec 6-12, 2026');
     expect(entry.start < entry.end).toBe(true);
     expect(changes).toEqual([]);
-    expect(flags.some((f) => f.includes('end is pinned'))).toBe(true);
-    expect(flags.some((f) => f.includes('end shifted'))).toBe(false);
+    expect(flags.some((f) => f.includes('end pinned'))).toBe(true);
   });
 
   it('a pinned end still allows a start move when there is no end to shift', () => {
@@ -156,6 +194,33 @@ describe('updateEntry', () => {
 
   it('full_name is not pinnable', () => {
     expect(SYNC_PINNABLE_FIELDS).not.toContain('full_name');
+  });
+});
+
+describe('updateEntry place', () => {
+  const placeOnly = (location) => ({ fullName: null, location, startIso: null, deadline: null, abstractDeadline: null });
+
+  it('fills a missing place from the source', () => {
+    const entry = { ...sydneyEntry(), place: undefined };
+    const { changes } = updateEntry(entry, placeOnly('Sydney, Australia'));
+    expect(entry.place).toBe('Sydney, Australia');
+    expect(changes.map((c) => c.field)).toEqual(['place']);
+  });
+
+  it('keeps a curated place and stays quiet when the source names the same city', () => {
+    const entry = { ...sydneyEntry(), place: 'Boston, Massachusetts, USA' };
+    const { changes, flags } = updateEntry(entry, placeOnly('Northeastern University, Boston'));
+    expect(entry.place).toBe('Boston, Massachusetts, USA');
+    expect(changes).toEqual([]);
+    expect(flags).toEqual([]);
+  });
+
+  it('keeps a curated place and flags a source that names another city', () => {
+    const entry = { ...sydneyEntry(), place: 'Paris, France' };
+    const { changes, flags } = updateEntry(entry, placeOnly('Lyon, France'));
+    expect(entry.place).toBe('Paris, France');
+    expect(changes).toEqual([]);
+    expect(flags).toEqual(['neuripssy26: place kept as "Paris, France"; source reports "Lyon, France"']);
   });
 });
 
@@ -204,7 +269,7 @@ describe('updateEntry full_name', () => {
 describe('draftEntry', () => {
   it('clones the previous edition, drops stale fields, fills facts', () => {
     const prev = { ...sydneyEntry(), sync_pin: ['deadline'] };
-    const { entry, flags } = draftEntry(prev, { ...neuripsFacts(), startIso: '2027-12-05' }, 2027);
+    const { entry, flags } = draftEntry(prev, { ...neuripsFacts(), startIso: '2027-12-05', endIso: '2027-12-11' }, 2027);
     expect(entry.sync_pin).toBeUndefined();
     expect(entry.id).toBe('neuripssy27');
     expect(entry.year).toBe(2027);
@@ -214,9 +279,43 @@ describe('draftEntry', () => {
     expect(entry.note).toBeUndefined();
     expect(entry.paperslink).toBeUndefined();
     expect(entry.start).toBe('2027-12-05');
-    expect(entry.end).toBe('2027-12-11'); // prev duration (6 days) applied
+    expect(entry.end).toBe('2027-12-11');
     expect(entry.date).toBe('Dec 5-11, 2027');
-    expect(flags.some((f) => f.includes('inferred'))).toBe(true);
+    expect(flags).toEqual([]);
+  });
+
+  it('never infers an end: without one from the source, end and date stay unset', () => {
+    const { entry, flags } = draftEntry(sydneyEntry(), { ...neuripsFacts(), startIso: '2027-12-05' }, 2027);
+    expect(entry.start).toBe('2027-12-05');
+    expect(entry.end).toBeUndefined();
+    expect(entry.date).toBeUndefined();
+    expect(flags).toContain('no end date from the source yet; set end and date by hand');
+  });
+
+  it('takes the edition link from the source', () => {
+    const prev = { ...sydneyEntry(), link: 'https://embc.embs.org/2026/' };
+    const { entry, flags } = draftEntry(prev, { ...neuripsFacts(), link: 'https://embc.embs.org/2027/' }, 2027);
+    expect(entry.link).toBe('https://embc.embs.org/2027/');
+    expect(flags.some((f) => f.includes('link'))).toBe(false);
+  });
+
+  it('flags a cloned link that points at the previous edition', () => {
+    const prev = { ...sydneyEntry(), link: 'https://embc.embs.org/2026/' };
+    const { entry, flags } = draftEntry(prev, neuripsFacts(), 2027);
+    expect(entry.link).toBe('https://embc.embs.org/2026/');
+    expect(flags).toContain('link still points at the 2026 edition (https://embc.embs.org/2026/); update it by hand');
+  });
+
+  it('keeps an evergreen link quietly', () => {
+    const { entry, flags } = draftEntry(sydneyEntry(), neuripsFacts(), 2027);
+    expect(entry.link).toBe('https://neurips.cc/');
+    expect(flags.some((f) => f.includes('link'))).toBe(false);
+  });
+
+  it('drops the cloned place when the source has none', () => {
+    const { entry, flags } = draftEntry(sydneyEntry(), { ...neuripsFacts(), location: null }, 2027);
+    expect(entry.place).toBeUndefined();
+    expect(flags).toContain('no place from the source yet');
   });
 
   it('drops deadline fields when the source has none yet', () => {

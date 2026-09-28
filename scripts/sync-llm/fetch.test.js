@@ -65,6 +65,13 @@ describe('htmlToText', () => {
   it('keeps table cells separated', () => {
     expect(text).toMatch(/Abstract submission deadline \| January 15, 2026 \(23:59 AoE\)/);
   });
+  it('keeps a date and the label under it in one cell on one line', () => {
+    const html = '<table>\r\n<tr><th>Full Contributed Papers</th></tr><tr><td><strong>24 January 2027</strong><br />\nSubmission Deadline</td></tr>' +
+      '<tr><td><p>16 April 2027</p><p>Accept/Reject Notification</p></td></tr></table>';
+    expect(htmlToText(html)).toBe(
+      'Full Contributed Papers |\n24 January 2027 Submission Deadline |\n16 April 2027 Accept/Reject Notification |',
+    );
+  });
   it('decodes entities and collapses whitespace', () => {
     expect(text).toContain('& enjoy the venue');
     expect(text).not.toMatch(/ {2,}/);

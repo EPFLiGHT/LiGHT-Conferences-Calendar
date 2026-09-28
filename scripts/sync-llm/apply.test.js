@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { applyEditions } from './apply.js';
+import { DateTime } from 'luxon';
+import { applyEditions, resolveDraftLinks } from './apply.js';
 
 const edition = (year, date, evidence = `Deadline: ${date}`) => ({
   year, full_name: null, location: null, start_date: null, end_date: null,
@@ -157,5 +158,58 @@ describe('applyEditions', () => {
     expect(draftedEntry.id).toBe('hc27');
     expect(draftedEntry.deadline).toBeUndefined();
     expect(evidence.some((e) => e.id === 'hc27' && e.field === 'deadline')).toBe(false);
+  });
+
+  it('leaves an edition that has already ended alone', () => {
+    const entries = [entry({ start: '2026-07-26', end: '2026-07-30' })];
+    const { updates } = applyEditions({
+      entries, title: 'HealthConf', editions: [edition(2026, '2026-02-01')],
+      sourceUrl: 'https://hc.example/dates', today: DateTime.fromISO('2026-09-28T00:00:00Z', { zone: 'utc' }),
+    });
+    expect(updates).toEqual([]);
+    expect(entries[0].deadline).toBe('2026-01-01 23:59');
+  });
+
+  it('drafts with the link resolved for that year', () => {
+    const entries = [entry({ link: 'https://hc.example/2026/' })];
+    const { flags } = applyEditions({
+      entries, title: 'HealthConf', editions: [edition(2027, '2027-02-01')],
+      sourceUrl: 'https://hc.example/2027/dates', links: { 2027: 'https://hc.example/2027/' },
+    });
+    expect(entries[1].link).toBe('https://hc.example/2027/');
+    expect(flags.some((f) => f.includes('link still points'))).toBe(false);
+  });
+});
+
+describe('resolveDraftLinks', () => {
+  const fetcherFor = (okUrls) => ({
+    fetchPage: async (url) => (okUrls.includes(url)
+      ? { ok: true, finalUrl: url, text: 'x'.repeat(500), links: [], tooShort: false }
+      : { ok: false, error: 'http 404' }),
+  });
+  const args = (over) => ({
+    entries: [entry({ link: 'https://hc.example/2026/' })], title: 'HealthConf',
+    editions: [edition(2027, '2027-02-01')], sourceUrl: 'https://hc.example/2027/dates', ...over,
+  });
+
+  it('moves the previous link to the new year when that page loads', async () => {
+    const links = await resolveDraftLinks(args({ fetcher: fetcherFor(['https://hc.example/2027/']) }));
+    expect(links).toEqual({ 2027: 'https://hc.example/2027/' });
+  });
+
+  it('falls back to the deadlines page when it names the new year', async () => {
+    const links = await resolveDraftLinks(args({ fetcher: fetcherFor([]) }));
+    expect(links).toEqual({ 2027: 'https://hc.example/2027/dates' });
+  });
+
+  it('gives no link when neither is known to be about the new edition', async () => {
+    const links = await resolveDraftLinks(args({ fetcher: fetcherFor([]), sourceUrl: 'https://hc.example/dates' }));
+    expect(links).toEqual({});
+  });
+
+  it('skips years that already have an entry, and multi-entry venues', async () => {
+    const fetcher = fetcherFor(['https://hc.example/2027/']);
+    expect(await resolveDraftLinks(args({ fetcher, editions: [edition(2026, '2026-02-01')] }))).toEqual({});
+    expect(await resolveDraftLinks(args({ fetcher, multiEntry: true }))).toEqual({});
   });
 });

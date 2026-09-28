@@ -6,7 +6,7 @@ const TODAY = DateTime.fromISO('2026-07-08T12:00:00Z', { zone: 'utc' });
 
 function edition(overrides = {}) {
   return {
-    year: 2026, full_name: null, location: null, start_date: '2026-11-10', end_date: null,
+    year: 2026, full_name: null, location: null, start_date: null, end_date: null, dates_evidence: null,
     deadlines: [{ kind: 'paper', date: '2026-09-15', time: null, timezone_text: null,
       evidence: 'Paper deadline: September 15, 2026' }],
     ...overrides,
@@ -124,7 +124,7 @@ describe('validateEditions', () => {
 
   it('keeps a submission deadline that shares its line with a grant deadline', () => {
     const page = 'Dates. 10 May 26: Abstract deadline and travel grant applications EXTENDED DATE.';
-    const e = edition({ start_date: '2026-06-22' });
+    const e = edition();
     e.deadlines[0] = {
       kind: 'abstract', date: '2026-05-10', time: null, timezone_text: null,
       evidence: '10 May 26: Abstract deadline and travel grant applications EXTENDED DATE',
@@ -137,7 +137,7 @@ describe('validateEditions', () => {
 
   it('matches plural submission words', () => {
     const page = 'The call for abstracts will be open from July 1 to September 1, 2026.';
-    const e = edition({ start_date: '2026-11-10' });
+    const e = edition();
     e.deadlines[0] = {
       kind: 'abstract', date: '2026-09-01', time: null, timezone_text: null,
       evidence: 'The call for abstracts will be open from July 1 to September 1, 2026.',
@@ -149,12 +149,12 @@ describe('validateEditions', () => {
 
   it('drops a date the quote does not state (month only, or no date at all)', () => {
     const page = 'Abstract Submission Deadline April 2026. Full paper submission deadline: Closed.';
-    const vague = edition({ start_date: '2026-10-06' });
+    const vague = edition();
     vague.deadlines[0] = {
       kind: 'abstract', date: '2026-04-01', time: null, timezone_text: null,
       evidence: 'Abstract Submission Deadline April 2026',
     };
-    const closed = edition({ start_date: '2026-10-06' });
+    const closed = edition();
     closed.deadlines[0] = {
       kind: 'paper', date: '2026-04-15', time: null, timezone_text: null,
       evidence: 'Full paper submission deadline: Closed.',
@@ -168,7 +168,7 @@ describe('validateEditions', () => {
 
   it('accepts a two-digit year and a day-first date', () => {
     const page = '10 May 26: Abstract deadline.';
-    const e = edition({ start_date: '2026-06-22' });
+    const e = edition();
     e.deadlines[0] = {
       kind: 'abstract', date: '2026-05-10', time: null, timezone_text: null,
       evidence: '10 May 26: Abstract deadline',
@@ -180,7 +180,7 @@ describe('validateEditions', () => {
 
   it('keeps an abstract registration deadline (a submission, despite the word registration)', () => {
     const page = 'Paper Abstract Registration (Intention to Submit) Thursday, February 12, 2026';
-    const e = edition({ start_date: '2026-10-06' });
+    const e = edition();
     e.deadlines[0] = {
       kind: 'abstract', date: '2026-02-12', time: null, timezone_text: null,
       evidence: 'Paper Abstract Registration (Intention to Submit) Thursday, February 12, 2026',
@@ -192,7 +192,7 @@ describe('validateEditions', () => {
 
   it('drops post-submission dates even when they say "paper"', () => {
     const page = 'October 1, 2026 Camera-ready accepted paper deadline. September 8, 2026 Notification of paper acceptance.';
-    const e = edition({ start_date: '2027-01-03', year: 2026 });
+    const e = edition({ year: 2026 });
     e.deadlines[0] = {
       kind: 'paper', date: '2026-10-01', time: null, timezone_text: null,
       evidence: 'October 1, 2026 Camera-ready accepted paper deadline',
@@ -205,7 +205,7 @@ describe('validateEditions', () => {
 
   it('corrects the kind when the evidence contradicts the model', () => {
     const page = '10 May 26: Abstract deadline and travel grant applications.';
-    const e = edition({ start_date: '2026-06-22' });
+    const e = edition();
     e.deadlines[0] = {
       kind: 'paper', date: '2026-05-10', time: null, timezone_text: null,
       evidence: '10 May 26: Abstract deadline and travel grant applications',
@@ -218,7 +218,7 @@ describe('validateEditions', () => {
 
   it('keeps the model kinds when the evidence override would collide', () => {
     const page = 'Paper registration: February 1, 2026. Full paper submission: March 1, 2026.';
-    const e = edition({ start_date: '2026-06-22' });
+    const e = edition();
     e.deadlines = [
       { kind: 'abstract', date: '2026-02-01', time: null, timezone_text: null,
         evidence: 'Paper registration: February 1, 2026' },
@@ -236,7 +236,7 @@ describe('validateEditions', () => {
 
   it('never blesses the model labels silently when the evidence disagrees with both', () => {
     const page = 'Full paper submission 10 January 2026. Paper submission 20 January 2026.';
-    const e = edition({ start_date: '2026-06-22' });
+    const e = edition();
     e.deadlines = [
       { kind: 'abstract', date: '2026-01-10', time: null, timezone_text: null,
         evidence: 'Full paper submission 10 January 2026' },
@@ -283,7 +283,7 @@ describe('validateEditions', () => {
 
   it('requires a two-digit year to sit beside the date, not loose in the text', () => {
     const page = 'Paper deadline March 15 Room 26';
-    const e = edition({ start_date: '2026-10-06' });
+    const e = edition();
     e.deadlines[0] = {
       kind: 'paper', date: '2026-03-15', time: null, timezone_text: null,
       evidence: 'Paper deadline March 15 Room 26',
@@ -296,7 +296,7 @@ describe('validateEditions', () => {
 
   it('drops a day the quote never states, even when the number appears elsewhere', () => {
     const page = 'Papers due in November 2026 (see item 1).';
-    const e = edition({ start_date: '2026-12-10' });
+    const e = edition();
     e.deadlines[0] = {
       kind: 'paper', date: '2026-11-01', time: null, timezone_text: null,
       evidence: 'Papers due in November 2026 (see item 1)',
@@ -354,9 +354,10 @@ describe('validateEditions', () => {
   });
 
   it('drops a deadline that falls after the conference start', () => {
-    const e = edition({ start_date: '2026-09-01' });
+    const e = edition({ start_date: '2026-09-01', dates_evidence: 'Conference: 1 September 2026' });
+    const page = `${pageText} Conference: 1 September 2026.`;
     const { editions, flags } = validateEditions(
-      { page_has_dates: true, editions: [e] }, { pageText, today: TODAY });
+      { page_has_dates: true, editions: [e] }, { pageText: page, today: TODAY });
     expect(editions[0].deadlines).toHaveLength(0);
     expect(flags[0]).toMatch(/after the conference start/);
   });
@@ -414,15 +415,121 @@ describe('validateEditions date-evidence hardening', () => {
   });
 });
 
+// EMBC 2027's dates page as htmlToText renders it: each cell is a date, then its label.
+const EMBC_PAGE = [
+  'Important Dates',
+  'Proposals (Workshops/Mini Symposium) | 24 January 2027 Submission Deadline | 28 February 2027 Accept/Reject Notification | 31 March 2027 Information Submission |',
+  'Full Contributed Papers | 24 January 2027 Submission Deadline | 16 April 2027 Accept/Reject Notification | 30 April 2027 Final Submission Deadline |',
+  'All submission deadlines are final and will be strictly observed.',
+].join('\n');
+
+const embcEdition = (deadlines) => ({
+  year: 2027, full_name: null, location: null, start_date: null, end_date: null, dates_evidence: null,
+  deadlines: deadlines.map(([kind, date, evidence]) => ({ kind, date, time: null, timezone_text: null, evidence })),
+});
+
+describe('validateEditions table cells', () => {
+  it('drops a date whose own cell labels it a later stage', () => {
+    const { editions, flags } = validateEditions(
+      { editions: [embcEdition([['paper', '2027-04-16', 'Full Contributed Papers | 24 January 2027 Submission Deadline | 16 April 2027']])] },
+      { pageText: EMBC_PAGE, today: TODAY });
+    expect(editions[0].deadlines).toHaveLength(0);
+    expect(flags).toEqual(['2027 paper deadline 2027-04-16: the page labels this date "Accept/Reject Notification"; dropped']);
+  });
+
+  it('keeps the date that shares its cell with the submission label', () => {
+    const { editions, flags } = validateEditions(
+      { editions: [embcEdition([['paper', '2027-01-24', 'Full Contributed Papers | 24 January 2027 Submission Deadline']])] },
+      { pageText: EMBC_PAGE, today: TODAY });
+    expect(editions[0].deadlines.map((d) => d.date)).toEqual(['2027-01-24']);
+    expect(flags).toEqual([]);
+  });
+
+  it('drops workshop and tutorial proposals, which are not paper or abstract deadlines', () => {
+    const { editions, flags } = validateEditions(
+      { editions: [embcEdition([['abstract', '2027-01-24', 'Proposals (Workshops/Mini Symposium) | 24 January 2027 Submission Deadline']])] },
+      { pageText: EMBC_PAGE, today: TODAY });
+    expect(editions[0].deadlines).toHaveLength(0);
+    expect(flags[0]).toMatch(/names no submission/);
+  });
+});
+
+describe('validateEditions conference facts', () => {
+  const page = 'AIME 2027. Conference Dates: July 5-8, 2027. Venue: KIT Royal Tropical Institute, Amsterdam, The Netherlands. International Conference on Artificial Intelligence in Medicine.';
+  const aime = (over) => ({
+    year: 2027, full_name: null, location: null, start_date: '2027-07-05', end_date: '2027-07-08',
+    dates_evidence: 'Conference Dates: July 5-8, 2027', deadlines: [], ...over,
+  });
+
+  it('keeps start and end that a quoted range states', () => {
+    const { editions, flags } = validateEditions({ editions: [aime()] }, { pageText: page, today: TODAY });
+    expect(editions[0].start_date).toBe('2027-07-05');
+    expect(editions[0].end_date).toBe('2027-07-08');
+    expect(flags).toEqual([]);
+  });
+
+  it('reads a day-first range and a cross-month range', () => {
+    const text = 'from 21-25 March 2027; main event 27 September - 01 October 2027';
+    const a = validateEditions({ editions: [aime({ start_date: '2027-03-21', end_date: '2027-03-25', dates_evidence: 'from 21-25 March 2027' })] },
+      { pageText: text, today: TODAY });
+    expect([a.editions[0].start_date, a.editions[0].end_date]).toEqual(['2027-03-21', '2027-03-25']);
+    const b = validateEditions({ editions: [aime({ start_date: '2027-09-27', end_date: '2027-10-01', dates_evidence: '27 September - 01 October 2027' })] },
+      { pageText: text, today: TODAY });
+    expect([b.editions[0].start_date, b.editions[0].end_date]).toEqual(['2027-09-27', '2027-10-01']);
+  });
+
+  it('drops conference dates without a quote from the page', () => {
+    const { editions, flags } = validateEditions({ editions: [aime({ dates_evidence: null })] }, { pageText: page, today: TODAY });
+    expect(editions[0].start_date).toBeNull();
+    expect(editions[0].end_date).toBeNull();
+    expect(flags).toEqual(['edition 2027: conference dates 2027-07-05 to 2027-07-08 are not shown in a quote from the page; dropped']);
+  });
+
+  it('drops only the end when the quote does not state it', () => {
+    const { editions, flags } = validateEditions({ editions: [aime({ end_date: '2027-07-09' })] }, { pageText: page, today: TODAY });
+    expect(editions[0].start_date).toBe('2027-07-05');
+    expect(editions[0].end_date).toBeNull();
+    expect(flags).toEqual(['edition 2027: end date 2027-07-09 is not shown in the quote; dropped']);
+  });
+
+  it('keeps a location whose city is on the page and drops one that is not', () => {
+    const ok = validateEditions({ editions: [aime({ location: 'Amsterdam, Netherlands' })] }, { pageText: page, today: TODAY });
+    expect(ok.editions[0].location).toBe('Amsterdam, Netherlands');
+    const bad = validateEditions({ editions: [aime({ location: 'Rotterdam, Netherlands' })] }, { pageText: page, today: TODAY });
+    expect(bad.editions[0].location).toBeNull();
+    expect(bad.flags).toEqual(['edition 2027: location "Rotterdam, Netherlands" is not on the page; dropped']);
+  });
+
+  it('matches a full name across the stray spaces some sites print inside words', () => {
+    const text = `${page} The 47th AN NUAL CONGRESS of the European Society of Mycobacteriology`;
+    const { editions, flags } = validateEditions(
+      { editions: [aime({ full_name: 'Annual Congress of the European Society of Mycobacteriology' })] },
+      { pageText: text, today: TODAY });
+    expect(editions[0].full_name).toBe('Annual Congress of the European Society of Mycobacteriology');
+    expect(flags).toEqual([]);
+  });
+
+  it('drops a full name the page does not carry', () => {
+    const ok = validateEditions({ editions: [aime({ full_name: 'International Conference on Artificial Intelligence in Medicine' })] },
+      { pageText: page, today: TODAY });
+    expect(ok.editions[0].full_name).toBe('International Conference on Artificial Intelligence in Medicine');
+    const bad = validateEditions({ editions: [aime({ full_name: 'Artificial Intelligence in Medicine Europe' })] },
+      { pageText: page, today: TODAY });
+    expect(bad.editions[0].full_name).toBeNull();
+    expect(bad.flags).toEqual(['edition 2027: full name "Artificial Intelligence in Medicine Europe" is not on the page; dropped']);
+  });
+});
+
 describe('editionToFacts', () => {
   it('maps abstract and paper deadlines into merge.js facts', () => {
-    const e = edition();
+    const e = edition({ start_date: '2026-11-10', end_date: '2026-11-12' });
     e.deadlines.push({ kind: 'abstract', date: '2026-08-01', time: '12:00', timezone_text: 'UTC',
       evidence: 'x' });
     e.location = 'Kigali, Rwanda';
     const facts = editionToFacts(e, 'UTC-12');
     expect(facts.location).toBe('Kigali, Rwanda');
     expect(facts.startIso).toBe('2026-11-10');
+    expect(facts.endIso).toBe('2026-11-12');
     expect(facts.deadline.toISO()).toBe('2026-09-16T11:59:00.000Z');
     expect(facts.abstractDeadline.toISO()).toBe('2026-08-01T12:00:00.000Z');
   });

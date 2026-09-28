@@ -3,12 +3,14 @@
  * title and year already exist updates that entry; an unknown year is drafted
  * from the venue's most recent earlier edition. Venues that keep several
  * entries for one year are never drafted into, only flagged, since there is no
- * way to guess which of them the new dates belong to. Every deadline that
- * lands gets an evidence row, so a reviewer can check the value against the
- * sentence it came from without opening the venue site.
+ * way to guess which of them the new dates belong to. Editions that have
+ * already ended are left alone. Every deadline that lands gets an evidence
+ * row, so a reviewer can check the value against the sentence it came from
+ * without opening the venue site.
  */
 import { DateTime } from 'luxon';
 import { updateEntry, draftEntry } from '../sync-shared/merge.js';
+import { editionEnded, namesYear, rollUrl } from '../sync-shared/dates.js';
 import { editionToFacts, bigMoveFlags } from './facts.js';
 
 const DEADLINE_FIELDS = new Set(['deadline', 'abstract_deadline']);
@@ -58,13 +60,49 @@ function flagUncheckedAgainstStart(facts, id) {
   ];
 }
 
+const previousEdition = (entries, title, year) =>
+  entries
+    .filter((e) => e.title === title && e.year < year)
+    .sort((a, b) => a.year - b.year)
+    .at(-1);
+
+/**
+ * Links for the editions applyEditions will draft: the previous link moved to
+ * the new year if that page loads, else the deadlines page if it names the
+ * year. With neither, draftEntry flags the cloned link.
+ * @param {{entries: Array<object>, title: string, editions: Array<object>,
+ *   multiEntry?: boolean, sourceUrl: string, fetcher: object}} args
+ * @returns {Promise<Object<number, string>>} Edition year to link.
+ */
+export async function resolveDraftLinks({ entries, title, editions, multiEntry = false, sourceUrl, fetcher }) {
+  const links = {};
+  if (multiEntry) return links;
+  for (const { year } of editions) {
+    if (entries.some((e) => e.title === title && e.year === year)) continue;
+    const previous = previousEdition(entries, title, year);
+    if (!previous) continue;
+    const rolled = previous.link ? rollUrl(previous.link, previous.year, year) : null;
+    if (rolled) {
+      const page = await fetcher.fetchPage(rolled);
+      if (page.ok && !page.tooShort && namesYear(page.finalUrl, year)) {
+        links[year] = rolled;
+        continue;
+      }
+    }
+    if (namesYear(sourceUrl, year)) links[year] = sourceUrl;
+  }
+  return links;
+}
+
 /**
  * @param {{entries: Array<object>, title: string, editions: Array<object>,
- *   multiEntry?: boolean, sourceUrl: string}} args entries is mutated in place.
+ *   multiEntry?: boolean, sourceUrl: string, today?: DateTime,
+ *   links?: Object<number, string>}} args entries is mutated in place; links
+ *   comes from resolveDraftLinks.
  * @returns {{updates: Array<object>, drafts: Array<object>, flags: string[],
  *   evidence: Array<{id: string, field: string, quote: string, url: string}>}}
  */
-export function applyEditions({ entries, title, editions, multiEntry = false, sourceUrl }) {
+export function applyEditions({ entries, title, editions, multiEntry = false, sourceUrl, today = null, links = {} }) {
   const updates = [];
   const drafts = [];
   const flags = [];
@@ -88,6 +126,7 @@ export function applyEditions({ entries, title, editions, multiEntry = false, so
     const existing = entries.filter((e) => e.title === title && e.year === edition.year);
     if (existing.length > 0) {
       for (const entry of existing) {
+        if (today && editionEnded(entry, today)) continue;
         const facts = editionToFacts(edition, entry.timezone);
         if (!edition.start_date) {
           flags.push(...dropDeadlinesAfterStart(facts, entry));
@@ -95,6 +134,7 @@ export function applyEditions({ entries, title, editions, multiEntry = false, so
         }
         const { changes, flags: updateFlags } = updateEntry(entry, facts, {
           deadlinesOnly: multiEntry,
+          today,
         });
         record(edition, changes);
         flags.push(...updateFlags);
@@ -107,15 +147,12 @@ export function applyEditions({ entries, title, editions, multiEntry = false, so
       );
       continue;
     }
-    const previous = entries
-      .filter((e) => e.title === title && e.year < edition.year)
-      .sort((a, b) => a.year - b.year)
-      .at(-1);
+    const previous = previousEdition(entries, title, edition.year);
     if (!previous) {
       flags.push(`${title} ${edition.year}: no previous edition in the YAML to clone; skipped`);
       continue;
     }
-    const facts = editionToFacts(edition, previous.timezone);
+    const facts = { ...editionToFacts(edition, previous.timezone), link: links[edition.year] ?? null };
     const { entry, flags: draftFlags } = draftEntry(previous, facts, edition.year);
     entries.splice(entries.indexOf(previous) + 1, 0, entry);
     drafts.push({ id: entry.id, title, year: edition.year });

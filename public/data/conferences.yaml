@@ -12,6 +12,20 @@
   sub: Global Health
   type: conference
 
+- title: ESMycobacteriology
+  year: 2027
+  id: esmyco27
+  full_name: The 47th Annual Congress of the European Society of Mycobacteriology
+  link: https://www.esmycobacteriology.eu/event-home
+  abstract_deadline: 2027-04-30 23:59
+  timezone: UTC-12
+  place: Hamburg, Germany
+  date: Jun 20-23, 2027
+  start: '2027-06-20'
+  end: '2027-06-23'
+  sub: Global Health
+  type: conference
+
 - title: NDSS Symposium
   year: 2026
   id: ndss26
@@ -142,6 +156,21 @@
   sub: SE
   type: conference
 
+- title: IEEE ICST
+  year: 2027
+  id: ieeeicst27
+  full_name: 20th IEEE International Conference on Software Testing, Verification and Validation
+  link: https://conf.researchr.org/home/icst-2027
+  deadline: 2026-11-02 23:59
+  timezone: UTC-12
+  place: San Sebastian, Spain
+  date: May 17-21, 2027
+  start: '2027-05-17'
+  end: '2027-05-21'
+  paperslink: https://conf.researchr.org/track/icst-2027/icst-2027-research-papers
+  sub: SE
+  type: conference
+
 - title: ICML
   year: 2026
   id: icml26
@@ -178,9 +207,15 @@
   year: 2027
   id: cvpr27
   full_name: Conference on Computer Vision and Pattern Recognition
-  link: https://cvpr.thecvf.com/
+  link: https://cvpr.thecvf.com/Conferences/2027
+  abstract_deadline: 2026-11-10 23:59
+  deadline: 2026-11-16 23:59
   timezone: UTC-12
   place: Seattle, WA, United States
+  date: Jun 20-25, 2027
+  start: '2027-06-20'
+  end: '2027-06-25'
+  paperslink: https://cvpr.thecvf.com/Conferences/2027/CallForPapers
   sub: CV
   type: conference
 
@@ -203,9 +238,15 @@
   year: 2027
   id: iclr27
   full_name: The Fifteenth International Conference on Learning Representations
-  link: https://iclr.cc/
+  link: https://iclr.cc/Conferences/2027
+  abstract_deadline: 2026-09-18 23:59
+  deadline: 2026-09-25 23:59
   timezone: UTC-12
   place: San Francisco, CA, USA
+  date: Apr 26-30, 2027
+  start: '2027-04-26'
+  end: '2027-04-30'
+  paperslink: https://iclr.cc/Conferences/2027/CallForPapers
   sub: ML
   type: conference
 
@@ -222,6 +263,22 @@
   end: '2026-03-29'
   sub: NLP
   type: conference
+
+- title: EACL
+  year: 2027
+  id: eacl27
+  full_name: The 20th Conference of the European Chapter of the Association for Computational Linguistics
+  link: https://2027.eacl.org/
+  deadline: 2026-08-03 23:59
+  timezone: UTC-12
+  place: Athens, Greece
+  date: Mar 9-14, 2027
+  start: '2027-03-09'
+  end: '2027-03-14'
+  paperslink: https://2027.eacl.org/calls/papers/
+  sub: NLP
+  type: conference
+  note: ARR submission deadline; commitment deadline Oct 11, 2026.
 
 - title: LoG
   year: 2025
@@ -244,8 +301,8 @@
   id: log26
   full_name: The Fifth Learning on Graphs Conference
   link: https://logconference.org/
-  abstract_deadline: 2026-07-29 23:59
-  deadline: 2026-08-06 00:00
+  abstract_deadline: 2026-08-05 23:59
+  deadline: 2026-08-07 23:59
   timezone: UTC-12
   place: Boston, Massachusetts, USA
   date: November 20-22, 2026
@@ -254,7 +311,6 @@
   paperslink: https://logconference.org/cfp/#call-for-papers
   sub: ML
   type: conference
-  note: Conference dates tentative.
 
 - title: ECIR
   year: 2026
@@ -269,6 +325,22 @@
   start: '2026-03-29'
   end: '2026-04-01'
   paperslink: https://ecir2026.eu/calls/call-for-full-papers
+  sub: DM
+  type: conference
+
+- title: ECIR
+  year: 2027
+  id: ecir27
+  full_name: 49th European Conference on Information Retrieval
+  link: https://www.ecir2027.co.uk/
+  abstract_deadline: 2026-09-21 23:59
+  deadline: 2026-10-05 23:59
+  timezone: UTC-12
+  place: Southampton, UK
+  date: Mar 21-25, 2027
+  start: '2027-03-21'
+  end: '2027-03-25'
+  paperslink: https://www.ecir2027.co.uk/call-for-full-papers
   sub: DM
   type: conference
 
@@ -350,6 +422,22 @@
   sub: NLP
   type: conference
 
+- title: COLING
+  year: 2027
+  id: coling27
+  full_name: The 32nd International Conference on Computational Linguistics
+  link: https://2027.coling-iccl.org/
+  deadline: 2026-10-12 23:59
+  timezone: UTC-12
+  place: Macau, China
+  date: May 9-14, 2027
+  start: '2027-05-09'
+  end: '2027-05-14'
+  paperslink: https://2027.coling-iccl.org/calls/main_conference_papers/
+  sub: NLP
+  type: conference
+  note: ARR submission deadline; commitment by Dec 23, 2026.
+
 - title: WSDM
   year: 2026
   id: wsdm26
@@ -387,10 +475,12 @@
   id: iberamia26
   full_name: 19th Ibero-American Conference on Artificial Intelligence
   link: https://www.iberamia.org/iberamia/iberamia2026/
-  deadline: 2026-05-31 23:59
+  deadline: 2026-06-10 23:59
   timezone: UTC-12
   place: Asunción, Paraguay
   date: Nov 18-20, 2026
+  start: '2026-11-18'
+  end: '2026-11-20'
   paperslink: https://www.iberamia.org/iberamia/iberamia2026/call-for-papers/
   sub: ML
   type: conference
@@ -504,6 +594,21 @@
   sub: ML
   type: conference
 
+- title: IJCAI
+  year: 2027
+  id: ijcai27
+  deadline_status: tba
+  full_name: International Joint Conference on Artificial Intelligence
+  link: https://www.ijcai.org/future_conferences
+  timezone: UTC-12
+  place: Kyoto, Japan
+  date: Aug 7-13, 2027
+  start: '2027-08-07'
+  end: '2027-08-13'
+  sub: ML
+  type: conference
+  note: Second site in Hengqin, China, Aug 15-17, 2027.
+
 - title: CHIL
   year: 2026
   id: chil26
@@ -541,6 +646,7 @@
   id: satml27
   full_name: 5th IEEE Conference on Secure and Trustworthy Machine Learning
   link: https://satml.org/
+  abstract_deadline: 2026-09-22 23:59
   deadline: 2026-09-29 23:59
   timezone: UTC-12
   place: Reykjavik, Iceland
@@ -593,19 +699,50 @@
   sub: DM
   type: conference
 
+- title: SIGIR
+  year: 2027
+  id: sigir27
+  full_name: 50th International ACM SIGIR Conference on Research and Development in Information Retrieval
+  link: https://sigir2027.org/
+  abstract_deadline: 2027-01-14 23:59
+  deadline: 2027-01-21 23:59
+  timezone: UTC-12
+  place: San Jose, California, USA
+  date: Jul 18-24, 2027
+  start: '2027-07-18'
+  end: '2027-07-24'
+  paperslink: https://sigir2027.org/pages/submit-full.html
+  sub: DM
+  type: conference
+  note: Deadlines marked as proposed on the conference site.
+
 - title: SIGGRAPH
   year: 2026
   id: siggraph26
   full_name: The Premier Conference & Exhibition on Computer Graphics & Interactive Techniques
   link: https://s2026.siggraph.org/
-  abstract_deadline: 2025-01-15 22:00
-  deadline: 2025-01-22 22:00
+  abstract_deadline: 2026-01-15 22:00
+  deadline: 2026-01-22 22:00
   timezone: GMT
   place: Los Angeles, California, USA
   date: July 19-23, 2026
   start: '2026-07-19'
   end: '2026-07-23'
   paperslink: https://s2026.siggraph.org/program/technical-papers/
+  sub: CV
+  type: conference
+
+- title: SIGGRAPH
+  year: 2027
+  id: siggraph27
+  deadline_status: tba
+  full_name: The Premier Conference & Exhibition on Computer Graphics & Interactive Techniques
+  link: https://www.siggraph.org/
+  timezone: GMT
+  place: Anaheim, California, USA
+  date: Aug 8-12, 2027
+  start: '2027-08-08'
+  end: '2027-08-12'
   sub: CV
   type: conference
 
@@ -622,6 +759,20 @@
   start: '2026-09-07'
   end: '2026-09-11'
   paperslink: https://ecmlpkdd.org/2026/submissions-research-track/
+  sub: ML
+  type: conference
+
+- title: ECML/PKDD
+  year: 2027
+  id: ecmlpkdd27
+  deadline_status: tba
+  full_name: European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases
+  link: https://ecmlpkdd.org/2027/
+  timezone: UTC-12
+  place: Eindhoven, The Netherlands
+  date: Aug 30 - Sep 3, 2027
+  start: '2027-08-30'
+  end: '2027-09-03'
   sub: ML
   type: conference
 
@@ -728,6 +879,22 @@
   sub: SEC
   type: conference
 
+- title: PETS
+  year: 2027
+  id: pets27
+  full_name: 27th Privacy Enhancing Technologies Symposium
+  link: https://petsymposium.org/2027/
+  deadline: 2026-11-30 23:59
+  timezone: UTC-12
+  place: Delft, The Netherlands
+  date: Jul 19-24, 2027
+  start: '2027-07-19'
+  end: '2027-07-24'
+  paperslink: https://petsymposium.org/cfp27.php
+  sub: SEC
+  type: conference
+  note: Issue 3 deadline; issue 4 closes Feb 28, 2027.
+
 - title: PRIVACY SYMPOSIUM
   year: 2026
   id: privacysymposium26
@@ -740,6 +907,21 @@
   date: April 20-24, 2026
   start: '2026-04-20'
   end: '2026-04-24'
+  paperslink: https://privacysymposium.org/call-for-papers/
+  sub: SEC
+  type: conference
+
+- title: PRIVACY SYMPOSIUM
+  year: 2027
+  id: privacysymposium27
+  full_name: The Privacy and Data Governance Symposium
+  link: https://privacysymposium.org/
+  deadline: 2026-10-25 23:59
+  timezone: UTC-12
+  place: Venice, Italy
+  date: Apr 26-30, 2027
+  start: '2027-04-26'
+  end: '2027-04-30'
   paperslink: https://privacysymposium.org/call-for-papers/
   sub: SEC
   type: conference
@@ -759,6 +941,22 @@
   sub: SEC
   type: conference
 
+- title: ACM SACMAT
+  year: 2027
+  id: sacmat27
+  full_name: 32nd ACM Symposium on Access Control Models and Technologies
+  link: https://sacmat.org/2027/index.php
+  deadline: 2026-10-30 23:59
+  timezone: UTC-12
+  place: Durham, UK
+  date: Jul 19-21, 2027
+  start: '2027-07-19'
+  end: '2027-07-21'
+  paperslink: https://sacmat.org/2027/call-for-papers.php
+  sub: SEC
+  type: conference
+  note: First cycle; the second cycle closes Feb 12, 2027.
+
 - title: The Web Conference
   year: 2026
   id: thewebconference26
@@ -772,6 +970,22 @@
   start: '2026-04-13'
   end: '2026-04-17'
   paperslink: https://www2026.thewebconf.org/calls/research-tracks.html
+  sub: DM
+  type: conference
+
+- title: The Web Conference
+  year: 2027
+  id: thewebconference27
+  full_name: The ACM Web Conference
+  link: https://www2027.thewebconf.org/
+  abstract_deadline: 2026-10-18 23:59
+  deadline: 2026-10-25 23:59
+  timezone: UTC-12
+  place: Dublin, Ireland
+  date: May 10-14, 2027
+  start: '2027-05-10'
+  end: '2027-05-14'
+  paperslink: https://www2027.thewebconf.org/research-track-papers/
   sub: DM
   type: conference
 
@@ -801,6 +1015,21 @@
   start: '2026-01-26'
   end: '2026-01-31'
   paperslink: https://pmac-2026.com/abstracts/about
+  sub: Global Health
+  type: conference
+
+- title: PMAC
+  year: 2027
+  id: pmac27
+  full_name: Prince Mahidol Award Conference
+  link: https://pmac2027.com/
+  abstract_deadline: 2026-08-15 16:00
+  timezone: Asia/Bangkok
+  place: Bangkok, Thailand
+  date: Jan 26-30, 2027
+  start: '2027-01-26'
+  end: '2027-01-30'
+  paperslink: https://pmac2027.com/abstracts/about
   sub: Global Health
   type: conference
 
@@ -847,6 +1076,21 @@
   sub: Global Health
   type: conference
 
+- title: CUGH
+  year: 2027
+  id: cugh27
+  full_name: 18th Consortium of Universities for Global Health Annual Conference
+  link: https://cughlima2027.org/
+  deadline: 2026-08-31 23:59
+  timezone: EST
+  place: Lima, Peru
+  date: Feb 25-28, 2027
+  start: '2027-02-25'
+  end: '2027-02-28'
+  paperslink: https://cughlima2027.org/abstract-submission/
+  sub: Global Health
+  type: conference
+
 - title: World Health AI (Boston)
   year: 2026
   id: worldhealthaibo26
@@ -867,15 +1111,29 @@
   id: worldhealthailo26
   deadline_status: attendance
   full_name: World Health AI London Forum
-  link: https://www.worldhealth.ai/london
+  link: https://www.worldhealth.ai/events/health-london-2026
   timezone: UTC-12
+  place: London, UK
   date: Sep 22, 2026
   start: '2026-09-22'
   end: '2026-09-22'
-  place: London, UK
   sub: Health AI
   type: conference
   note: Advancing healthcare with AI and LLMs through cutting-edge innovations and proactive, data-driven prevention models
+
+- title: World Health AI (London)
+  year: 2027
+  id: worldhealthailo27
+  deadline_status: attendance
+  full_name: World Health AI London Forum
+  link: https://www.worldhealth.ai/events/health-london-2027
+  timezone: UTC-12
+  place: London, UK
+  date: Sep 22, 2027
+  start: '2027-09-22'
+  end: '2027-09-22'
+  sub: Health AI
+  type: conference
 
 - title: HHL
   year: 2025
@@ -900,6 +1158,19 @@
   date: May 29-30, 2025
   start: '2025-05-29'
   end: '2025-05-30'
+  sub: Global Health
+  type: conference
+
+- title: INMED HHC
+  year: 2027
+  id: inmedhhc27
+  full_name: Institute for International Medicine Annual Humanitarian Health Conference
+  link: https://www.inmed.us/hhc/
+  timezone: UTC
+  place: Raytown, Missouri, USA
+  date: Apr 15-16, 2027
+  start: '2027-04-15'
+  end: '2027-04-16'
   sub: Global Health
   type: conference
 
@@ -942,6 +1213,21 @@
   date: July 02-07, 2026
   start: '2026-07-02'
   end: '2026-07-07'
+  sub: NLP
+  type: conference
+  note: All submissions via ACL Rolling Review (ARR).
+
+- title: ACL
+  year: 2027
+  id: acl27
+  deadline_status: tba
+  full_name: 65th Annual Meeting of the Association for Computational Linguistics
+  link: https://2027.aclweb.org/
+  timezone: UTC-12
+  place: Kyoto, Japan
+  date: Aug 17-22, 2027
+  start: '2027-08-17'
+  end: '2027-08-22'
   sub: NLP
   type: conference
   note: All submissions via ACL Rolling Review (ARR).
@@ -990,6 +1276,23 @@
   sub: DM
   type: conference
 
+- title: KDD
+  year: 2027
+  id: kdd27
+  full_name: ACM SIGKDD Conference on Knowledge Discovery and Data Mining
+  link: https://kdd2027.kdd.org/
+  abstract_deadline: 2026-07-19 23:59
+  deadline: 2026-07-26 23:59
+  timezone: UTC-12
+  place: San Jose, California, USA
+  date: Aug 1-5, 2027
+  start: '2027-08-01'
+  end: '2027-08-05'
+  paperslink: https://kdd2027.kdd.org/research-track-call-for-papers/
+  sub: DM
+  type: conference
+  note: First cycle; the second cycle closes in February 2027, exact date TBA.
+
 - title: ICDM
   year: 2026
   id: icdm26
@@ -1004,6 +1307,21 @@
   end: '2026-11-15'
   sub: DM
   type: conference
+
+- title: ICDM
+  year: 2027
+  id: icdm27
+  full_name: IEEE International Conference on Data Mining
+  link: https://icdm2027-website.onrender.com/
+  deadline: 2027-06-06 23:59
+  timezone: UTC-12
+  place: Brisbane, Australia
+  date: Nov 15-18, 2027
+  start: '2027-11-15'
+  end: '2027-11-18'
+  sub: DM
+  type: conference
+  note: Dates marked tentative by the organizers.
 
 - title: ECCV
   year: 2026
@@ -1037,6 +1355,20 @@
   sync_pin:
     - place
 
+- title: MICCAI
+  year: 2027
+  id: miccai27
+  deadline_status: tba
+  full_name: 30th International Conference on Medical Image Computing and Computer Assisted Intervention
+  link: https://conferences.miccai.org/2027/en/
+  timezone: UTC-12
+  place: Auckland, New Zealand
+  date: Sep 27 - Oct 1, 2027
+  start: '2027-09-27'
+  end: '2027-10-01'
+  sub: Health AI
+  type: conference
+
 - title: MIDL
   year: 2026
   id: midl26
@@ -1049,6 +1381,20 @@
   date: July 8-10, 2026
   start: '2026-07-08'
   end: '2026-07-10'
+  sub: Health AI
+  type: conference
+
+- title: MIDL
+  year: 2027
+  id: midl27
+  deadline_status: tba
+  full_name: Medical Imaging with Deep Learning
+  link: https://2027.midl.io/
+  timezone: UTC-12
+  place: Porto, Portugal
+  date: Jul 14-16, 2027
+  start: '2027-07-14'
+  end: '2027-07-16'
   sub: Health AI
   type: conference
 
@@ -1066,6 +1412,22 @@
   sub: Health AI
   type: conference
   abstract_deadline: 2026-02-10 23:59
+
+- title: AIME
+  year: 2027
+  id: aime27
+  full_name: International Conference on Artificial Intelligence in Medicine
+  link: https://aime27.aimedicine.info/
+  abstract_deadline: 2027-01-31 23:59
+  deadline: 2027-02-07 23:59
+  timezone: UTC-12
+  place: Amsterdam, The Netherlands
+  date: Jul 6-7, 2027
+  start: '2027-07-06'
+  end: '2027-07-07'
+  paperslink: https://aime27.aimedicine.info/call-for-papers/
+  sub: Health AI
+  type: conference
 
 - title: IEEE EMBC
   year: 2026
@@ -1085,15 +1447,17 @@
   year: 2027
   id: embc27
   full_name: 49th Annual International Conference of the IEEE Engineering in Medicine and Biology Society
-  link: https://embc.embs.org/2026/
+  link: https://embc.embs.org/2027/
+  deadline: 2027-01-24 23:59
   timezone: UTC-12
-  place: Suntec Singapore Convention & Exhibition Centre, Singapore
+  place: Singapore
   date: Jul 11-15, 2027
   start: '2027-07-11'
   end: '2027-07-15'
+  paperslink: https://embc.embs.org/2027/papers/
   sub: Health AI
   type: conference
-  deadline: 2027-04-16 23:59
+  note: 1-page poster papers due Apr 23, 2027.
 
 - title: AMIA
   year: 2026
@@ -1175,6 +1539,7 @@
   id: ghf26
   full_name: Geneva Health Forum
   link: https://genevahealthforum.com/
+  abstract_deadline: 2026-09-15 23:59
   timezone: UTC-12
   place: Geneva, Switzerland
   date: November 10-12, 2026
@@ -1182,6 +1547,5 @@
   end: '2026-11-12'
   sub: Global Health
   type: conference
-  abstract_deadline: 2026-09-01 23:59
   sync_pin:
     - place

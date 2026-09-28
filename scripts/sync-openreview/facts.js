@@ -14,10 +14,14 @@ const PLACEHOLDER_RE = /^(tbd|tba)$/i;
  *   fullName: string|null,
  *   location: string|null,
  *   startIso: string|null,
+ *   endIso: null,
+ *   link: string|null,
  *   submissionId: string|null,
  *   abstractDeadline: DateTime|null,
  *   deadline: DateTime|null,
  * }} Missing, empty or placeholder ("TBD"/"TBA") values come back as null.
+ *   OpenReview never states an end date, so endIso is always null; link is
+ *   the edition's website.
  */
 export function buildFacts(content) {
   const value = (key) => content?.[key]?.value;
@@ -27,6 +31,8 @@ export function buildFacts(content) {
     fullName: value('title') || null,
     location: location && !PLACEHOLDER_RE.test(location) ? location : null,
     startIso: parseStartDate(value('start_date')),
+    endIso: null,
+    link: value('website') || null,
     submissionId: value('submission_id') || null,
     abstractDeadline: dates.abstractDeadline || null,
     deadline: dates.deadline || null,

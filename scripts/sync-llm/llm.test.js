@@ -62,7 +62,7 @@ describe('createLlm', () => {
       tools: [{ type: 'function', name: 't' }],
       schema: { name: 'thing', schema: { type: 'object' } },
     });
-    expect(seen.model).toBe('gpt-5.4-mini');
+    expect(seen.model).toBe('gpt-5.6-sol');
     expect(seen.tools).toHaveLength(1);
     expect(seen.text.format).toEqual({
       type: 'json_schema', name: 'thing', schema: { type: 'object' }, strict: true,

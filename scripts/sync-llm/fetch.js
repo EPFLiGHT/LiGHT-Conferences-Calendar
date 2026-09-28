@@ -92,8 +92,9 @@ function decodeEntities(s) {
 
 /**
  * Reduce HTML to readable text. Regex-based on purpose: good enough for
- * deadline pages, zero dependencies. Table cells become " | " so date rows
- * survive; block-level closers become newlines.
+ * deadline pages, zero dependencies. Each table cell stays on one line ending
+ * in " | ", so a date and its label read as one unit; other block closers
+ * become newlines.
  * @param {string} html Raw HTML.
  * @returns {string} Cleaned text with single spaces and single newlines.
  */
@@ -101,12 +102,15 @@ export function htmlToText(html) {
   let s = html
     .replace(/<(script|style|noscript|svg|head|nav|footer)\b[\s\S]*?<\/\1\s*>/gi, ' ')
     .replace(/<!--[\s\S]*?-->/g, ' ')
+    .replace(/<(td|th)\b[^>]*>([\s\S]*?)<\/\1\s*>/gi, (_, _tag, inner) =>
+      ` ${inner.replace(/<(br|hr)\b[^>]*>|<\/(p|div|li|h[1-6])>/gi, ' ').replace(/\s+/g, ' ')} | `)
     .replace(/<\/(td|th)>/gi, ' | ')
     .replace(/<(br|hr)\b[^>]*>/gi, '\n')
     .replace(/<\/(p|div|li|tr|table|h[1-6]|section|article)>/gi, '\n')
     .replace(/<[^>]+>/g, ' ');
   s = decodeEntities(s);
   return s
+    .replace(/\r/g, '')
     .replace(/[ \t]+/g, ' ')
     .replace(/ ?\n[ \n]*/g, '\n')
     .trim();

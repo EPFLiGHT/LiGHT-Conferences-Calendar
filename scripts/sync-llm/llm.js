@@ -27,7 +27,8 @@ export function loadApiKey(repoRoot) {
  *   client is an openai SDK instance or a test fake with responses.create.
  */
 // Sampling params stay unset: the Responses API pins them for reasoning models.
-export function createLlm({ client, model = 'gpt-5.4-mini', onUsage = () => {} }) {
+// Smaller models pair labels with the wrong dates on tables that list the date first.
+export function createLlm({ client, model = 'gpt-5.6-sol', onUsage = () => {} }) {
   return {
     model,
     async respond({ input, tools, schema }) {

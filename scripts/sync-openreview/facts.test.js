@@ -15,6 +15,8 @@ describe('buildFacts', () => {
     expect(facts.submissionId).toBe('NeurIPS.cc/2026/Conference/-/Submission');
     expect(facts.deadline.toISO()).toBe('2026-05-07T11:59:00.000Z');
     expect(facts.abstractDeadline.toISO()).toBe('2026-05-05T11:59:00.000Z');
+    expect(facts.link).toBe('https://neurips.cc/');
+    expect(facts.endIso).toBeNull();
   });
 
   it('nulls out placeholder locations', () => {

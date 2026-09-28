@@ -1,7 +1,8 @@
 /**
  * Date, id and formatting helpers shared by the syncs: render an instant in an
- * entry's timezone, build the human-readable `date` field, and derive a new
- * edition's id and end date. Source-specific parsing lives with its source.
+ * entry's timezone, build the human-readable `date` field, derive a new
+ * edition's id, and tell edition-specific links and finished editions apart.
+ * Source-specific parsing lives with its source.
  */
 import { DateTime } from 'luxon';
 
@@ -20,11 +21,13 @@ export function toZoneString(dt, zone) {
  * @param {string} startIso ISO start date.
  * @param {string} endIso ISO end date.
  * @returns {string} e.g. "Dec 6-12, 2026", "Nov 30 - Dec 5, 2025",
- *   or "Dec 28, 2026 - Jan 2, 2027" across a year boundary.
+ *   "Dec 28, 2026 - Jan 2, 2027" across a year boundary, or "Sep 22, 2027"
+ *   for a one-day event.
  */
 export function formatDateRange(startIso, endIso) {
   const start = DateTime.fromISO(startIso, { locale: 'en-US' });
   const end = DateTime.fromISO(endIso, { locale: 'en-US' });
+  if (startIso === endIso) return start.toFormat('MMM d, yyyy');
   if (start.year !== end.year) {
     return `${start.toFormat('MMM d, yyyy')} - ${end.toFormat('MMM d, yyyy')}`;
   }
@@ -45,15 +48,62 @@ export function nextId(prevId, newYear) {
   return prevId.replace(/\d{2}$/, String(newYear).slice(-2));
 }
 
+const yearRe = (year) => new RegExp(`(?<!\\d)(?:${year}|${String(year).slice(-2)})(?!\\d)`);
+
 /**
- * Infer an end date by applying the previous edition's duration to a new start
- * (sources rarely publish end dates; conference lengths are stable year to year).
- * @param {string} prevStartIso Previous edition's ISO start date.
- * @param {string} prevEndIso Previous edition's ISO end date.
- * @param {string} newStartIso New edition's ISO start date.
- * @returns {string} ISO end date for the new edition.
+ * Whether a URL is tied to one edition, e.g. "https://embc.embs.org/2026/" or
+ * "https://aime26.aimedicine.info/".
+ * @param {string} url
+ * @param {number} year Full edition year.
+ * @returns {boolean}
  */
-export function inferEndDate(prevStartIso, prevEndIso, newStartIso) {
-  const days = DateTime.fromISO(prevEndIso).diff(DateTime.fromISO(prevStartIso), 'days').days;
-  return DateTime.fromISO(newStartIso).plus({ days }).toISODate();
+export function namesYear(url, year) {
+  return yearRe(year).test(url);
+}
+
+/**
+ * The edition year a URL is tied to: a four-digit year anywhere, or a two-digit
+ * one in the host ("aime26."), where a bare number in a path is too ambiguous.
+ * @param {string} url
+ * @returns {number|null}
+ */
+export function urlYear(url) {
+  const full = url.match(/(?<!\d)20\d{2}(?!\d)/);
+  if (full) return Number(full[0]);
+  let host;
+  try {
+    host = new URL(url).hostname;
+  } catch {
+    return null;
+  }
+  const short = host.match(/(?<=[a-z])\d{2}(?=[.-])/i);
+  return short ? 2000 + Number(short[0]) : null;
+}
+
+/**
+ * The URL with its edition year swapped. Only a guess until it is fetched.
+ * @param {string} url
+ * @param {number} fromYear Full year the URL names.
+ * @param {number} toYear Full year to move it to.
+ * @returns {string|null} null when the URL does not name fromYear.
+ */
+export function rollUrl(url, fromYear, toYear) {
+  const full = new RegExp(`(?<!\\d)${fromYear}(?!\\d)`, 'g');
+  if (full.test(url)) return url.replace(full, String(toYear));
+  const u = new URL(url);
+  const short = new RegExp(`(?<=[a-z])${String(fromYear).slice(-2)}(?=[.-])`, 'i');
+  if (!short.test(u.hostname)) return null;
+  u.hostname = u.hostname.replace(short, String(toYear).slice(-2));
+  return u.toString();
+}
+
+/**
+ * Whether an edition is over. Undated (TBA) editions never are.
+ * @param {{start?: string, end?: string}} entry
+ * @param {DateTime} today
+ * @returns {boolean}
+ */
+export function editionEnded(entry, today) {
+  const last = entry.end ?? entry.start;
+  return Boolean(last) && last < today.toISODate();
 }

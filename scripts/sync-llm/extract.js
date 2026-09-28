@@ -30,12 +30,19 @@ const EDITION_ITEM = {
       type: ['string', 'null'],
       description: 'the long official conference name as written on the page, without year or acronym; null if the page only shows the acronym',
     },
-    location: { type: ['string', 'null'], description: 'city, country if stated' },
+    location: {
+      type: ['string', 'null'],
+      description: 'city and country as written on the page, e.g. "Singapore" or "Lima, Peru"; never a venue, hotel or building name',
+    },
     start_date: { type: ['string', 'null'], description: 'conference start, YYYY-MM-DD' },
     end_date: { type: ['string', 'null'], description: 'conference end, YYYY-MM-DD' },
+    dates_evidence: {
+      type: ['string', 'null'],
+      description: 'verbatim page text stating the conference dates; null when the page does not state them',
+    },
     deadlines: { type: 'array', items: DEADLINE_ITEM },
   },
-  required: ['year', 'full_name', 'location', 'start_date', 'end_date', 'deadlines'],
+  required: ['year', 'full_name', 'location', 'start_date', 'end_date', 'dates_evidence', 'deadlines'],
 };
 
 export const EDITIONS_SCHEMA = {
@@ -66,9 +73,17 @@ export const PAGE_RULES = `Rules:
 - Ignore every other date, including registration, early bird pricing, travel grants,
   award or bursary applications, notification of acceptance, camera ready, and the
   conference dates themselves. If the page has no submission deadline, say so.
+- Ignore proposals for workshops, tutorials, special sessions or symposia, and any
+  "final submission" that follows an acceptance notification (that is the camera ready).
+- A " | " ends a table cell. Some tables put the date first and its label after it in the
+  same cell: in "24 January 2027 Submission Deadline | 16 April 2027 Accept/Reject
+  Notification |" the submission deadline is 24 January and 16 April is the notification.
+  A date belongs to the label in its own cell, never to the label in the cell before it.
 - "evidence" is page text copied unchanged, showing both the date and what it is for.
   When the label sits in a heading or an earlier row, quote from that label through the
   date, copying every character in between.
+- Give start_date and end_date only when the page states them, and copy the text that
+  states them into "dates_evidence".
 - "full_name" is the long official name of the conference, without the year or the acronym
   ("Conference on Uncertainty in Artificial Intelligence", not "UAI 2026"); null when the page
   only shows the acronym.

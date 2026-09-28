@@ -6,9 +6,11 @@
  * A deadline survives only if its quote appears on the page it cites (which
  * catches both invented dates and instructions smuggled into page text), the
  * quote names something being submitted, the quote shows the date rather than
- * merely implying it, the date is plausibly near, and it falls before the
- * conference itself. What survives becomes the facts object the shared merge
- * layer writes from, so sync_pin and curated fields still hold downstream.
+ * merely implying it, the date's own table cell does not label it a later
+ * stage, the date is plausibly near, and it falls before the conference
+ * itself. Conference dates need a quote too, and the location and full name
+ * must appear on the page. What survives becomes the facts object the shared
+ * merge layer writes from, so sync_pin and curated fields still hold downstream.
  */
 import { DateTime } from 'luxon';
 import { isValidDate } from '../../src/utils/conferenceSchema.js';
@@ -64,12 +66,12 @@ export function parseDeadline({ date, time, timezone_text }, entryTimezone) {
 }
 
 const normalize = (s) => s.toLowerCase().replace(/\s+/g, ' ').trim();
+// Ignores the stray spaces some sites print inside words ("AN NUAL CONGRESS").
+const squash = (s) => s.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
 
-// Stages that follow submission. They carry the word "paper", so the
-// submission check below cannot catch them. Attendee registration and early
-// bird rows need no entry here: they name no submission and fail that check,
-// while "Abstract Registration" is a submission deadline and must survive.
-const NOT_A_DEADLINE_RE = /camera.?ready|notification|acceptance/i;
+// Later stages and workshop or tutorial proposals, whose rows still say "paper" or
+// "submission". Not "registration": "Abstract Registration" is a real deadline.
+const NOT_A_DEADLINE_RE = /camera.?ready|notification|acceptance|\bproposals?\b/i;
 
 // Full names and their abbreviations, both anchored on word boundaries below.
 // A bare `sep[a-z]*` would let "separate", "maybe" and "marathon" stand in for
@@ -112,6 +114,51 @@ function dateShownInEvidence(dateIso, evidence) {
   if (!adjacent) return false;
   const fullYearShown = new RegExp(`(?<!\\d)${year}(?!\\d)`).test(evidence);
   return fullYearShown || orders(shortYear).some((re) => re.test(evidence));
+}
+
+const WEEKDAY = '(?:(?:mon|tue|wed|thu|fri|sat|sun)[a-z]*\\.?,?\\s*)?';
+const RANGE_SEP = `\\s*(?:-|\\u2013|\\u2014|to|until|through)\\s*${WEEKDAY}`;
+
+/**
+ * Whether a quote shows a conference's start and end, as two full dates or as
+ * a day range under one month ("July 5-8, 2027", "21-25 March 2027").
+ * @param {string} startIso
+ * @param {string|null} endIso
+ * @param {string} evidence
+ * @returns {{start: boolean, end: boolean}}
+ */
+function conferenceDatesShown(startIso, endIso, evidence) {
+  const [year, month, startDay] = startIso.split('-').map(Number);
+  const names = MONTHS[month - 1];
+  const nameRe = `\\b(?:${names.join('|')})\\b\\.?`;
+  const day = (d) => `0?${d}(?:st|nd|rd|th)?`;
+  const inRange = (endDay) =>
+    new RegExp(`(?<!\\d)${year}(?!\\d)`).test(evidence) &&
+    [
+      new RegExp(`${nameRe}\\s*${day(startDay)}${RANGE_SEP}${day(endDay)}(?!\\d)`, 'i'),
+      new RegExp(`(?<!\\d)${day(startDay)}${RANGE_SEP}${day(endDay)}\\s*${nameRe}`, 'i'),
+    ].some((re) => re.test(evidence));
+  const sameMonthEnd = endIso && Number(endIso.slice(5, 7)) === month ? Number(endIso.slice(8)) : null;
+  return {
+    start: dateShownInEvidence(startIso, evidence) || inRange('\\d{1,2}'),
+    end: Boolean(endIso) && (dateShownInEvidence(endIso, evidence) || (sameMonthEnd != null && inRange(sameMonthEnd))),
+  };
+}
+
+const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * The rest of the table cell a quote ends in. Where a page puts the date before
+ * its label ("16 April 2027 Accept/Reject Notification |"), that is the date's label.
+ * @returns {string|null} null when the quote is not inside a table cell.
+ */
+function ownCellLabel(pageText, evidence) {
+  const tokens = evidence.trim().split(/\s+/).map(escapeRe);
+  const m = new RegExp(tokens.join('\\s+'), 'i').exec(pageText);
+  if (!m) return null;
+  const rest = pageText.slice(m.index + m[0].length);
+  const end = rest.search(/[|\n]/);
+  return end !== -1 && rest[end] === '|' ? rest.slice(0, end).trim() : null;
 }
 
 // What remains must name the thing being submitted. Requiring the word beats
@@ -207,6 +254,38 @@ export function validateEditions({ editions = [] }, { pageText, today = DateTime
       flags.push(`edition ${edition.year}: start date "${startDate}" is not a real YYYY-MM-DD date; dropped`);
       startDate = null;
     }
+    let endDate = edition.end_date || null;
+    if (endDate && !isValidDate(endDate)) {
+      flags.push(`edition ${edition.year}: end date "${endDate}" is not a real YYYY-MM-DD date; dropped`);
+      endDate = null;
+    }
+    if (startDate) {
+      const quote = edition.dates_evidence ?? '';
+      const onPage = Boolean(quote) && haystack.includes(normalize(quote));
+      const shown = onPage ? conferenceDatesShown(startDate, endDate, quote) : { start: false, end: false };
+      if (!shown.start) {
+        flags.push(
+          `edition ${edition.year}: conference dates ${startDate}${endDate ? ` to ${endDate}` : ''} are not shown in a quote from the page; dropped`,
+        );
+        startDate = null;
+        endDate = null;
+      } else if (endDate && !shown.end) {
+        flags.push(`edition ${edition.year}: end date ${endDate} is not shown in the quote; dropped`);
+        endDate = null;
+      }
+    } else {
+      endDate = null;
+    }
+    let location = edition.location || null;
+    if (location && !haystack.includes(normalize(location.split(',')[0]))) {
+      flags.push(`edition ${edition.year}: location "${location}" is not on the page; dropped`);
+      location = null;
+    }
+    let fullName = edition.full_name || null;
+    if (fullName && !squash(pageText).includes(squash(fullName))) {
+      flags.push(`edition ${edition.year}: full name "${fullName}" is not on the page; dropped`);
+      fullName = null;
+    }
     const start = startDate ? DateTime.fromISO(startDate, { zone: 'utc' }) : null;
     const survivors = [];
     for (const d of edition.deadlines) {
@@ -224,6 +303,11 @@ export function validateEditions({ editions = [] }, { pageText, today = DateTime
         flags.push(`${label}: the page does not state this date; dropped ("${d.evidence.slice(0, 80)}")`);
         continue;
       }
+      const cellLabel = ownCellLabel(pageText, d.evidence);
+      if (cellLabel && NOT_A_DEADLINE_RE.test(cellLabel)) {
+        flags.push(`${label}: the page labels this date "${cellLabel}"; dropped`);
+        continue;
+      }
       const dt = parseDeadline(d, 'utc');
       if (!dt || dt < minDate || dt > maxDate) {
         flags.push(`${label}: implausible or unparseable date; dropped`);
@@ -238,19 +322,24 @@ export function validateEditions({ editions = [] }, { pageText, today = DateTime
       }
       survivors.push(d);
     }
-    out.push({ ...edition, start_date: startDate, deadlines: reconcileKinds(survivors, edition.year, flags) });
+    out.push({
+      ...edition,
+      full_name: fullName,
+      location,
+      start_date: startDate,
+      end_date: endDate,
+      deadlines: reconcileKinds(survivors, edition.year, flags),
+    });
   }
   return { editions: out, flags };
 }
 
 /**
  * Convert a validated edition into the facts shape the merge layer consumes.
- * end_date is deliberately dropped: the merge layer infers the end from the
- * start, and a venue page stating one without the other is common.
  * @param {object} edition Validated edition.
  * @param {string} entryTimezone The matched entry's timezone field.
  * @returns {{fullName: string|null, location: string|null, startIso: string|null,
- *   abstractDeadline: DateTime|null, deadline: DateTime|null}}
+ *   endIso: string|null, abstractDeadline: DateTime|null, deadline: DateTime|null}}
  */
 export function editionToFacts(edition, entryTimezone) {
   const byKind = (kind) => edition.deadlines.find((d) => d.kind === kind);
@@ -260,6 +349,7 @@ export function editionToFacts(edition, entryTimezone) {
     fullName: edition.full_name || null,
     location: edition.location || null,
     startIso: edition.start_date || null,
+    endIso: edition.end_date || null,
     abstractDeadline: abstract ? parseDeadline(abstract, entryTimezone) : null,
     deadline: paper ? parseDeadline(paper, entryTimezone) : null,
   };

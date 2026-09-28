@@ -1,10 +1,11 @@
 /**
  * Merge rules shared by every sync: decides what a source may write into a
  * conference entry. Only "factual" fields are ever touched (deadline,
- * abstract_deadline, place, start, end, date, and full_name when the entry has
- * none); curated fields (sub, type, note, link, paperslink, id, timezone,
+ * abstract_deadline, start, end, date, and place and full_name when the entry
+ * has none); curated fields (sub, type, note, link, paperslink, id, timezone,
  * deadline_status, hindex, pwclink) are protected by construction because they
- * are never passed to the setter.
+ * are never passed to the setter. A value the source does not state is left
+ * alone, never derived from the old one.
  * An entry can also pin individual factual fields via `sync_pin` (a list of
  * field names) when a curated value should win over the source, e.g. a venue
  * whose announced deadline differs from the portal cutoff; pinned fields are
@@ -14,12 +15,14 @@
  * missing or drafted; a curated one is kept, and flagged when the source's
  * core name differs.
  *
- * Sources hand in a `facts` object: {fullName, location, startIso,
- * abstractDeadline, deadline}, with the deadlines as Luxon UTC instants.
+ * Sources hand in a `facts` object: {fullName, location, startIso, endIso,
+ * link, abstractDeadline, deadline}, with the deadlines as Luxon UTC instants;
+ * endIso and link are optional.
  * Building it from a source's payload is the source's own job (see
  * scripts/sync-openreview/facts.js and scripts/sync-llm/facts.js).
  */
-import { toZoneString, formatDateRange, nextId, inferEndDate } from './dates.js';
+import { DateTime } from 'luxon';
+import { toZoneString, formatDateRange, nextId, namesYear } from './dates.js';
 import { cleanFullName, sameConferenceName } from './names.js';
 
 /** Fields a sync may write into an entry, i.e. the ones `sync_pin` accepts. */
@@ -28,21 +31,38 @@ export const SYNC_PINNABLE_FIELDS = [
 ];
 
 /**
+ * The curated place and the source's name one city when a curated segment
+ * other than the country appears in the source's string: "Boston,
+ * Massachusetts, USA" and "Northeastern University, Boston" agree, while
+ * "Paris, France" and "Lyon, France" do not.
+ */
+function samePlace(curated, reported) {
+  const parts = curated.split(',').map((p) => p.trim().toLowerCase()).filter(Boolean);
+  const local = parts.length > 1 ? parts.slice(0, -1) : parts;
+  const haystack = reported.toLowerCase();
+  return local.some((p) => haystack.includes(p));
+}
+
+/**
  * Apply facts to an existing entry, mutating it in place. Deadlines are
- * rendered in the entry's own timezone. When the start moves, the end is
- * shifted by the same delta and flagged; when the source's start year does
- * not match the edition year (upstream typo), start/end/date are left
- * untouched and flagged instead.
+ * rendered in the entry's own timezone. Start, end and date move only as far
+ * as the source states them: a moved start with no stated end is flagged, not
+ * shifted, and a source start in another year than the edition (upstream
+ * typo) is flagged too. A curated place is kept; a source naming another city
+ * is flagged.
  * @param {object} entry A conferences.yaml entry (mutated).
  * @param {object} facts Facts from the source's own facts builder.
- * @param {{deadlinesOnly?: boolean}} [opts] deadlinesOnly restricts writes to
- *   deadline fields, used for venues split into one entry per location.
+ * @param {{deadlinesOnly?: boolean, today?: DateTime}} [opts] deadlinesOnly
+ *   restricts writes to deadline fields, used for venues split into one entry
+ *   per location. With today, a deadline whose old and new values have both
+ *   passed is left alone.
  * @returns {{changes: Array<{id: string, field: string, old: string|null, new: string}>, flags: string[]}}
  *   The field-level changes made and any items needing human attention.
  */
-export function updateEntry(entry, facts, { deadlinesOnly = false } = {}) {
+export function updateEntry(entry, facts, opts = {}) {
   const changes = [];
   const flags = [];
+  const { deadlinesOnly = false, today = null } = opts;
   const pinned = new Set(entry.sync_pin ?? []);
   // Returns whether the field was actually written, so callers can avoid
   // deriving other fields from a value a pin rejected.
@@ -59,8 +79,14 @@ export function updateEntry(entry, facts, { deadlinesOnly = false } = {}) {
     return true;
   };
 
-  set('deadline', facts.deadline && toZoneString(facts.deadline, entry.timezone));
-  set('abstract_deadline', facts.abstractDeadline && toZoneString(facts.abstractDeadline, entry.timezone));
+  const setDeadline = (field, dt) => {
+    if (!dt) return;
+    const old = entry[field] && DateTime.fromISO(entry[field].replace(' ', 'T'), { zone: entry.timezone });
+    if (today && old?.isValid && old < today && dt < today) return;
+    set(field, toZoneString(dt, entry.timezone));
+  };
+  setDeadline('deadline', facts.deadline);
+  setDeadline('abstract_deadline', facts.abstractDeadline);
 
   if (!deadlinesOnly) {
     const fullName = cleanFullName(facts.fullName, entry);
@@ -69,37 +95,49 @@ export function updateEntry(entry, facts, { deadlinesOnly = false } = {}) {
     } else if (fullName && !sameConferenceName(entry.full_name, fullName)) {
       flags.push(`${entry.id}: full_name kept as "${entry.full_name}"; source names it "${fullName}"`);
     }
-    set('place', facts.location);
-    if (facts.startIso && facts.startIso !== entry.start) {
-      const startYear = Number(facts.startIso.slice(0, 4));
-      if (startYear !== entry.year) {
-        flags.push(
-          `${entry.id}: source start date ${facts.startIso} is in year ${startYear} but the edition year is ${entry.year}; start/end/date left untouched`,
-        );
-      } else {
-        const oldStart = entry.start;
-        const mustShiftEnd = Boolean(oldStart && entry.end);
-        if (pinned.has('start')) {
-          flags.push(`${entry.id}: start pinned; source reports ${facts.startIso}`);
-        } else if (mustShiftEnd && pinned.has('end')) {
-          flags.push(
-            `${entry.id}: source moved start to ${facts.startIso} but end is pinned; start, end and date left untouched, fix them by hand`,
-          );
-        } else {
-          set('start', facts.startIso);
-          if (mustShiftEnd && set('end', inferEndDate(oldStart, entry.end, facts.startIso))) {
-            flags.push(
-              `${entry.id}: end shifted to keep the previous duration after start moved; verify against the venue site`,
-            );
-          }
-          if (entry.start && entry.end) {
-            set('date', formatDateRange(entry.start, entry.end));
-          }
-        }
-      }
+    if (!entry.place) {
+      set('place', facts.location);
+    } else if (facts.location && !samePlace(entry.place, facts.location)) {
+      flags.push(`${entry.id}: place kept as "${entry.place}"; source reports "${facts.location}"`);
     }
+    updateDates(entry, facts, { set, pinned, flags });
   }
   return { changes, flags };
+}
+
+/** The start/end/date part of updateEntry; see its doc comment for the rules. */
+function updateDates(entry, { startIso = null, endIso = null }, { set, pinned, flags }) {
+  const start = startIso ?? entry.start;
+  const end = endIso ?? entry.end;
+  if (start === entry.start && end === entry.end) return;
+  if (!start) return;
+
+  const startYear = Number(start.slice(0, 4));
+  if (startYear !== entry.year) {
+    flags.push(
+      `${entry.id}: source start date ${start} is in year ${startYear} but the edition year is ${entry.year}; start/end/date left untouched`,
+    );
+    return;
+  }
+  if (end && end < start) {
+    flags.push(`${entry.id}: source range ${start} to ${end} ends before it starts; start, end and date left untouched`);
+    return;
+  }
+  if (!endIso && entry.end && start !== entry.start) {
+    flags.push(
+      `${entry.id}: source moved start to ${start} but states no end; start, end and date left untouched, fix them by hand`,
+    );
+    return;
+  }
+  const blocked = [['start', start], ['end', end]].filter(([f, v]) => pinned.has(f) && v !== entry[f]);
+  if (blocked.length > 0) {
+    const what = blocked.map(([f, v]) => `${f} pinned (source reports ${v})`).join(', ');
+    flags.push(`${entry.id}: ${what}; start, end and date left untouched`);
+    return;
+  }
+  set('start', start);
+  set('end', end);
+  if (entry.start && entry.end) set('date', formatDateRange(entry.start, entry.end));
 }
 
 // Fields that are edition-specific and would be stale on a cloned draft
@@ -108,15 +146,16 @@ const DRAFT_DROPPED_FIELDS = ['note', 'paperslink', 'deadline_status', 'sync_pin
 
 /**
  * Draft a new edition by cloning the previous one and overwriting it with
- * facts. Curated fields (sub, type, timezone, link) carry over from the clone;
- * edition-specific fields (note, paperslink, deadline_status) are dropped; the
- * end date is inferred from the previous edition's duration and flagged; the
+ * facts. Curated fields (sub, type, timezone) carry over from the clone;
+ * edition-specific fields (note, paperslink, deadline_status) are dropped, and
+ * so are place, start, end and date unless the source states them. The link
+ * comes from the source; a cloned one naming the previous year is flagged. The
  * full_name comes from the source when it passes the gate, else from the clone.
  * @param {object} prevEntry The venue's latest existing entry (not mutated).
  * @param {object} facts Facts from the source's own facts builder.
  * @param {number} year Edition year of the draft.
  * @returns {{entry: object, flags: string[]}} The drafted entry and the
- *   attention items (inferred/missing dates, year mismatches).
+ *   attention items (missing facts, a stale link, year mismatches).
  */
 export function draftEntry(prevEntry, facts, year) {
   const entry = { ...prevEntry };
@@ -132,8 +171,17 @@ export function draftEntry(prevEntry, facts, year) {
     const why = facts.fullName ? `the source reports "${facts.fullName}"` : 'the source has none';
     flags.push(`full_name kept from ${prevEntry.id} (${why}); check its edition ordinal`);
   }
-  if (facts.location) entry.place = facts.location;
-  else flags.push(`place kept from ${prevEntry.id}; the source has none yet`);
+  if (facts.link) {
+    entry.link = facts.link;
+  } else if (entry.link && namesYear(entry.link, prevEntry.year)) {
+    flags.push(`link still points at the ${prevEntry.year} edition (${entry.link}); update it by hand`);
+  }
+  if (facts.location) {
+    entry.place = facts.location;
+  } else {
+    delete entry.place;
+    flags.push('no place from the source yet');
+  }
 
   // Assigning to an existing key keeps its position in the dumped YAML;
   // only delete when the fact is absent.
@@ -162,14 +210,13 @@ export function draftEntry(prevEntry, facts, year) {
 
   if (startIso) {
     entry.start = startIso;
-    if (prevEntry.start && prevEntry.end) {
-      entry.end = inferEndDate(prevEntry.start, prevEntry.end, startIso);
+    if (facts.endIso && facts.endIso >= startIso) {
+      entry.end = facts.endIso;
       entry.date = formatDateRange(entry.start, entry.end);
-      flags.push(`end date inferred from ${prevEntry.id} duration; verify against the venue site`);
     } else {
       delete entry.end;
       delete entry.date;
-      flags.push('no previous duration to infer end date from; set end and date manually');
+      flags.push('no end date from the source yet; set end and date by hand');
     }
   } else {
     delete entry.start;

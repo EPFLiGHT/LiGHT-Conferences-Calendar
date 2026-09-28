@@ -9,16 +9,16 @@
     "note": "site returns 403 to bots; deadlines may need manual updates"
   },
   "MICCAI": {
-    "url": "https://conferences.miccai.org/2026/en/IMPORTANT-DATES.html",
-    "home": "https://conferences.miccai.org/2026/en/default.asp"
+    "url": "https://conferences.miccai.org/2027/en/IMPORTANT-DATES.html",
+    "home": "https://conferences.miccai.org/2027/en/"
   },
   "AIME": {
-    "url": "https://aime26.aimedicine.info/call-for-papers/",
-    "home": "https://aime26.aimedicine.info/"
+    "url": "https://aime27.aimedicine.info/call-for-papers/",
+    "home": "https://aime27.aimedicine.info/"
   },
   "IEEE EMBC": {
     "url": "https://embc.embs.org/2027/important-dates",
-    "home": "https://embc.embs.org/2026/"
+    "home": "https://embc.embs.org/2027/"
   },
   "PSB": {
     "url": "https://psb.stanford.edu/keydates",
