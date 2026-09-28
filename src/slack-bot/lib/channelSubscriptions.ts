@@ -1,10 +1,10 @@
 /**
  * Channel Subscriptions Management
  * Tracks which channels the bot should post reminders to across all workspaces
- * Uses Vercel KV (Redis) for storage
+ * Uses Upstash Redis for storage
  */
 
-import { kv } from '@vercel/kv';
+import { kv } from './kv';
 import type { ChannelSubscription } from '@/types/slack';
 import { logger } from '../utils/logger';
 import { kvKeys } from './kvKeys';

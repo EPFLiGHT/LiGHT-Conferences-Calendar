@@ -117,7 +117,7 @@ export default function PrivacyPolicyPage() {
               How the Conferences Calendar Bot collects, uses, and protects your information.
             </Text>
             <Text textStyle="metaLabel" color="brand.400" className="tabular" whiteSpace="nowrap">
-              Updated 2 Jul 2026
+              Updated 28 Sep 2026
             </Text>
           </Flex>
 
@@ -185,8 +185,8 @@ export default function PrivacyPolicyPage() {
           </Section>
 
           <Section num="03" title="Data storage & security">
-            <Bullet>All user preferences are stored securely in a Vercel KV (Redis) database with encryption at rest.</Bullet>
-            <Bullet>Workspace OAuth tokens are stored securely in the same encrypted database.</Bullet>
+            <Bullet>All user preferences are stored in an Upstash Redis database, and every connection to it is encrypted in transit (TLS).</Bullet>
+            <Bullet>Workspace OAuth tokens are stored in the same database.</Bullet>
             <Bullet>All communications with the Slack API are encrypted via HTTPS.</Bullet>
             <Bullet>Access to the database is restricted and authenticated.</Bullet>
             <Bullet>We do not sell, trade, or share your personal information with third parties.</Bullet>
@@ -237,8 +237,14 @@ export default function PrivacyPolicyPage() {
               </ChakraLink>
             </Bullet>
             <Bullet>
-              <Text as="span" fontWeight="600" color="brand.500">Vercel</Text>: hosting and database storage.{' '}
+              <Text as="span" fontWeight="600" color="brand.500">Vercel</Text>: hosting.{' '}
               <ChakraLink href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" {...inlineLinkStyle} display="inline-flex" alignItems="center" gap="1">
+                Privacy policy <ArrowUpRight size={11} strokeWidth={2} />
+              </ChakraLink>
+            </Bullet>
+            <Bullet>
+              <Text as="span" fontWeight="600" color="brand.500">Upstash</Text>: database storage.{' '}
+              <ChakraLink href="https://upstash.com/trust/privacy.pdf" target="_blank" rel="noopener noreferrer" {...inlineLinkStyle} display="inline-flex" alignItems="center" gap="1">
                 Privacy policy <ArrowUpRight size={11} strokeWidth={2} />
               </ChakraLink>
             </Bullet>

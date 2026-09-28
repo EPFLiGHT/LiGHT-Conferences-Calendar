@@ -1,11 +1,11 @@
 /**
  * Team Token Storage
  *
- * Manages storage and retrieval of Slack workspace tokens in Vercel KV.
+ * Manages storage and retrieval of Slack workspace tokens in Upstash Redis.
  * Supports multiple workspace installations with OAuth.
  */
 
-import { kv } from '@vercel/kv';
+import { kv } from './kv';
 import { kvKeys } from './kvKeys';
 
 interface TeamMetadata {
@@ -48,7 +48,7 @@ export async function storeTeamMetadata(
   metadata: TeamMetadata
 ): Promise<void> {
   const key = kvKeys.team.metadata(teamId);
-  await kv.set(key, JSON.stringify(metadata));
+  await kv.set(key, metadata);
   console.log(`✅ Stored metadata for team: ${teamId}`);
 }
 
@@ -57,13 +57,8 @@ export async function storeTeamMetadata(
  */
 export async function getTeamMetadata(teamId: string): Promise<TeamMetadata | null> {
   const key = kvKeys.team.metadata(teamId);
-  const metadata = await kv.get<string>(key);
-
-  if (!metadata) {
-    return null;
-  }
-
-  return JSON.parse(metadata);
+  // The client JSON-decodes on read, including entries stored as JSON strings
+  return kv.get<TeamMetadata>(key);
 }
 
 /**
@@ -86,7 +81,6 @@ export async function removeTeamData(teamId: string): Promise<void> {
  * This allows the bot to work with both OAuth and legacy single-token mode
  */
 export async function getTokenWithFallback(teamId?: string): Promise<string> {
-  // If we have a team ID, try to get the OAuth token
   if (teamId) {
     const oauthToken = await getTeamToken(teamId);
     if (oauthToken) {
@@ -95,7 +89,6 @@ export async function getTokenWithFallback(teamId?: string): Promise<string> {
     console.warn(`⚠️  No OAuth token for team ${teamId}, falling back to env var`);
   }
 
-  // Fallback to environment variable (legacy mode)
   const envToken = process.env.SLACK_BOT_TOKEN;
   if (!envToken) {
     throw new Error(

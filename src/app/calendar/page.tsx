@@ -8,11 +8,19 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { Crosshair, Download } from 'lucide-react';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import listPlugin from '@fullcalendar/list';
-import luxonPlugin from '@fullcalendar/luxon3';
+import FullCalendar, {
+  joinClassNames,
+  type CalendarRef,
+  type EventClickInfo,
+  type EventInput,
+} from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/react/daygrid';
+import timeGridPlugin from '@fullcalendar/react/timegrid';
+import listPlugin from '@fullcalendar/react/list';
+import classicThemePlugin from '@fullcalendar/react/themes/classic';
+import '@fullcalendar/react/skeleton.css';
+import '@fullcalendar/react/themes/classic/theme.css';
+import '@fullcalendar/react/themes/classic/palette.css';
 import { DateTime } from 'luxon';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -28,11 +36,10 @@ import { getEventColorFromSubjects, toISOFormat } from '@/utils/parser';
 import { conferenceToICSEvents, createICSContent, downloadICS } from '@/utils/ics';
 import { secondaryButtonStyle, primaryButtonStyle } from '@/styles/buttonStyles';
 import type { Conference } from '@/types/conference';
-import { EventClickArg } from '@fullcalendar/core';
 
 
 function CalendarContent() {
-  const calendarRef = useRef<FullCalendar>(null);
+  const calendarRef = useRef<CalendarRef>(null);
   const { conferences, loading, error } = useConferences();
   const initialParams = useInitialURLParams();
   const { syncFiltersToURL, syncSearchToURL } = useURLSync('/calendar');
@@ -64,24 +71,22 @@ function CalendarContent() {
     syncFiltersToURL('', cleared);
   };
 
-  // Use the centralized filtering hook instead of duplicating logic
   const filteredConferences = useConferenceFilters(conferences, searchQuery, filters);
 
   const calendarEvents = useMemo(() => {
-    const events: any[] = [];
+    const events: EventInput[] = [];
 
     filteredConferences.forEach(conf => {
-      const eventColors = getEventColorFromSubjects(conf.sub);
+      const color = getEventColorFromSubjects(conf.sub).backgroundColor;
 
       if (conf.start && conf.end) {
         events.push({
           id: `conf-${conf.id}`,
           title: `${conf.title} ${conf.year}`,
           start: conf.start,
-          end: DateTime.fromISO(conf.end).plus({ days: 1 }).toISODate(),
+          end: DateTime.fromISO(conf.end).plus({ days: 1 }).toISODate() ?? undefined,
           allDay: true,
-          backgroundColor: eventColors.backgroundColor,
-          borderColor: eventColors.borderColor,
+          color,
           extendedProps: {
             type: 'conference',
             conference: conf,
@@ -98,8 +103,7 @@ function CalendarContent() {
             start: dt.toISO(),
             end: dt.plus({ hours: 1 }).toISO(),
             allDay: false,
-            backgroundColor: eventColors.backgroundColor,
-            borderColor: eventColors.borderColor,
+            color,
             extendedProps: {
               type: 'abstract',
               conference: conf,
@@ -118,8 +122,7 @@ function CalendarContent() {
             start: dt.toISO(),
             end: dt.plus({ hours: 1 }).toISO(),
             allDay: false,
-            backgroundColor: eventColors.backgroundColor,
-            borderColor: eventColors.borderColor,
+            color,
             extendedProps: {
               type: 'submission',
               conference: conf,
@@ -133,7 +136,7 @@ function CalendarContent() {
     return events;
   }, [filteredConferences]);
 
-  const handleEventClick = (info: EventClickArg) => {
+  const handleEventClick = (info: EventClickInfo) => {
     const conference = info.event.extendedProps.conference;
     setSelectedConference(conference);
   };
@@ -146,10 +149,7 @@ function CalendarContent() {
 
 
   const handleToday = () => {
-    const calendarApi = calendarRef.current?.getApi();
-    if (calendarApi) {
-      calendarApi.today();
-    }
+    calendarRef.current?.getApi().today();
   };
 
   if (loading) return <LoadingState />;
@@ -217,20 +217,9 @@ function CalendarContent() {
             borderRadius="card"
             p={{ base: '4', md: '6' }}
           >
-            <style>{`
-              .fc-event {
-                margin-bottom: 4px !important;
-              }
-              .fc-daygrid-event {
-                margin-bottom: 4px !important;
-              }
-              .fc-timegrid-event {
-                margin-bottom: 6px !important;
-              }
-            `}</style>
             <FullCalendar
               ref={calendarRef}
-              plugins={[dayGridPlugin, timeGridPlugin, listPlugin, luxonPlugin]}
+              plugins={[classicThemePlugin, dayGridPlugin, timeGridPlugin, listPlugin]}
               initialView="dayGridMonth"
               headerToolbar={{
                 left: 'prev,next',
@@ -247,10 +236,37 @@ function CalendarContent() {
                 hour12: false,
               }}
               eventDisplay="block"
-              displayEventTime={true}
               displayEventEnd={true}
+              allDayText="all-day"
+              views={{
+                dayGridMonth: { displayEventTime: false },
+                timeGridWeek: {
+                  titleFormat: { year: 'numeric', month: 'short', day: 'numeric' },
+                  dayHeaderFormat: { weekday: 'short', month: 'numeric', day: 'numeric', omitCommas: true },
+                },
+              }}
               dayMaxEvents={false}
               eventMaxStack={10}
+              className="cal"
+              toolbarClass="cal-toolbar"
+              toolbarSectionClass="cal-toolbar-section"
+              toolbarTitleClass="cal-title"
+              buttonClass={(info) => joinClassNames('cal-button', info.isSelected && 'cal-button-active')}
+              dayHeaderClass="cal-day-header"
+              dayHeaderInnerClass="cal-day-header-text"
+              dayCellTopInnerClass={(info) => joinClassNames('cal-day-number', info.isToday && 'cal-day-number-today')}
+              eventClass="cal-event"
+              rowEventClass="cal-block-event"
+              rowEventInnerClass="cal-event-inner"
+              rowEventTitleClass="cal-event-inner"
+              columnEventClass="cal-block-event"
+              columnEventTimeClass="cal-column-event-text cal-column-event-time"
+              columnEventTitleClass="cal-column-event-text"
+              listDayHeaderClass="cal-list-day"
+              listDayHeaderInnerClass="cal-list-day-text"
+              listItemEventClass="cal-list-event"
+              listItemEventTimeClass="cal-list-event-text cal-list-event-time"
+              listItemEventTitleClass="cal-list-event-text"
             />
           </Box>
 

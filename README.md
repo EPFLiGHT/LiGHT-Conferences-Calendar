@@ -45,7 +45,7 @@ workspace via OAuth. Setup and command reference: [SLACK_BOT_README.md](SLACK_BO
 
 There is no database. Conferences are authored as YAML and deployed as static files with the rest of the
 site; the browser fetches and parses them on page load. The Slack bot pulls the same files from the deployed
-site through the same parser and caches the result in Vercel KV. Schema validation (`pnpm validate`) runs in
+site through the same parser and caches the result in Upstash Redis. Schema validation (`pnpm validate`) runs in
 CI on every PR, so malformed data never reaches either consumer.
 
 ### Keeping deadlines fresh
@@ -147,7 +147,7 @@ To run it locally, put `OPENAI_API_KEY=...` in `.env.local`. `--venue "<title>"`
 ## Stack
 
 Next.js 16, React 19, TypeScript, Chakra UI v3, FullCalendar, Luxon, js-yaml. The site is a static export
-deployed to GitHub Pages; the Slack API routes run on Vercel, with Vercel KV (Redis) backing bot state.
+deployed to GitHub Pages; the Slack API routes run on Vercel, with Upstash Redis backing bot state.
 
 ## Contributing
 
