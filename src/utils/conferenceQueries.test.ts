@@ -1,6 +1,10 @@
-import { describe, it, expect } from 'vitest';
-import { DateTime } from 'luxon';
-import { getUpcomingEvents, filterDeadlinesByReminders } from '@/utils/conferenceQueries';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { DateTime, Settings } from 'luxon';
+import {
+  getUpcomingEvents,
+  getEventStartsOnDays,
+  filterDeadlinesByReminders,
+} from '@/utils/conferenceQueries';
 import type { Conference } from '@/types/conference';
 
 function conf(id: string, start?: string): Conference {
@@ -62,6 +66,36 @@ describe('getUpcomingEvents', () => {
   it('reports a non-negative daysLeft for upcoming events', () => {
     const [event] = getUpcomingEvents([conf('x', iso(5))]);
     expect(event.daysLeft).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('event start day counts across timezones', () => {
+  const ZONES = ['UTC-12', 'America/Los_Angeles', 'America/New_York', 'utc', 'Europe/Paris', 'Asia/Tokyo'];
+  let prevZone: typeof Settings.defaultZone;
+
+  // Vercel's daily cron: 09:00 UTC, three days before an Oct 5 start.
+  beforeEach(() => {
+    prevZone = Settings.defaultZone;
+    Settings.defaultZone = 'utc';
+    vi.useFakeTimers({ now: new Date('2026-10-02T09:00:00Z') });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    Settings.defaultZone = prevZone;
+  });
+
+  const startingOct5 = (timezone: string) =>
+    ({ ...conf(timezone, '2026-10-05'), timezone }) as Conference;
+
+  it.each(ZONES)('getEventStartsOnDays matches the 3-day reminder for %s', (zone) => {
+    const [event] = getEventStartsOnDays([startingOct5(zone)], [30, 7, 3]);
+    expect(event?.daysLeft).toBe(3);
+  });
+
+  it.each(ZONES)('getUpcomingEvents reports 3 days left for %s', (zone) => {
+    const [event] = getUpcomingEvents([startingOct5(zone)]);
+    expect(event?.daysLeft).toBe(3);
   });
 });
 

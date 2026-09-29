@@ -7,15 +7,27 @@ import { Redis } from '@upstash/redis';
 
 let client: Redis | undefined;
 
+/** First env pair with both URL and token set, UPSTASH_* before KV_*. */
+function readCredentials(): { url: string; token: string } | undefined {
+  const pairs = [
+    [process.env.UPSTASH_REDIS_REST_URL, process.env.UPSTASH_REDIS_REST_TOKEN],
+    [process.env.KV_REST_API_URL, process.env.KV_REST_API_TOKEN],
+  ];
+  for (const [url, token] of pairs) {
+    if (url && token) return { url, token };
+  }
+  return undefined;
+}
+
 function getClient(): Redis {
   if (!client) {
-    const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
-    const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
-    if (!url || !token) {
+    const credentials = readCredentials();
+    if (!credentials) {
       throw new Error(
         'Missing Redis credentials: set KV_REST_API_URL and KV_REST_API_TOKEN (or UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN)'
       );
     }
+    const { url, token } = credentials;
     client = new Redis({
       url,
       token,

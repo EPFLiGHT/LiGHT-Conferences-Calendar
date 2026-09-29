@@ -37,6 +37,35 @@ import { conferenceToICSEvents, createICSContent, downloadICS } from '@/utils/ic
 import { secondaryButtonStyle, primaryButtonStyle } from '@/styles/buttonStyles';
 import type { Conference } from '@/types/conference';
 
+// Stable references, so FullCalendar does not reprocess options on every render.
+const PLUGINS = [classicThemePlugin, dayGridPlugin, timeGridPlugin, listPlugin];
+
+const HEADER_TOOLBAR = {
+  left: 'prev,next',
+  center: 'title',
+  right: 'dayGridMonth,timeGridWeek,listMonth',
+};
+
+const EVENT_TIME_FORMAT = {
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+} as const;
+
+const VIEWS = {
+  dayGridMonth: { displayEventTime: false },
+  timeGridWeek: {
+    titleFormat: { year: 'numeric', month: 'short', day: 'numeric' },
+    dayHeaderFormat: { weekday: 'short', month: 'numeric', day: 'numeric', omitCommas: true },
+  },
+} as const;
+
+const buttonClass = (info: { isSelected: boolean }) =>
+  joinClassNames('cal-button', info.isSelected && 'cal-button-active');
+
+const dayCellTopInnerClass = (info: { isToday: boolean }) =>
+  joinClassNames('cal-day-number', info.isToday && 'cal-day-number-today');
+
 
 function CalendarContent() {
   const calendarRef = useRef<CalendarRef>(null);
@@ -219,42 +248,28 @@ function CalendarContent() {
           >
             <FullCalendar
               ref={calendarRef}
-              plugins={[classicThemePlugin, dayGridPlugin, timeGridPlugin, listPlugin]}
+              plugins={PLUGINS}
               initialView="dayGridMonth"
-              headerToolbar={{
-                left: 'prev,next',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,listMonth',
-              }}
+              headerToolbar={HEADER_TOOLBAR}
               events={calendarEvents}
               eventClick={handleEventClick}
               height="auto"
               timeZone="local"
-              eventTimeFormat={{
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false,
-              }}
+              eventTimeFormat={EVENT_TIME_FORMAT}
               eventDisplay="block"
               displayEventEnd={true}
               allDayText="all-day"
-              views={{
-                dayGridMonth: { displayEventTime: false },
-                timeGridWeek: {
-                  titleFormat: { year: 'numeric', month: 'short', day: 'numeric' },
-                  dayHeaderFormat: { weekday: 'short', month: 'numeric', day: 'numeric', omitCommas: true },
-                },
-              }}
+              views={VIEWS}
               dayMaxEvents={false}
               eventMaxStack={10}
               className="cal"
               toolbarClass="cal-toolbar"
               toolbarSectionClass="cal-toolbar-section"
               toolbarTitleClass="cal-title"
-              buttonClass={(info) => joinClassNames('cal-button', info.isSelected && 'cal-button-active')}
+              buttonClass={buttonClass}
               dayHeaderClass="cal-day-header"
               dayHeaderInnerClass="cal-day-header-text"
-              dayCellTopInnerClass={(info) => joinClassNames('cal-day-number', info.isToday && 'cal-day-number-today')}
+              dayCellTopInnerClass={dayCellTopInnerClass}
               eventClass="cal-event"
               rowEventClass="cal-block-event"
               rowEventInnerClass="cal-event-inner"

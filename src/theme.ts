@@ -119,7 +119,7 @@ export const system = createSystem(defaultConfig, defineConfig({
   globalCss: {
     'html, body': {
       background: '#ffffff',
-      color: '#041634',
+      color: '{colors.brand.900}',
     },
     '.tabular': {
       fontVariantNumeric: 'tabular-nums',
@@ -140,7 +140,9 @@ export const system = createSystem(defaultConfig, defineConfig({
       fontVariantNumeric: 'tabular-nums',
       '--fc-classic-primary': brand(1),
       '--fc-classic-today': brand(0.04),
-      '--fc-classic-foreground': '#041634',
+      '--fc-classic-foreground': '{colors.brand.900}',
+      '--fc-classic-border': brand(0.14),
+      '--fc-classic-strong-border': brand(0.22),
     },
 
     /* Toolbar buttons */
@@ -233,7 +235,7 @@ export const system = createSystem(defaultConfig, defineConfig({
 
     '.cal .cal-day-number-today': {
       background: '{colors.brand.500}',
-      color: 'white',
+      color: 'white !important',
       borderRadius: '2px',
       minWidth: '1.6rem',
       height: '1.6rem',
@@ -254,13 +256,12 @@ export const system = createSystem(defaultConfig, defineConfig({
       opacity: '0.85',
     },
 
-    /* Month bars, all-day bars and week-view blocks (not list rows) */
+    /* Month bars, all-day bars and week-view blocks (not list rows). Borders
+       come from the theme, which leaves the edges of week-split events open. */
     '.cal .cal-block-event': {
       fontSize: '0.85rem !important',
       lineHeight: '1.5 !important',
       padding: '2px 6px !important',
-      border: '1px solid var(--fc-event-color) !important',
-      borderRadius: '3px !important',
       marginBottom: '4px !important',
     },
 
@@ -301,7 +302,6 @@ export const system = createSystem(defaultConfig, defineConfig({
       fontSize: '0.78rem !important',
       padding: '8px 14px !important',
       borderRadius: '0 !important',
-      borderBottom: '1px solid var(--fc-classic-border)',
     },
 
     '.cal .cal-list-event:hover': {
@@ -329,6 +329,15 @@ export const system = createSystem(defaultConfig, defineConfig({
       '.cal .cal-toolbar-section': {
         display: 'flex !important',
         justifyContent: 'center !important',
+      },
+
+      '.cal .cal-title': {
+        fontSize: '1.25rem !important',
+      },
+
+      '.cal .cal-button': {
+        fontSize: '0.875rem !important',
+        padding: '0.375rem 0.75rem !important',
       },
     } as any,
   },

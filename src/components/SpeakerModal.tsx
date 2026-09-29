@@ -25,7 +25,7 @@ export default function SpeakerModal({ speaker, onClose }: SpeakerModalProps): J
   const total = sortedPresentations.length;
 
   return (
-    <ModalShell onClose={onClose}>
+    <ModalShell onClose={onClose} label={speaker.name}>
       {(close) => (
         <>
           <ModalHeader eyebrow="Speaker Profile" onClose={close}>

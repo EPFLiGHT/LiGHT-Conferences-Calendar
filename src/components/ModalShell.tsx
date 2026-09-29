@@ -1,7 +1,7 @@
 'use client';
 
 import type { JSX } from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Box, Portal, Text } from '@chakra-ui/react';
 import { X } from 'lucide-react';
 
@@ -63,24 +63,31 @@ export function ModalHeader({ eyebrow, onClose, children }: ModalHeaderProps): J
 
 interface ModalShellProps {
   onClose: () => void;
+  /** Accessible name of the dialog. */
+  label: string;
   /** Max width of the modal card. */
   maxW?: string;
   /** Card contents. Receives `close` for the header's close button. */
   children: (close: () => void) => React.ReactNode;
 }
 
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 /**
  * Shared modal scaffolding: portal, dimmed backdrop, blur, Escape-to-close,
- * page scroll-lock, backdrop-click-to-close, and the white card with its top
- * accent rule. Single source for modal behavior so ConferenceModal and
+ * focus trap, page scroll-lock, backdrop-click-to-close, and the white card with
+ * its top accent rule. Single source for modal behavior so ConferenceModal and
  * SpeakerModal cannot drift.
  */
 export default function ModalShell({
   onClose,
+  label,
   maxW = '860px',
   children,
 }: ModalShellProps): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(true);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   const handleClose = () => {
     setIsOpen(false);
@@ -88,13 +95,39 @@ export default function ModalShell({
   };
 
   useEffect(() => {
-    const handleEscapeKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        handleClose();
+    const opener = document.activeElement;
+    dialogRef.current?.focus({ preventScroll: true });
+
+    const trapTab = (e: KeyboardEvent) => {
+      const dialog = dialogRef.current;
+      if (!dialog) return;
+      const items = Array.from(dialog.querySelectorAll<HTMLElement>(FOCUSABLE));
+      if (items.length === 0) {
+        e.preventDefault();
+        return;
+      }
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+      const outside = !dialog.contains(active);
+      if (e.shiftKey && (outside || active === first || active === dialog)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (outside || active === last)) {
+        e.preventDefault();
+        first.focus();
       }
     };
 
-    document.addEventListener('keydown', handleEscapeKey);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleClose();
+      } else if (e.key === 'Tab') {
+        trapTab(e);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
 
     // html has overflow-x: clip, so body's overflow never reaches the viewport.
     const html = document.documentElement;
@@ -113,10 +146,13 @@ export default function ModalShell({
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscapeKey);
+      document.removeEventListener('keydown', handleKeyDown);
       html.style.overflowY = previous.htmlOverflowY;
       body.style.overflowY = previous.bodyOverflowY;
       body.style.paddingRight = previous.bodyPaddingRight;
+      if (opener instanceof HTMLElement && opener.isConnected) {
+        opener.focus({ preventScroll: true });
+      }
     };
   }, []);
 
@@ -142,6 +178,12 @@ export default function ModalShell({
         }}
       >
         <Box
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={label}
+          tabIndex={-1}
+          outline="none"
           bg="white"
           borderRadius="card"
           maxW={maxW}

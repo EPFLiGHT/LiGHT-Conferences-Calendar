@@ -111,6 +111,7 @@ function fakeResponse({ status = 200, url, body = '', headers = {} } = {}) {
     status,
     url,
     headers: { get: (k) => headers[k.toLowerCase()] ?? null },
+    body: new Response(body).body,
     arrayBuffer: async () => new TextEncoder().encode(body).buffer,
   };
 }
@@ -124,6 +125,23 @@ describe('createFetcher', () => {
     expect(page.text).toContain('Abstract submission deadline');
     expect(page.links.length).toBeGreaterThan(0);
     expect(page.tooShort).toBe(false);
+  });
+
+  it('stops downloading once the byte cap is reached', async () => {
+    const CHUNK = 64 * 1024;
+    let pulled = 0;
+    const huge = new ReadableStream({
+      pull(controller) {
+        if (pulled >= 50 * 1024 * 1024) return controller.close();
+        pulled += CHUNK;
+        controller.enqueue(new Uint8Array(CHUNK).fill(97));
+      },
+    });
+    const fetchImpl = async () => new Response(huge, { status: 200 });
+    const f = createFetcher({ fetchImpl, hostDelayMs: 0, maxBytes: 100_000 });
+    const page = await f.fetchPage('https://huge.example/');
+    expect(page.ok).toBe(true);
+    expect(pulled).toBeLessThanOrEqual(100_000 + 2 * CHUNK);
   });
 
   it('serves the in-run cache on a second fetch of the same URL', async () => {

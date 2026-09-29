@@ -31,7 +31,7 @@ export default function ConferenceModal({ conference, onClose }: ConferenceModal
   };
 
   return (
-    <ModalShell onClose={onClose}>
+    <ModalShell onClose={onClose} label={`${conference.title} ${conference.year}`}>
       {(close) => (
         <>
           <ModalHeader eyebrow="Conference Dossier" onClose={close}>

@@ -84,7 +84,8 @@ function extractTeamId(parsedBody: any): string | undefined {
 }
 
 /**
- * Verify cron request authentication
+ * Verify cron request authentication.
+ * Fails closed: a route that requires auth rejects everyone until a secret is set.
  */
 function verifyCronAuth(
   headers: Headers,
@@ -94,14 +95,13 @@ function verifyCronAuth(
     return true;
   }
 
-  const authHeader = headers.get('authorization');
   const cronSecret = authConfig.authSecret || process.env.CRON_SECRET;
-
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+  if (!cronSecret) {
+    console.error('Cron auth required but CRON_SECRET is not set; rejecting request');
     return false;
   }
 
-  return true;
+  return headers.get('authorization') === `Bearer ${cronSecret}`;
 }
 
 /**

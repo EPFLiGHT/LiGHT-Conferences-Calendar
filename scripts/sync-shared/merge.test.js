@@ -179,6 +179,17 @@ describe('updateEntry', () => {
     expect(flags.some((f) => f.includes('end pinned'))).toBe(true);
   });
 
+  it('a pinned date freezes start and end too, so the shown date never goes stale', () => {
+    const entry = { ...sydneyEntry(), sync_pin: ['date'] };
+    const facts = { ...neuripsFacts(), startIso: '2026-12-08', endIso: '2026-12-14', deadline: null, abstractDeadline: null, fullName: null, location: null };
+    const { changes, flags } = updateEntry(entry, facts);
+    expect(entry.start).toBe('2026-12-06');
+    expect(entry.end).toBe('2026-12-12');
+    expect(entry.date).toBe('Dec 6-12, 2026');
+    expect(changes).toEqual([]);
+    expect(flags.some((f) => f.includes('date pinned'))).toBe(true);
+  });
+
   it('a pinned end still allows a start move when there is no end to shift', () => {
     const entry = { ...sydneyEntry(), end: undefined, date: undefined, sync_pin: ['end'] };
     const facts = { ...neuripsFacts(), startIso: '2026-12-20', deadline: null, abstractDeadline: null, fullName: null, location: null };

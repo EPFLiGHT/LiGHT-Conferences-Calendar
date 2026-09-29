@@ -2,12 +2,12 @@
  * ExternalLinkButton Component
  *
  * Reusable button component for external links (Website, Papers, PWC).
- * Wraps a Link and Button with consistent styling and behavior.
+ * A single link styled as a Button.
  * Supports primary and secondary variants with configurable sizes.
  */
 
 import type { JSX } from 'react';
-import { Button, Link, ButtonProps } from '@chakra-ui/react';
+import { Button, ButtonProps } from '@chakra-ui/react';
 import { primaryButtonStyle, secondaryButtonStyle } from '@/styles/buttonStyles';
 
 interface ExternalLinkButtonProps {
@@ -30,21 +30,17 @@ export default function ExternalLinkButton({
   const buttonStyle = variant === 'primary' ? primaryButtonStyle : secondaryButtonStyle;
 
   return (
-    <Link
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
+    <Button
+      asChild
+      size={size}
+      px={px}
+      fontSize="sm"
       textDecoration="none"
+      {...buttonStyle}
     >
-      <Button
-        size={size}
-        px={px}
-        fontSize="sm"
-        {...buttonStyle}
-        onClick={onClick}
-      >
+      <a href={href} target="_blank" rel="noopener noreferrer" onClick={onClick}>
         {children}
-      </Button>
-    </Link>
+      </a>
+    </Button>
   );
 }

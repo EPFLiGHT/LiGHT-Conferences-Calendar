@@ -85,7 +85,8 @@ function replyEphemeral(
 }
 
 async function handleBlockActions(
-  payload: SlackInteractionPayload
+  payload: SlackInteractionPayload,
+  teamId?: string
 ): Promise<NextResponse> {
   const actionId = payload.actions?.[0]?.action_id;
   const actionValue = payload.actions?.[0]?.value;
@@ -114,7 +115,7 @@ async function handleBlockActions(
 
   if (actionId === 'enable_notifications') {
     try {
-      const prefs = await enableNotifications(userId);
+      const prefs = await enableNotifications(userId, teamId);
       return replyEphemeral(responseUrl, buildSettingsPanel(prefs), true);
     } catch (error) {
       logger.error('Failed to enable notifications', error, { userId });
@@ -187,7 +188,7 @@ async function handleInteraction(
   logger.debug('Interaction received', { type: payload.type, teamId });
   switch (payload.type) {
     case 'block_actions':
-      return handleBlockActions(payload);
+      return handleBlockActions(payload, teamId);
     case 'view_submission':
       return handleViewSubmission(payload);
     case 'view_closed':

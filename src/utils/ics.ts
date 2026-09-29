@@ -24,7 +24,7 @@ export function createICSContent(events: ICSEvent[]): string {
   events.forEach(event => {
     lines.push('BEGIN:VEVENT');
     lines.push(`UID:${event.uid}`);
-    lines.push(`DTSTAMP:${DateTime.now().toFormat("yyyyMMdd'T'HHmmss'Z'")}`);
+    lines.push(`DTSTAMP:${DateTime.now().toUTC().toFormat("yyyyMMdd'T'HHmmss'Z'")}`);
 
     if (event.isAllDay) {
       lines.push(`DTSTART;VALUE=DATE:${event.start.toFormat('yyyyMMdd')}`);

@@ -129,7 +129,10 @@ function updateDates(entry, { startIso = null, endIso = null }, { set, pinned, f
     );
     return;
   }
-  const blocked = [['start', start], ['end', end]].filter(([f, v]) => pinned.has(f) && v !== entry[f]);
+  const date = end ? formatDateRange(start, end) : entry.date;
+  const blocked = [['start', start], ['end', end], ['date', date]].filter(
+    ([f, v]) => pinned.has(f) && v !== entry[f],
+  );
   if (blocked.length > 0) {
     const what = blocked.map(([f, v]) => `${f} pinned (source reports ${v})`).join(', ');
     flags.push(`${entry.id}: ${what}; start, end and date left untouched`);

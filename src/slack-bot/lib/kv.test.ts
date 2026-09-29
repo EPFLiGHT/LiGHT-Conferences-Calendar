@@ -80,6 +80,18 @@ describe('kv client', () => {
     });
   });
 
+  it('never pairs a URL from one set of names with the token from the other', async () => {
+    vi.stubEnv('KV_REST_API_URL', 'https://kv.example');
+    vi.stubEnv('KV_REST_API_TOKEN', 'kv-token');
+    vi.stubEnv('UPSTASH_REDIS_REST_URL', 'https://upstash.example');
+    const kv = await loadKv();
+    kv.self();
+    expect(constructed[0]).toMatchObject({
+      url: 'https://kv.example',
+      token: 'kv-token',
+    });
+  });
+
   it('reuses one client and binds methods to it', async () => {
     vi.stubEnv('KV_REST_API_URL', 'https://kv.example');
     vi.stubEnv('KV_REST_API_TOKEN', 'kv-token');

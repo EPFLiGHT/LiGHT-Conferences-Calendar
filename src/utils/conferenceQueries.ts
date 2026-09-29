@@ -8,9 +8,10 @@ import { DateTime } from 'luxon';
 import { getNextDeadline } from './parser';
 import type { Conference, DeadlineInfo } from '@/types/conference';
 
-/** Whole days from `today` (start-of-day) until `start`, rounded up. */
+/** Calendar days from `today` until `start`, compared as wall-clock dates. */
 function daysUntilStart(start: DateTime, today: DateTime): number {
-  return Math.ceil(start.startOf('day').diff(today, 'days').days);
+  const asDate = (dt: DateTime) => dt.setZone('utc', { keepLocalTime: true }).startOf('day');
+  return asDate(start).diff(asDate(today), 'days').days;
 }
 
 /**

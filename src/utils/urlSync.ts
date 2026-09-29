@@ -2,7 +2,7 @@
  * URL Sync Utilities
  *
  * Utilities for synchronizing search query and filters with URL parameters.
- * Manages browser history for shareable URLs and back/forward navigation.
+ * Replaces the current history entry: the page reads the URL only on load.
  */
 
 import { useSearchParams } from 'next/navigation';
@@ -19,10 +19,10 @@ interface UseURLSyncReturn {
 }
 
 export function useURLSync(basePath: string = ''): UseURLSyncReturn {
-  const pushToHistory = (params: URLSearchParams) => {
+  const replaceURL = (params: URLSearchParams) => {
     if (typeof window === 'undefined') return;
     const newUrl = params.toString() ? `${basePath}?${params.toString()}` : basePath;
-    window.history.pushState({}, '', newUrl);
+    window.history.replaceState({}, '', newUrl);
   };
 
   const buildParams = (searchQuery: string, filters: URLSyncFilters) => {
@@ -42,12 +42,12 @@ export function useURLSync(basePath: string = ''): UseURLSyncReturn {
 
   const syncFiltersToURL = (searchQuery: string, filters: URLSyncFilters) => {
     const params = buildParams(searchQuery, filters);
-    pushToHistory(params);
+    replaceURL(params);
   };
 
   const syncSearchToURL = (searchQuery: string, currentFilters: URLSyncFilters) => {
     const params = buildParams(searchQuery, currentFilters);
-    pushToHistory(params);
+    replaceURL(params);
   };
 
   return {

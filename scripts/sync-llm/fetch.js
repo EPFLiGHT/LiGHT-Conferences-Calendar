@@ -146,6 +146,21 @@ export function extractLinks(html, baseUrl) {
 const USER_AGENT =
   'LiGHT-Conferences-Calendar sync bot (https://github.com/EPFLiGHT/Conferences-Calendar)';
 
+async function readCapped(res, maxBytes) {
+  if (!res.body) return Buffer.alloc(0);
+  const reader = res.body.getReader();
+  const chunks = [];
+  let total = 0;
+  while (total < maxBytes) {
+    const { done, value } = await reader.read();
+    if (done) return Buffer.concat(chunks);
+    chunks.push(value);
+    total += value.byteLength;
+  }
+  await reader.cancel().catch(() => {});
+  return Buffer.concat(chunks).subarray(0, maxBytes);
+}
+
 /**
  * A page fetcher that behaves itself on other people's servers. It holds one
  * request per host at a time with a delay between them, keeps every page it has
@@ -236,12 +251,12 @@ export function createFetcher({
         const location =
           res.status >= 300 && res.status < 400 ? res.headers.get('location') : null;
         if (!location) {
-          const buf = await res.arrayBuffer();
+          const buf = await readCapped(res, maxBytes);
           return {
             status: res.status,
             ok: res.ok,
             finalUrl: current,
-            html: new TextDecoder('utf-8', { fatal: false }).decode(buf.slice(0, maxBytes)),
+            html: new TextDecoder('utf-8', { fatal: false }).decode(buf),
           };
         }
         if (hop >= MAX_REDIRECTS) throw new Error(`too many redirects at ${current}`);

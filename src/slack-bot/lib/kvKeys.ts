@@ -41,6 +41,9 @@ export const kvKeys = {
   user: {
     record: (userId: string) => `${KV_ROOT}:user:${userId}`,
   },
+  reminder: {
+    sent: (target: string, day: string) => `${KV_ROOT}:reminder:${target}:${day}`,
+  },
   cache: {
     conferences: `${KV_ROOT}:cache:conferences`,
     conferencesTimestamp: `${KV_ROOT}:cache:conferences:ts`,

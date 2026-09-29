@@ -14,6 +14,7 @@ import { getConferences } from '@/slack-bot/utils/conferenceCache';
 import { filterDeadlinesByReminders, getEventStartsOnDays } from '@/utils/conferenceQueries';
 import { NOTIFICATION_CONFIG } from '@/slack-bot/config/constants';
 import { postToChannel } from '@/slack-bot/lib/slackClient';
+import { sendOncePerDay } from '@/slack-bot/lib/reminderDedup';
 import { buildChannelDigest } from '@/slack-bot/lib/messageBuilder';
 import {
   getAllActiveChannels,
@@ -86,17 +87,25 @@ async function handleChannelReminders(): Promise<NextResponse> {
 
     // Post to all subscribed channels
     let successCount = 0;
+    let skippedCount = 0;
     let failureCount = 0;
     const errors: string[] = [];
 
     for (const channel of subscribedChannels) {
       try {
-        await postToChannel(
-          channel.channelId,
-          digest.blocks,
-          digest.text ?? 'Conference Reminders',
-          channel.teamId
+        const posted = await sendOncePerDay(`channel:${channel.channelId}`, () =>
+          postToChannel(
+            channel.channelId,
+            digest.blocks,
+            digest.text ?? 'Conference Reminders',
+            channel.teamId
+          )
         );
+        if (!posted) {
+          skippedCount++;
+          logger.debug('Already posted to channel today', { channelId: channel.channelId });
+          continue;
+        }
 
         await updateChannelLastPosted(channel.channelId);
 
@@ -136,12 +145,13 @@ async function handleChannelReminders(): Promise<NextResponse> {
     }
 
     return NextResponse.json({
-      success: successCount > 0,
-      message: `Reminders posted to ${successCount}/${subscribedChannels.length} channels`,
+      success: successCount + skippedCount > 0,
+      message: `Reminders posted to ${successCount}/${subscribedChannels.length} channels (${skippedCount} already posted today)`,
       deadlineCount: relevantDeadlines.length,
       eventStartCount: upcomingEventStarts.length,
       channelCount: subscribedChannels.length,
       successCount,
+      skippedCount,
       failureCount,
       reminderDays,
       errors: errors.length > 0 ? errors : undefined,

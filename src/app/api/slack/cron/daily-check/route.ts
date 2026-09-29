@@ -5,6 +5,7 @@ import { successResponse, errorResponse } from '@/slack-bot/lib/responses';
 import { getConferences } from '@/slack-bot/utils/conferenceCache';
 import { getAllUsersWithNotifications } from '@/slack-bot/lib/userPreferences';
 import { sendDM } from '@/slack-bot/lib/slackClient';
+import { sendOncePerDay } from '@/slack-bot/lib/reminderDedup';
 import {
   buildUserDeadlineNotification,
   buildEventStartNotification,
@@ -98,7 +99,13 @@ async function handleDailyCheck(): Promise<NextResponse> {
           if (eventMsg.text) fallbackParts.push(eventMsg.text);
         }
 
-        await sendDM(userId, combinedBlocks, fallbackParts.join(' • '), user.teamId);
+        const sent = await sendOncePerDay(`dm:${userId}`, () =>
+          sendDM(userId, combinedBlocks, fallbackParts.join(' • '), user.teamId)
+        );
+        if (!sent) {
+          logger.debug('Already notified user today', { userId });
+          continue;
+        }
 
         notificationsSent++;
         logger.info('Sent notification to user', {
