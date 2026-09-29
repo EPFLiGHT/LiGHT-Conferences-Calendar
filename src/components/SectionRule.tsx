@@ -5,20 +5,24 @@ interface SectionRuleProps extends Omit<FlexProps, 'children'> {
   label: React.ReactNode;
   trailing?: React.ReactNode;
   labelColor?: string;
-  trailingColor?: string;
+  /** `page` above grids and lists, `modal` for the bolder section headers inside dialogs. */
+  variant?: 'page' | 'modal';
 }
 
-/**
- * Shared "section rule" heading: two small uppercase labels on a baseline,
- * closed by a hairline bottom border. Used above grids and lists across pages.
- */
+const VARIANTS = {
+  page: { mb: '6', label: { textStyle: 'metaLabel' }, trailing: { textStyle: 'metaLabel' } },
+  modal: { mb: '5', label: { textStyle: 'eyebrow' }, trailing: { textStyle: 'eyebrow', fontWeight: '600' } },
+} as const;
+
+/** Section heading: a label and optional trailing marker on a baseline, over a hairline rule. */
 export default function SectionRule({
   label,
   trailing,
   labelColor = 'brand.500',
-  trailingColor = 'brand.400',
+  variant = 'page',
   ...rest
 }: SectionRuleProps): JSX.Element {
+  const styles = VARIANTS[variant];
   return (
     <Flex
       align="baseline"
@@ -26,16 +30,16 @@ export default function SectionRule({
       gap="4"
       flexWrap="wrap"
       pb="3"
-      mb="6"
+      mb={styles.mb}
       borderBottom="1px solid"
       borderColor="line.default"
       {...rest}
     >
-      <Text textStyle="metaLabel" color={labelColor} className="tabular">
+      <Text {...styles.label} color={labelColor} className="tabular">
         {label}
       </Text>
       {trailing != null && (
-        <Text textStyle="metaLabel" color={trailingColor} className="tabular">
+        <Text {...styles.trailing} color="brand.400" className="tabular">
           {trailing}
         </Text>
       )}

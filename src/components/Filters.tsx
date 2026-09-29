@@ -1,3 +1,5 @@
+'use client';
+
 import type { JSX } from 'react';
 import { forwardRef, useMemo } from 'react';
 import { Box, Flex, Grid, Text } from '@chakra-ui/react';
@@ -7,6 +9,8 @@ import { Conference } from '@/types/conference';
 import { SUBJECT_LABELS } from '@/constants/subjects';
 import { VALID_TYPES } from '@/utils/conferenceSchema';
 import type { ConferenceFiltersState } from '@/hooks/useConferenceFilters';
+import type { SortBy } from '@/utils/conferenceQueries';
+import { brandAlpha } from '@/theme';
 
 interface FiltersProps {
   conferences: Conference[];
@@ -100,8 +104,7 @@ export default function Filters({ conferences, filters, onFilterChange }: Filter
   const types = VALID_TYPES;
 
   const sortLabel =
-    filters.sortBy === 'deadline' ? 'Upcoming Deadline' :
-    'Start Date';
+    filters.sortBy === 'deadline' ? 'Upcoming Deadline' : 'Start Date';
 
   const selectStyle = {
     fontSize: 'sm',
@@ -111,7 +114,7 @@ export default function Filters({ conferences, filters, onFilterChange }: Filter
     fontWeight: '500',
     _focus: {
       borderColor: 'brand.500',
-      boxShadow: '0 0 0 1px var(--chakra-colors-brand-500)',
+      boxShadow: `0 0 0 1px ${brandAlpha(1)}`,
     },
   } as const;
 
@@ -123,7 +126,7 @@ export default function Filters({ conferences, filters, onFilterChange }: Filter
           <NativeSelectRoot>
             <NativeSelectField
               value={filters.sortBy}
-              onChange={(e) => onFilterChange({ sortBy: e.target.value })}
+              onChange={(e) => onFilterChange({ sortBy: e.target.value as SortBy })}
               {...selectStyle}
             >
               <option value="deadline">Upcoming Deadline</option>

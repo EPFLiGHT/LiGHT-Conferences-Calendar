@@ -17,9 +17,10 @@ export default function Search({ value, onChange }: SearchProps): JSX.Element {
         borderColor={value ? 'brand.500' : 'line.strong'}
         transition="border-color 0.2s ease"
         _focusWithin={{ borderColor: 'brand.500' }}
+        color="brand.400"
       >
-        <SearchIcon size={16} strokeWidth={1.75} color="var(--chakra-colors-brand-400)" />
-        <Text textStyle="badgeLabel" color="brand.400">
+        <SearchIcon size={16} strokeWidth={1.75} />
+        <Text textStyle="badgeLabel">
           Search
         </Text>
         <Input

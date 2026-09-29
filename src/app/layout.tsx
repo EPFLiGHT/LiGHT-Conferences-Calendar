@@ -21,7 +21,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body style={{ margin: 0, padding: 0, background: '#ffffff', overflowX: 'clip' }} suppressHydrationWarning>
+      <body style={{ margin: 0, padding: 0, overflowX: 'clip' }} suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>

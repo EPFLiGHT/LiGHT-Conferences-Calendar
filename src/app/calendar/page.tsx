@@ -1,12 +1,7 @@
 'use client';
 
 import { Suspense, useState, useMemo, useRef } from 'react';
-import {
-  Box,
-  Button,
-  Flex,
-  Text,
-} from '@chakra-ui/react';
+import { Box, Button, Flex, Text } from '@chakra-ui/react';
 import { Crosshair, Download } from 'lucide-react';
 import FullCalendar, {
   joinClassNames,
@@ -27,14 +22,15 @@ import Footer from '@/components/Footer';
 import PageShell from '@/components/PageShell';
 import ConferenceFiltersPanel from '@/components/ConferenceFiltersPanel';
 import ConferenceModal from '@/components/ConferenceModal';
-import LoadingState from '@/components/LoadingState';
-import ErrorState from '@/components/ErrorState';
+import { LoadingState, ErrorState } from '@/components/StatusScreen';
+import { countLabel } from '@/components/format';
 import { useConferences } from '@/hooks/useConferences';
-import { useConferenceFilters, type ConferenceFiltersState } from '@/hooks/useConferenceFilters';
-import { useURLSync, useInitialURLParams } from '@/utils/urlSync';
+import { useConferenceFilters } from '@/hooks/useConferenceFilters';
+import { useConferenceFilterState } from '@/hooks/useConferenceFilterState';
 import { getDeadlineInfo, getEventColor } from '@/utils/parser';
 import { conferenceToICSEvents, createICSContent, downloadICS } from '@/utils/ics';
 import { secondaryButtonStyle, primaryButtonStyle } from '@/styles/buttonStyles';
+import { cardSurfaceStyle } from '@/styles/containerStyles';
 import type { Conference } from '@/types/conference';
 
 // Stable references, so FullCalendar does not reprocess options on every render.
@@ -68,39 +64,11 @@ const buttonClass = (info: { isSelected: boolean }) =>
 const dayCellTopInnerClass = (info: { isToday: boolean }) =>
   joinClassNames('cal-day-number', info.isToday && 'cal-day-number-today');
 
-
 function CalendarContent() {
   const calendarRef = useRef<CalendarRef>(null);
   const { conferences, loading, error } = useConferences();
-  const initialParams = useInitialURLParams();
-  const { syncFiltersToURL, syncSearchToURL } = useURLSync('/calendar');
-
-  const [searchQuery, setSearchQuery] = useState<string>(initialParams.searchQuery);
-  const [filters, setFilters] = useState<ConferenceFiltersState>({
-    sortBy: 'deadline',
-    year: initialParams.year,
-    subject: initialParams.subject,
-    type: initialParams.type,
-  });
+  const { searchQuery, filters, setSearchQuery, updateFilters, resetFilters } = useConferenceFilterState();
   const [selectedConference, setSelectedConference] = useState<Conference | null>(null);
-
-  const handleFilterChange = (newFilters: Partial<ConferenceFiltersState>) => {
-    const updated = { ...filters, ...newFilters };
-    setFilters(updated);
-    syncFiltersToURL(searchQuery, updated);
-  };
-
-  const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
-    syncSearchToURL(query, filters);
-  };
-
-  const handleResetAll = () => {
-    const cleared = { ...filters, year: '', subject: [], type: [] };
-    setSearchQuery('');
-    setFilters(cleared);
-    syncFiltersToURL('', cleared);
-  };
 
   const filteredConferences = useConferenceFilters(conferences, searchQuery, filters);
 
@@ -135,16 +103,13 @@ function CalendarContent() {
   );
 
   const handleEventClick = (info: EventClickInfo) => {
-    const conference = info.event.extendedProps.conference;
-    setSelectedConference(conference);
+    setSelectedConference(info.event.extendedProps.conference);
   };
 
   const handleExportAll = () => {
     const allEvents = filteredConferences.flatMap(conferenceToICSEvents);
-    const content = createICSContent(allEvents);
-    downloadICS(content, 'conference-calendar.ics');
+    downloadICS(createICSContent(allEvents), 'conference-calendar.ics');
   };
-
 
   const handleToday = () => {
     calendarRef.current?.getApi().today();
@@ -162,11 +127,11 @@ function CalendarContent() {
             eyebrow="LiGHT · Calendar"
             description="View every tracked conference and its deadlines in a calendar. Click any event for details."
             searchValue={searchQuery}
-            onSearchChange={handleSearchChange}
+            onSearchChange={setSearchQuery}
             conferences={conferences}
             filters={filters}
-            onFilterChange={handleFilterChange}
-            onReset={handleResetAll}
+            onFilterChange={updateFilters}
+            onReset={resetFilters}
           />
 
           <Flex
@@ -180,7 +145,7 @@ function CalendarContent() {
             flexWrap="wrap"
           >
             <Text textStyle="eyebrow" color="brand.500" className="tabular">
-              {String(filteredConferences.length).padStart(2, '0')} conference{filteredConferences.length === 1 ? '' : 's'} tracked
+              {countLabel(filteredConferences.length, 'conference')} tracked
             </Text>
             <Flex gap="2" flexWrap="wrap">
               <Button
@@ -208,13 +173,7 @@ function CalendarContent() {
             </Flex>
           </Flex>
 
-          <Box
-            bg="white"
-            border="1px solid"
-            borderColor="line.default"
-            borderRadius="card"
-            p={{ base: '4', md: '6' }}
-          >
+          <Box {...cardSurfaceStyle} p={{ base: '4', md: '6' }}>
             <FullCalendar
               ref={calendarRef}
               plugins={PLUGINS}

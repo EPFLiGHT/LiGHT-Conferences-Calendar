@@ -1,11 +1,14 @@
+'use client';
+
 import type { JSX } from 'react';
 import { useState, useEffect } from 'react';
 import { DateTime } from 'luxon';
 import { Flex, Text } from '@chakra-ui/react';
+import { pad2 } from './format';
 
 interface CountdownProps {
   deadline: DateTime;
-  label: string;
+  label?: string;
 }
 
 interface TimeLeft {
@@ -16,6 +19,7 @@ interface TimeLeft {
   expired: boolean;
 }
 
+/** Ticking time left until `deadline`, or "Passed" once it is over. */
 export default function Countdown({ deadline, label }: CountdownProps): JSX.Element {
   const calculateTimeLeft = (): TimeLeft => {
     const now = DateTime.now();
@@ -46,13 +50,13 @@ export default function Countdown({ deadline, label }: CountdownProps): JSX.Elem
 
   if (timeLeft.expired) {
     return (
-      <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.14em" fontWeight="500">
+      <Text textStyle="caption" color="gray.500">
         Passed
       </Text>
     );
   }
 
-  const pad = (n?: number) => String(n ?? 0).padStart(2, '0');
+  const pad = (n?: number) => pad2(n ?? 0);
 
   return (
     <Flex direction="column" gap="0.5">

@@ -1,23 +1,20 @@
 /**
- * Button Styles
- *
- * Reusable button style objects that can be spread onto Button components.
- * Provides consistent styling for primary, secondary, and brand buttons.
- *
- * Usage: <Button {...primaryButtonStyle}>Click me</Button>
+ * Button style objects, spread onto Chakra Buttons:
+ * <Button {...primaryButtonStyle}>Click me</Button>
  */
 
-import { ButtonProps } from '@chakra-ui/react';
-import { TRANSITIONS } from '@/theme';
+import type { ButtonProps } from '@chakra-ui/react';
+
+const TRANSITION = 'all 0.2s ease-in-out';
 
 export const primaryButtonStyle: Partial<ButtonProps> = {
   bg: 'brand.500',
   color: 'white',
   fontWeight: '600',
-  borderRadius: '3px',
+  borderRadius: 'control',
   border: '1px solid',
   borderColor: 'brand.500',
-  transition: TRANSITIONS.normal,
+  transition: TRANSITION,
   _hover: {
     bg: 'brand.700',
     borderColor: 'brand.700',
@@ -41,10 +38,10 @@ export const secondaryButtonStyle: Partial<ButtonProps> = {
   bg: 'white',
   color: 'brand.500',
   fontWeight: '600',
-  borderRadius: '3px',
+  borderRadius: 'control',
   border: '1px solid',
   borderColor: 'brand.500',
-  transition: TRANSITIONS.normal,
+  transition: TRANSITION,
   _hover: {
     bg: 'brand.50',
     color: 'brand.700',
@@ -54,4 +51,3 @@ export const secondaryButtonStyle: Partial<ButtonProps> = {
     bg: 'brand.50',
   },
 };
-

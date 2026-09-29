@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import { Flex, Grid, Text, VStack } from '@chakra-ui/react';
-import { MapPin, Calendar as CalendarIcon, type LucideIcon } from 'lucide-react';
+import { MapPin, Calendar as CalendarIcon } from 'lucide-react';
 import SubjectBadge from './SubjectBadge';
 import NoteBadge from './NoteBadge';
 import type { Conference } from '@/types/conference';
@@ -8,62 +8,22 @@ import type { Conference } from '@/types/conference';
 interface ConferenceDetailsProps {
   conference: Conference;
   variant?: 'card' | 'modal';
-  showSubjects?: boolean;
-  showNote?: boolean;
 }
 
-const CARD_FIELDS: Array<{
-  key: string;
-  Icon: LucideIcon;
-  label: string;
-  getValue: (conference: Conference) => string | number;
-}> = [
-  {
-    key: 'location',
-    Icon: MapPin,
-    label: 'Location:',
-    getValue: (conf) => conf.place || 'TBA',
-  },
-  {
-    key: 'date',
-    Icon: CalendarIcon,
-    label: 'Date:',
-    getValue: (conf) => conf.date || 'TBA',
-  },
-];
-
-const MODAL_FIELDS: Array<{
-  key: string;
-  label: string;
-  getValue: (conference: Conference) => string | number;
-  isPresent: (conference: Conference) => boolean;
-}> = [
-  {
-    key: 'location',
-    label: 'Location',
-    getValue: (conf) => conf.place || 'TBA',
-    isPresent: () => true,
-  },
-  {
-    key: 'date',
-    label: 'Date',
-    getValue: (conf) => conf.date || 'TBA',
-    isPresent: () => true,
-  },
+const FIELDS = [
+  { key: 'location', Icon: MapPin, label: 'Location', getValue: (conf: Conference) => conf.place || 'TBA' },
+  { key: 'date', Icon: CalendarIcon, label: 'Date', getValue: (conf: Conference) => conf.date || 'TBA' },
 ];
 
 export default function ConferenceDetails({
   conference,
   variant = 'card',
-  showSubjects = variant === 'modal',
-  showNote = variant === 'modal',
 }: ConferenceDetailsProps): JSX.Element {
-  const subjects = conference.sub;
-
   if (variant === 'modal') {
+    const subjects = conference.sub;
     return (
       <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap="6">
-        {MODAL_FIELDS.filter((field) => field.isPresent(conference)).map((field) => (
+        {FIELDS.map((field) => (
           <VStack key={field.key} align="start" gap="2">
             <Text textStyle="metaLabel" color="brand.400">
               {field.label}
@@ -74,7 +34,7 @@ export default function ConferenceDetails({
           </VStack>
         ))}
 
-        {showSubjects && subjects.length > 0 && (
+        {subjects.length > 0 && (
           <VStack align="start" gap="2">
             <Text textStyle="metaLabel" color="brand.400">
               Subject{subjects.length > 1 ? 's' : ''}
@@ -83,7 +43,7 @@ export default function ConferenceDetails({
           </VStack>
         )}
 
-        {showNote && conference.note && (
+        {conference.note && (
           <VStack align="start" gap="2">
             <Text textStyle="metaLabel" color="brand.400">
               Note
@@ -97,17 +57,15 @@ export default function ConferenceDetails({
 
   return (
     <VStack align="stretch" gap="2">
-      {CARD_FIELDS.map((field) => (
+      {FIELDS.map((field) => (
         <Flex key={field.key} fontSize="sm" align="center">
           <Flex align="center" gap="1.5" color="gray.600" fontWeight="500" minW="100px">
             <field.Icon size={14} />
-            <Text>{field.label}</Text>
+            <Text>{field.label}:</Text>
           </Flex>
           <Text color="gray.800">{field.getValue(conference)}</Text>
         </Flex>
       ))}
-
-      {showNote && conference.note && <NoteBadge note={conference.note} />}
     </VStack>
   );
 }

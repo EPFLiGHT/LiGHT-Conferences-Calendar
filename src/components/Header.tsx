@@ -6,6 +6,19 @@ import NextLink from 'next/link';
 import { Box, Container, Flex, HStack, Link, Text, Image } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { Home, Calendar, Users } from 'lucide-react';
+import { EXTERNAL_URLS } from '@/constants/routes';
+
+const LAB_NAME_LINES = [
+  { text: 'Laboratory for Intelligent', color: 'brand.500' },
+  { text: 'Global Health & Humanitarian', color: 'brand.400' },
+  { text: 'Response Technologies', color: 'brand.400' },
+];
+
+const NAV_LINKS = [
+  { href: '/', label: 'Home', Icon: Home },
+  { href: '/calendar', label: 'Calendar', Icon: Calendar },
+  { href: '/speakers', label: 'Speakers', Icon: Users },
+];
 
 export default function Header(): JSX.Element {
   const pathname = usePathname();
@@ -46,7 +59,7 @@ export default function Header(): JSX.Element {
       position="sticky"
       top="0"
       zIndex="100"
-      bg="rgba(255, 255, 255, 0.92)"
+      bg="whiteAlpha.900"
       backdropFilter="blur(12px) saturate(140%)"
       borderBottom="1px solid"
       borderColor="line.default"
@@ -68,7 +81,7 @@ export default function Header(): JSX.Element {
           <Flex align="center" gap={{ base: '2', md: '6' }} flex="1">
             <Link
               as="a"
-              href="https://www.light-laboratory.org/"
+              href={EXTERNAL_URLS.lightLab}
               target="_blank"
               rel="noopener noreferrer"
               display="flex"
@@ -87,16 +100,19 @@ export default function Header(): JSX.Element {
                 transition="opacity 0.2s ease"
                 _hover={{ opacity: 0.85 }}
               />
-              <Box display={{ base: 'none', lg: 'block' }}>
-                <Text fontSize="xs" fontWeight="500" color="brand.500" lineHeight="1.4" textTransform="uppercase" letterSpacing="0.12em">
-                  Laboratory for Intelligent
-                </Text>
-                <Text fontSize="xs" fontWeight="500" color="brand.400" lineHeight="1.4" textTransform="uppercase" letterSpacing="0.12em">
-                  Global Health &amp; Humanitarian
-                </Text>
-                <Text fontSize="xs" fontWeight="500" color="brand.400" lineHeight="1.4" textTransform="uppercase" letterSpacing="0.12em">
-                  Response Technologies
-                </Text>
+              <Box
+                display={{ base: 'none', lg: 'block' }}
+                fontSize="xs"
+                fontWeight="500"
+                lineHeight="1.4"
+                textTransform="uppercase"
+                letterSpacing="0.12em"
+              >
+                {LAB_NAME_LINES.map(({ text, color }) => (
+                  <Text key={text} color={color}>
+                    {text}
+                  </Text>
+                ))}
               </Box>
             </Link>
 
@@ -125,11 +141,7 @@ export default function Header(): JSX.Element {
 
           {/* Navigation */}
           <HStack gap={{ base: '1.5', lg: '3' }} flexShrink="0">
-            {[
-              { href: '/', label: 'Home', Icon: Home },
-              { href: '/calendar', label: 'Calendar', Icon: Calendar },
-              { href: '/speakers', label: 'Speakers', Icon: Users },
-            ].map(({ href, label, Icon }) => {
+            {NAV_LINKS.map(({ href, label, Icon }) => {
               const isActive = pathname === href;
               return (
                 <Link

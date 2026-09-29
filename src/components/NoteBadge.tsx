@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
-import { Badge, BadgeProps } from '@chakra-ui/react';
+import { Badge, type BadgeProps } from '@chakra-ui/react';
 
-interface NoteBadgeProps extends Omit<BadgeProps, 'children'> {
+interface NoteBadgeProps {
   note: string;
   layout?: 'card' | 'modal';
 }
@@ -30,17 +30,9 @@ const LAYOUT_PROPS: Record<NonNullable<NoteBadgeProps['layout']>, Partial<BadgeP
   },
 };
 
-export default function NoteBadge({
-  note,
-  layout = 'card',
-  ...rest
-}: NoteBadgeProps): JSX.Element {
+export default function NoteBadge({ note, layout = 'card' }: NoteBadgeProps): JSX.Element {
   return (
-    <Badge
-      {...BASE_BADGE_PROPS}
-      {...LAYOUT_PROPS[layout]}
-      {...rest}
-    >
+    <Badge {...BASE_BADGE_PROPS} {...LAYOUT_PROPS[layout]}>
       {note}
     </Badge>
   );

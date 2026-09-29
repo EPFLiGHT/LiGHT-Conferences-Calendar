@@ -1,98 +1,45 @@
 'use client';
 
 import type { JSX } from 'react';
-import { useState, useEffect, useRef } from 'react';
-import { Box, Portal, Text } from '@chakra-ui/react';
+import { useEffect, useId, useRef } from 'react';
+import { Box, Flex, Heading, Portal, Text } from '@chakra-ui/react';
 import { X } from 'lucide-react';
-
-interface ModalHeaderProps {
-  /** Small uppercase label above the title, e.g. "Conference Dossier". */
-  eyebrow: string;
-  onClose: () => void;
-  /** Title area rendered below the eyebrow. */
-  children: React.ReactNode;
-}
-
-/**
- * Shared sticky modal header: close button, eyebrow label, title slot.
- * Single source for the header chrome of ConferenceModal and SpeakerModal.
- */
-export function ModalHeader({ eyebrow, onClose, children }: ModalHeaderProps): JSX.Element {
-  return (
-    <Box
-      position="sticky"
-      top="0"
-      bg="white"
-      borderBottom="1px solid"
-      borderColor="line.strong"
-      px={{ base: '6', md: '8' }}
-      py={{ base: '5', md: '6' }}
-      zIndex="10"
-    >
-      <Box
-        as="button"
-        position="absolute"
-        top="5"
-        right="5"
-        w="32px"
-        h="32px"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        border="1px solid"
-        borderColor="line.strong"
-        borderRadius="control"
-        bg="white"
-        color="brand.500"
-        cursor="pointer"
-        transition="all 0.2s ease"
-        _hover={{ bg: 'brand.500', color: 'white', borderColor: 'brand.500' }}
-        onClick={onClose}
-        aria-label="Close"
-      >
-        <X size={16} strokeWidth={2} />
-      </Box>
-
-      <Text textStyle="eyebrow" color="brand.400" mb="3">
-        {eyebrow}
-      </Text>
-      {children}
-    </Box>
-  );
-}
 
 interface ModalShellProps {
   onClose: () => void;
-  /** Accessible name of the dialog. */
-  label: string;
-  /** Max width of the modal card. */
-  maxW?: string;
-  /** Card contents. Receives `close` for the header's close button. */
-  children: (close: () => void) => React.ReactNode;
+  /** Small uppercase label above the title, e.g. "Conference Dossier". */
+  eyebrow: string;
+  /** Dialog heading; also the dialog's accessible name. */
+  title: React.ReactNode;
+  subtitle?: React.ReactNode;
+  /** Shown left of the title, e.g. an avatar. */
+  leading?: React.ReactNode;
+  /** Modal body, rendered inside the standard padding. */
+  children: React.ReactNode;
 }
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 /**
- * Shared modal scaffolding: portal, dimmed backdrop, blur, Escape-to-close,
- * focus trap, page scroll-lock, backdrop-click-to-close, and the white card with
- * its top accent rule. Single source for modal behavior so ConferenceModal and
- * SpeakerModal cannot drift.
+ * Dialog scaffolding: portal, backdrop, Escape and backdrop-click close, focus trap and restore,
+ * page scroll-lock, sticky header. The parent closes it by unmounting it.
  */
 export default function ModalShell({
   onClose,
-  label,
-  maxW = '860px',
+  eyebrow,
+  title,
+  subtitle,
+  leading,
   children,
-}: ModalShellProps): JSX.Element | null {
-  const [isOpen, setIsOpen] = useState(true);
+}: ModalShellProps): JSX.Element {
   const dialogRef = useRef<HTMLDivElement>(null);
-
-  const handleClose = () => {
-    setIsOpen(false);
-    onClose();
-  };
+  const titleId = useId();
+  // The Escape listener is attached once, so it reads the latest onClose through a ref.
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
 
   useEffect(() => {
     const opener = document.activeElement;
@@ -121,7 +68,7 @@ export default function ModalShell({
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        handleClose();
+        onCloseRef.current();
       } else if (e.key === 'Tab') {
         trapTab(e);
       }
@@ -156,8 +103,6 @@ export default function ModalShell({
     };
   }, []);
 
-  if (!isOpen) return null;
-
   return (
     <Portal>
       <Box
@@ -174,19 +119,19 @@ export default function ModalShell({
         zIndex="modal"
         p={{ base: '3', md: '6' }}
         onClick={(e) => {
-          if (e.target === e.currentTarget) handleClose();
+          if (e.target === e.currentTarget) onClose();
         }}
       >
         <Box
           ref={dialogRef}
           role="dialog"
           aria-modal="true"
-          aria-label={label}
+          aria-labelledby={titleId}
           tabIndex={-1}
           outline="none"
           bg="white"
           borderRadius="card"
-          maxW={maxW}
+          maxW="860px"
           w="full"
           maxH="90vh"
           overflowY="auto"
@@ -197,7 +142,67 @@ export default function ModalShell({
         >
           {/* Top accent rule */}
           <Box h="3px" bg="brand.500" />
-          {children(handleClose)}
+
+          <Box
+            position="sticky"
+            top="0"
+            bg="white"
+            borderBottom="1px solid"
+            borderColor="line.strong"
+            px={{ base: '6', md: '8' }}
+            py={{ base: '5', md: '6' }}
+            zIndex="10"
+          >
+            <Box
+              as="button"
+              position="absolute"
+              top="5"
+              right="5"
+              w="32px"
+              h="32px"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              border="1px solid"
+              borderColor="line.strong"
+              borderRadius="control"
+              bg="white"
+              color="brand.500"
+              cursor="pointer"
+              transition="all 0.2s ease"
+              _hover={{ bg: 'brand.500', color: 'white', borderColor: 'brand.500' }}
+              onClick={onClose}
+              aria-label="Close"
+            >
+              <X size={16} strokeWidth={2} />
+            </Box>
+
+            <Text textStyle="eyebrow" color="brand.400" mb="3">
+              {eyebrow}
+            </Text>
+            <Flex align="center" gap="5" pr="12">
+              {leading}
+              <Box>
+                <Heading
+                  id={titleId}
+                  as="h2"
+                  fontSize={{ base: '2xl', md: '4xl' }}
+                  fontWeight="600"
+                  color="brand.500"
+                  lineHeight="1.05"
+                  letterSpacing="-0.02em"
+                  mb={subtitle ? '2' : undefined}
+                >
+                  {title}
+                </Heading>
+                {subtitle}
+              </Box>
+            </Flex>
+          </Box>
+
+          <Box px={{ base: '6', md: '8' }} py={{ base: '6', md: '8' }}>
+            {children}
+          </Box>
         </Box>
       </Box>
     </Portal>

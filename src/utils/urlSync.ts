@@ -1,77 +1,31 @@
-/**
- * URL Sync Utilities
- *
- * Utilities for synchronizing search query and filters with URL parameters.
- * Replaces the current history entry: the page reads the URL only on load.
- */
-
-import { useSearchParams } from 'next/navigation';
-
-interface URLSyncFilters {
-  year?: string;
-  subject?: string[];
-  type?: string[];
+/** Search query and filters mirrored in the page URL; the sort order stays out of it. */
+export interface URLFilters {
+  searchQuery: string;
+  year: string;
+  subject: string[];
+  type: string[];
 }
 
-interface UseURLSyncReturn {
-  syncFiltersToURL: (searchQuery: string, filters: URLSyncFilters) => void;
-  syncSearchToURL: (searchQuery: string, currentFilters: URLSyncFilters) => void;
-}
+const list = (value: string | null) => (value ? value.split(',').filter((item) => item.trim()) : []);
 
-export function useURLSync(basePath: string = ''): UseURLSyncReturn {
-  const replaceURL = (params: URLSearchParams) => {
-    if (typeof window === 'undefined') return;
-    const newUrl = params.toString() ? `${basePath}?${params.toString()}` : basePath;
-    window.history.replaceState({}, '', newUrl);
-  };
-
-  const buildParams = (searchQuery: string, filters: URLSyncFilters) => {
-    const params = new URLSearchParams();
-
-    if (searchQuery) params.set('q', searchQuery);
-    if (filters.year) params.set('year', filters.year);
-    if (filters.subject && filters.subject.length > 0) {
-      params.set('subject', filters.subject.join(','));
-    }
-    if (filters.type && filters.type.length > 0) {
-      params.set('type', filters.type.join(','));
-    }
-
-    return params;
-  };
-
-  const syncFiltersToURL = (searchQuery: string, filters: URLSyncFilters) => {
-    const params = buildParams(searchQuery, filters);
-    replaceURL(params);
-  };
-
-  const syncSearchToURL = (searchQuery: string, currentFilters: URLSyncFilters) => {
-    const params = buildParams(searchQuery, currentFilters);
-    replaceURL(params);
-  };
-
+export function filtersFromSearchParams(params: { get(name: string): string | null }): URLFilters {
   return {
-    syncFiltersToURL,
-    syncSearchToURL,
+    searchQuery: params.get('q') || '',
+    year: params.get('year') || '',
+    subject: list(params.get('subject')),
+    type: list(params.get('type')),
   };
 }
 
-/**
- * useInitialURLParams Hook
- *
- * Reads initial URL parameters and returns them.
- * Use this once on component mount to initialize state from URL.
- */
-export function useInitialURLParams() {
-  const searchParams = useSearchParams();
+/** Writes the filters to the current URL, replacing the history entry so typing adds none. */
+export function replaceURLFilters({ searchQuery, year, subject, type }: URLFilters): void {
+  const params = new URLSearchParams();
+  if (searchQuery) params.set('q', searchQuery);
+  if (year) params.set('year', year);
+  if (subject.length > 0) params.set('subject', subject.join(','));
+  if (type.length > 0) params.set('type', type.join(','));
 
-  const subjectParam = searchParams?.get('subject') || '';
-  const typeParam = searchParams?.get('type') || '';
-
-  return {
-    searchQuery: searchParams?.get('q') || '',
-    year: searchParams?.get('year') || '',
-    subject: subjectParam ? subjectParam.split(',').filter(s => s.trim()) : [],
-    type: typeParam ? typeParam.split(',').filter(t => t.trim()) : [],
-  };
+  const query = params.toString();
+  const path = window.location.pathname;
+  window.history.replaceState({}, '', query ? `${path}?${query}` : path);
 }

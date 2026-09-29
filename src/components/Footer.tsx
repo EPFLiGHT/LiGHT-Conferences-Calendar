@@ -1,10 +1,10 @@
-'use client';
-
 import type { JSX } from 'react';
 import { Box, Container, Flex, Grid, Heading, Text, Link, Image } from '@chakra-ui/react';
-import { MapPin, Mail, ArrowUpRight, ArrowUp } from 'lucide-react';
-import { GitHubIcon, LinkedInIcon, SlackIcon } from '@/components/BrandIcons';
-import { ROUTES } from '@/constants/routes';
+import { MapPin, Mail, ArrowUpRight } from 'lucide-react';
+import AccentCard from './AccentCard';
+import BackToTopButton from './BackToTopButton';
+import { GitHubIcon, LinkedInIcon, SlackIcon } from './BrandIcons';
+import { ROUTES, EXTERNAL_URLS } from '@/constants/routes';
 import { inlineLinkStyle } from '@/styles/linkStyles';
 
 const colHeadStyle = {
@@ -16,9 +16,47 @@ const colHeadStyle = {
   borderColor: 'line.strong',
 };
 
-export default function Footer(): JSX.Element {
-  const scrollTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+const CONTACTS = [
+  {
+    Icon: MapPin,
+    label: 'Location',
+    content: (
+      <Text fontSize="sm" color="gray.700" lineHeight="1.6">
+        EPFL · Lausanne, Switzerland
+      </Text>
+    ),
+  },
+  {
+    Icon: Mail,
+    label: 'Email',
+    content: (
+      <Link href="mailto:mary-anne.hartley@epfl.ch" fontSize="sm" {...inlineLinkStyle}>
+        mary-anne.hartley@epfl.ch
+      </Link>
+    ),
+  },
+  {
+    Icon: LinkedInIcon,
+    label: 'LinkedIn',
+    content: (
+      <Link
+        href="https://www.linkedin.com/company/light-laboratory/"
+        target="_blank"
+        rel="noopener noreferrer"
+        fontSize="sm"
+        display="inline-flex"
+        alignItems="center"
+        gap="1"
+        {...inlineLinkStyle}
+      >
+        LiGHT Laboratory
+        <ArrowUpRight size={12} strokeWidth={2} />
+      </Link>
+    ),
+  },
+];
 
+export default function Footer(): JSX.Element {
   return (
     <Box as="footer" mt="auto" position="relative">
       {/* Top accent rule */}
@@ -100,7 +138,7 @@ export default function Footer(): JSX.Element {
 
                 {/* Banner card */}
                 <Link
-                  href="https://www.light-laboratory.org/"
+                  href={EXTERNAL_URLS.lightLab}
                   target="_blank"
                   rel="noopener noreferrer"
                   position="relative"
@@ -168,7 +206,7 @@ export default function Footer(): JSX.Element {
               </Text>
 
               <Link
-                href="https://www.light-laboratory.org/"
+                href={EXTERNAL_URLS.lightLab}
                 target="_blank"
                 rel="noopener noreferrer"
                 display="inline-flex"
@@ -188,55 +226,17 @@ export default function Footer(): JSX.Element {
               <Text {...colHeadStyle}>Contact</Text>
 
               <Flex direction="column" gap="6" mt="6">
-                <Box>
-                  <Flex align="center" gap="2" mb="2">
-                    <MapPin size={14} strokeWidth={1.75} color="var(--chakra-colors-brand-500)" />
-                    <Text fontSize="xs" fontWeight="700" color="brand.500" textTransform="uppercase" letterSpacing="0.16em">
-                      Location
-                    </Text>
-                  </Flex>
-                  <Text fontSize="sm" color="gray.700" lineHeight="1.6">
-                    EPFL · Lausanne, Switzerland
-                  </Text>
-                </Box>
-
-                <Box>
-                  <Flex align="center" gap="2" mb="2">
-                    <Mail size={14} strokeWidth={1.75} color="var(--chakra-colors-brand-500)" />
-                    <Text fontSize="xs" fontWeight="700" color="brand.500" textTransform="uppercase" letterSpacing="0.16em">
-                      Email
-                    </Text>
-                  </Flex>
-                  <Link
-                    href="mailto:mary-anne.hartley@epfl.ch"
-                    fontSize="sm"
-                    {...inlineLinkStyle}
-                  >
-                    mary-anne.hartley@epfl.ch
-                  </Link>
-                </Box>
-
-                <Box>
-                  <Flex align="center" gap="2" mb="2">
-                    <LinkedInIcon size={14} strokeWidth={1.75} color="var(--chakra-colors-brand-500)" />
-                    <Text fontSize="xs" fontWeight="700" color="brand.500" textTransform="uppercase" letterSpacing="0.16em">
-                      LinkedIn
-                    </Text>
-                  </Flex>
-                  <Link
-                    href="https://www.linkedin.com/company/light-laboratory/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    fontSize="sm"
-                    display="inline-flex"
-                    alignItems="center"
-                    gap="1"
-                    {...inlineLinkStyle}
-                  >
-                    LiGHT Laboratory
-                    <ArrowUpRight size={12} strokeWidth={2} />
-                  </Link>
-                </Box>
+                {CONTACTS.map(({ Icon, label, content }) => (
+                  <Box key={label}>
+                    <Flex align="center" gap="2" mb="2" color="brand.500">
+                      <Icon size={14} strokeWidth={1.75} />
+                      <Text fontSize="xs" fontWeight="700" textTransform="uppercase" letterSpacing="0.16em">
+                        {label}
+                      </Text>
+                    </Flex>
+                    {content}
+                  </Box>
+                ))}
               </Flex>
             </Box>
 
@@ -246,7 +246,7 @@ export default function Footer(): JSX.Element {
 
               <Flex direction="column" gap="3.5" mt="6">
                 <Link
-                  href="https://github.com/EPFLiGHT/Conferences-Calendar"
+                  href={EXTERNAL_URLS.repo}
                   target="_blank"
                   rel="noopener noreferrer"
                   fontSize="sm"
@@ -285,22 +285,7 @@ export default function Footer(): JSX.Element {
               </Flex>
 
               {/* Credits card */}
-              <Box
-                mt="8"
-                p="5"
-                bg="white"
-                border="1px solid"
-                borderColor="line.strong"
-                position="relative"
-              >
-                <Box
-                  position="absolute"
-                  top="-1px"
-                  left="-1px"
-                  w="24px"
-                  h="3px"
-                  bg="brand.500"
-                />
+              <AccentCard mt="8" p="5" bg="white">
                 <Text textStyle="badgeLabel" color="brand.400" mb="2">
                   Credits
                 </Text>
@@ -317,7 +302,7 @@ export default function Footer(): JSX.Element {
                   </Link>
                   {' '}from the{' '}
                   <Link
-                    href="https://github.com/EPFLiGHT"
+                    href={EXTERNAL_URLS.githubOrg}
                     target="_blank"
                     rel="noopener noreferrer"
                     {...inlineLinkStyle}
@@ -327,7 +312,7 @@ export default function Footer(): JSX.Element {
                   </Link>
                   .
                 </Text>
-              </Box>
+              </AccentCard>
             </Box>
           </Grid>
 
@@ -346,7 +331,7 @@ export default function Footer(): JSX.Element {
             </Text>
             <Flex gap="6" align="center">
               <Link
-                href="https://github.com/EPFLiGHT/Conferences-Calendar"
+                href={EXTERNAL_URLS.repo}
                 target="_blank"
                 rel="noopener noreferrer"
                 textStyle="metaLabel"
@@ -355,26 +340,7 @@ export default function Footer(): JSX.Element {
               >
                 Source
               </Link>
-              <Box
-                as="button"
-                onClick={scrollTop}
-                aria-label="Back to top"
-                display="inline-flex"
-                alignItems="center"
-                gap="1.5"
-                textStyle="metaLabel"
-                color="brand.500"
-                border="1px solid"
-                borderColor="brand.500"
-                px="3"
-                py="1.5"
-                cursor="pointer"
-                transition="all 0.2s ease"
-                _hover={{ bg: 'brand.500', color: 'white' }}
-              >
-                Top
-                <ArrowUp size={11} strokeWidth={2} />
-              </Box>
+              <BackToTopButton />
             </Flex>
           </Flex>
         </Container>

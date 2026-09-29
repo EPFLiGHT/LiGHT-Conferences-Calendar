@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import { Box, Flex, Heading, Text, VStack } from '@chakra-ui/react';
-import { motion } from 'framer-motion';
+import AnimatedCard from './AnimatedCard';
 import DeadlineCard from './DeadlineCard';
 import ExternalLinkButton from './ExternalLinkButton';
 import SubjectBadge from './SubjectBadge';
@@ -8,46 +8,19 @@ import TypeBadge from './TypeBadge';
 import NoteBadge from './NoteBadge';
 import ConferenceDetails from './ConferenceDetails';
 import { getDeadlineInfo, getNoDeadlineLabel } from '@/utils/parser';
-import { Conference } from '@/types/conference';
-import { cardSurfaceStyle } from '@/styles/containerStyles';
-import { useCardAnimation } from '@/hooks/useCardAnimation';
-import { brandAlpha } from '@/theme';
-
-const MotionBox = motion.create(Box);
+import type { Conference } from '@/types/conference';
 
 interface ConferenceCardProps {
   conference: Conference;
   onClick: () => void;
-  index?: number;
+  index: number;
 }
 
-export default function ConferenceCard({ conference, onClick, index = 0 }: ConferenceCardProps): JSX.Element {
+export default function ConferenceCard({ conference, onClick, index }: ConferenceCardProps): JSX.Element {
   const allDeadlines = getDeadlineInfo(conference);
 
-  // Label shown when an event carries no deadline, honest about which case applies.
-  const noDeadlineLabel = getNoDeadlineLabel(conference);
-
-  const { animationDelay, animationDuration } = useCardAnimation(index);
-
   return (
-    <MotionBox
-      initial={{ opacity: 0, y: 8 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-30px", amount: 0.1 }}
-      transition={{
-        duration: animationDuration,
-        delay: animationDelay,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      }}
-      {...cardSurfaceStyle}
-      cursor="pointer"
-      position="relative"
-      whileHover={{
-        borderColor: brandAlpha(0.55),
-        transition: { duration: 0.18, ease: 'easeOut' }
-      }}
-      onClick={onClick}
-    >
+    <AnimatedCard index={index} onClick={onClick}>
       {/* Card Header */}
       <VStack align="stretch" gap="3" mb="3">
         <Flex justify="space-between" align="start" gap="3" wrap="wrap">
@@ -102,13 +75,8 @@ export default function ConferenceCard({ conference, onClick, index = 0 }: Confe
           borderColor="line.default"
           mb="4"
         >
-          {allDeadlines.map((deadline, idx) => (
-            <DeadlineCard
-              key={idx}
-              deadline={deadline}
-              timezone={conference.timezone}
-              variant="compact"
-            />
+          {allDeadlines.map((deadline) => (
+            <DeadlineCard key={deadline.kind} deadline={deadline} variant="compact" />
           ))}
         </VStack>
       ) : (
@@ -120,8 +88,8 @@ export default function ConferenceCard({ conference, onClick, index = 0 }: Confe
           borderColor="line.default"
           mb="4"
         >
-          <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.14em">
-            {noDeadlineLabel}
+          <Text textStyle="caption" fontWeight="normal" color="gray.500">
+            {getNoDeadlineLabel(conference)}
           </Text>
         </Box>
       )}
@@ -147,6 +115,6 @@ export default function ConferenceCard({ conference, onClick, index = 0 }: Confe
           </ExternalLinkButton>
         )}
       </Flex>
-    </MotionBox>
+    </AnimatedCard>
   );
 }

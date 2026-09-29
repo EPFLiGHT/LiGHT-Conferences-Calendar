@@ -2,61 +2,36 @@
 
 import type { JSX } from 'react';
 import { useState, useEffect } from 'react';
-import { Box, Flex, Heading, Text, VStack } from '@chakra-ui/react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ExternalLink } from 'lucide-react';
-import { Speaker } from '@/types/speaker';
-import ExternalLinkButton from './ExternalLinkButton';
+import { Box, Flex, Heading, Text } from '@chakra-ui/react';
+import { AnimatePresence } from 'framer-motion';
+import type { Speaker } from '@/types/speaker';
+import AnimatedCard, { MotionBox } from './AnimatedCard';
+import PresentationDetails from './PresentationDetails';
 import SpeakerAvatar from './SpeakerAvatar';
-import { cardSurfaceStyle } from '@/styles/containerStyles';
-import { useCardAnimation } from '@/hooks/useCardAnimation';
-import { brandAlpha } from '@/theme';
-
-const MotionBox = motion.create(Box);
+import { pad2 } from './format';
 
 interface SpeakerCardProps {
   speaker: Speaker;
-  index?: number;
-  onClick?: () => void;
+  index: number;
+  onClick: () => void;
 }
 
-export default function SpeakerCard({ speaker, index = 0, onClick }: SpeakerCardProps): JSX.Element {
-  const { animationDelay, animationDuration } = useCardAnimation(index);
-
+export default function SpeakerCard({ speaker, index, onClick }: SpeakerCardProps): JSX.Element {
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentPresentation = speaker.presentations[currentIndex];
-  const hasMultiplePresentations = speaker.presentations.length > 1;
+  const total = speaker.presentations.length;
+  const hasMultiplePresentations = total > 1;
 
   useEffect(() => {
     if (!hasMultiplePresentations) return;
     const interval = setInterval(() => {
-      setCurrentIndex((prev) =>
-        prev === speaker.presentations.length - 1 ? 0 : prev + 1
-      );
+      setCurrentIndex((prev) => (prev + 1) % total);
     }, 5000);
     return () => clearInterval(interval);
-  }, [hasMultiplePresentations, speaker.presentations.length]);
-
-  const total = speaker.presentations.length;
+  }, [hasMultiplePresentations, total]);
 
   return (
-    <MotionBox
-      initial={{ opacity: 0, y: 8 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-30px', amount: 0.1 }}
-      transition={{
-        duration: animationDuration,
-        delay: animationDelay,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      }}
-      {...cardSurfaceStyle}
-      cursor={onClick ? 'pointer' : 'default'}
-      onClick={onClick}
-      whileHover={{
-        borderColor: brandAlpha(0.55),
-        transition: { duration: 0.18, ease: 'easeOut' },
-      }}
-    >
+    <AnimatedCard index={index} onClick={onClick}>
       {/* Header: avatar + name + counter */}
       <Flex align="center" justify="space-between" mb="5" gap="4">
         <Flex align="center" gap="4" flex="1" minW="0">
@@ -78,7 +53,7 @@ export default function SpeakerCard({ speaker, index = 0, onClick }: SpeakerCard
             className="tabular"
             whiteSpace="nowrap"
           >
-            {String(currentIndex + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
+            {pad2(currentIndex + 1)} / {pad2(total)}
           </Text>
         )}
       </Flex>
@@ -101,47 +76,10 @@ export default function SpeakerCard({ speaker, index = 0, onClick }: SpeakerCard
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.3 }}
           >
-            <VStack align="stretch" gap="4">
-              {/* Topic */}
-              <Box>
-                <Text textStyle="fieldLabel" color="brand.400" mb="2">
-                  Topic
-                </Text>
-                <Text fontSize="md" color="brand.500" fontWeight="500" lineHeight="1.45" fontStyle="italic">
-                  &ldquo;{currentPresentation.topic}&rdquo;
-                </Text>
-              </Box>
-
-              {/* Event */}
-              <Box>
-                <Text textStyle="fieldLabel" color="brand.400" mb="2">
-                  Event
-                </Text>
-                <Text fontSize="sm" color="gray.700" lineHeight="1.5">
-                  {currentPresentation.event}
-                </Text>
-              </Box>
-
-              {/* Link */}
-              {currentPresentation.link && (
-                <Box pt="2">
-                  <ExternalLinkButton
-                    href={currentPresentation.link}
-                    variant="secondary"
-                    size="sm"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Flex align="center" gap="2">
-                      <ExternalLink size={13} strokeWidth={1.75} />
-                      <Text>View Presentation</Text>
-                    </Flex>
-                  </ExternalLinkButton>
-                </Box>
-              )}
-            </VStack>
+            <PresentationDetails presentation={currentPresentation} />
           </MotionBox>
         </AnimatePresence>
       </Box>
-    </MotionBox>
+    </AnimatedCard>
   );
 }

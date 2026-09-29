@@ -1,7 +1,7 @@
 /**
  * ExternalLinkButton Component
  *
- * Reusable button component for external links (Website, Papers, PWC).
+ * Reusable button component for external links (Website, Papers).
  * A single link styled as a Button.
  * Supports primary and secondary variants with configurable sizes.
  */

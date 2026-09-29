@@ -1,42 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Box, Flex, Grid, Heading, Text } from '@chakra-ui/react';
-import { load } from 'js-yaml';
+import { useState } from 'react';
+import { Box, Grid, Text } from '@chakra-ui/react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PageShell from '@/components/PageShell';
+import PageMasthead from '@/components/PageMasthead';
 import SpeakerCard from '@/components/SpeakerCard';
 import SpeakerModal from '@/components/SpeakerModal';
-import LoadingState from '@/components/LoadingState';
-import ErrorState from '@/components/ErrorState';
-import { Speaker } from '@/types/speaker';
+import { LoadingState, ErrorState } from '@/components/StatusScreen';
+import { countLabel } from '@/components/format';
+import { useSpeakers } from '@/hooks/useSpeakers';
+import type { Speaker } from '@/types/speaker';
 
 export default function SpeakersPage() {
-  const [speakers, setSpeakers] = useState<Speaker[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { speakers, loading, error } = useSpeakers();
   const [selectedSpeaker, setSelectedSpeaker] = useState<Speaker | null>(null);
-
-  useEffect(() => {
-    const fetchSpeakers = async () => {
-      try {
-        const response = await fetch('/data/speakers.yaml');
-        if (!response.ok) {
-          throw new Error('Failed to fetch speakers data');
-        }
-        const yamlText = await response.text();
-        const data = load(yamlText) as Speaker[];
-        setSpeakers(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSpeakers();
-  }, []);
 
   if (loading) return <LoadingState />;
   if (error) return <ErrorState error={error} />;
@@ -45,46 +24,21 @@ export default function SpeakersPage() {
     <>
       <Header />
       <PageShell>
-          {/* Page Header */}
-          <Box mb="10">
-            <Text textStyle="eyebrow" color="brand.400" mb="4">
-              LiGHT · Speakers
-            </Text>
-
-            <Heading
-              as="h1"
-              fontSize={{ base: '3xl', md: '5xl' }}
-              fontWeight="600"
-              color="brand.500"
-              letterSpacing="-0.022em"
-              lineHeight="1.05"
-              mb="4"
-            >
-              Our Speakers
-            </Heading>
-
-            <Flex
-              align="baseline"
-              justify="space-between"
-              gap="4"
-              flexWrap="wrap"
-              pb="4"
-              borderBottom="1px solid"
-              borderColor="brand.500"
-            >
-              <Text fontSize="sm" color="gray.600" maxW="640px" lineHeight="1.55">
-                Members of LiGHT Lab who have presented their research at conferences, workshops, summits, and seminars around the world.
-              </Text>
+          <PageMasthead
+            eyebrow="LiGHT · Speakers"
+            title="Our Speakers"
+            description="Members of LiGHT Lab who have presented their research at conferences, workshops, summits, and seminars around the world."
+            trailing={
               <Text
                 textStyle="metaLabel"
                 color="brand.400"
                 className="tabular"
                 whiteSpace="nowrap"
               >
-                {String(speakers.length).padStart(2, '0')} member{speakers.length === 1 ? '' : 's'}
+                {countLabel(speakers.length, 'member')}
               </Text>
-            </Flex>
-          </Box>
+            }
+          />
 
           {/* Speakers Grid */}
           <Grid
@@ -121,7 +75,6 @@ export default function SpeakersPage() {
       </PageShell>
       <Footer />
 
-      {/* Speaker Modal */}
       {selectedSpeaker && (
         <SpeakerModal
           speaker={selectedSpeaker}

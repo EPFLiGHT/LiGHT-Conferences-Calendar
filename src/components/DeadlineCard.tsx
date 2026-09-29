@@ -1,26 +1,18 @@
-/**
- * DeadlineCard Component
- *
- * Displays conference deadline information with countdown timer.
- * Supports two variants: compact (for cards) and detailed (for modals).
- * Shows both original timezone and local timezone, plus countdown or expired state.
- */
-
 import type { JSX } from 'react';
 import { Box, VStack, Text, Flex } from '@chakra-ui/react';
 import { DateTime } from 'luxon';
 import Countdown from './Countdown';
+import { formatTimeWithZone } from './format';
 import type { DeadlineInfo } from '@/types/conference';
 
 interface DeadlineCardProps {
   deadline: DeadlineInfo;
-  timezone: string;
+  /** `compact` for cards, `detailed` for the modal (entry and local times). */
   variant?: 'compact' | 'detailed';
 }
 
 export default function DeadlineCard({
   deadline,
-  timezone,
   variant = 'compact'
 }: DeadlineCardProps): JSX.Element {
   const now = DateTime.now();
@@ -93,7 +85,7 @@ export default function DeadlineCard({
                 {deadline.datetime.toFormat('EEEE, MMMM dd, yyyy')}
               </Text>
               <Text fontSize="xs" color="gray.600" className="tabular">
-                {deadline.datetime.toFormat('HH:mm')} {timezone}
+                {formatTimeWithZone(deadline.datetime)}
               </Text>
             </VStack>
             <VStack align="start" gap="1">
@@ -104,7 +96,7 @@ export default function DeadlineCard({
                 {deadline.localDatetime.toFormat('EEEE, MMMM dd, yyyy')}
               </Text>
               <Text fontSize="xs" color="gray.600" className="tabular">
-                {deadline.localDatetime.toFormat('HH:mm')} {deadline.localDatetime.zoneName}
+                {formatTimeWithZone(deadline.localDatetime)}
               </Text>
             </VStack>
 
@@ -121,7 +113,6 @@ export default function DeadlineCard({
 
   const day = deadline.localDatetime.toFormat('dd');
   const monthYear = deadline.localDatetime.toFormat('MMM yyyy').toUpperCase();
-  const time = deadline.localDatetime.toFormat('HH:mm');
 
   return (
     <Flex gap="4" align="stretch">
@@ -155,17 +146,9 @@ export default function DeadlineCard({
           {deadline.label}
         </Text>
         <Text fontSize="xs" color="gray.600" className="tabular" lineHeight="1.5">
-          {time} {timezone}
+          {formatTimeWithZone(deadline.localDatetime)}
         </Text>
-        {isExpired ? (
-          <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.14em" fontWeight="500">
-            Passed
-          </Text>
-        ) : (
-          <Box className="tabular">
-            <Countdown deadline={deadline.localDatetime} label="" />
-          </Box>
-        )}
+        <Countdown deadline={deadline.localDatetime} />
       </VStack>
     </Flex>
   );

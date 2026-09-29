@@ -6,7 +6,6 @@ import { createSystem, defaultConfig, defineConfig } from '@chakra-ui/react'
  * updates with it. Values match LiGHT Brand Guidelines (April 2026, p.11):
  *   Dark Blue (base)    #0C43A0  rgb(12, 67, 160)   -> brand.500 anchor
  *   Light Blue (accent) #68AFE7  rgb(104, 175, 231) -> brand.300
- *   Eggshell (neutral)  #FEFFF7                     -> eggshell token
  */
 const BRAND_RGB = '12, 67, 160'   // #0C43A0, official Dark Blue
 const NAVY_RGB = '10, 26, 61'     // non-brand dark scrim for overlays only
@@ -31,8 +30,6 @@ export const system = createSystem(defaultConfig, defineConfig({
           800: { value: '#062350' },
           900: { value: '#041634' },
         },
-        // Neutral background (brand guidelines, p.11).
-        eggshell: { value: '#FEFFF7' },
       },
       fonts: {
         // Ivy Presto Headline is Adobe-licensed; Playfair Display is the free stand-in.
@@ -46,19 +43,10 @@ export const system = createSystem(defaultConfig, defineConfig({
         badge: { value: '2px' },
         control: { value: '3px' },
         card: { value: '4px' },
-        panel: { value: '8px' },
-        sheet: { value: '12px' },
         hero: { value: '20px' },
-        pill: { value: '24px' },
-      },
-      animations: {
-        'button-transition': { value: 'all 0.2s ease-in-out' },
-        'card-transition': { value: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' },
       },
     },
-    // Shared uppercase micro-label typography. Callers still set `color` (it
-    // varies by context); everything else lives here so the label look is
-    // defined once. See COLORS/SHADOWS/TRANSITIONS below for raw-string contexts.
+    // Shared uppercase label typography. Callers set `color`, which varies by context.
     textStyles: {
       eyebrow: {
         value: {
@@ -94,12 +82,27 @@ export const system = createSystem(defaultConfig, defineConfig({
           letterSpacing: '0.2em',
         },
       },
+      // Status captions: "Passed", "No deadlines on record".
+      caption: {
+        value: {
+          fontSize: 'xs',
+          fontWeight: '500',
+          textTransform: 'uppercase',
+          letterSpacing: '0.14em',
+        },
+      },
+      // Small uppercase headings and back links on long-form pages.
+      subhead: {
+        value: {
+          fontSize: 'xs',
+          fontWeight: '600',
+          textTransform: 'uppercase',
+          letterSpacing: '0.18em',
+        },
+      },
     },
     semanticTokens: {
       colors: {
-        primary: { value: '{colors.brand.500}' },
-        'primary.solid': { value: '{colors.brand.500}' },
-        'primary.contrast': { value: 'white' },
         // Brand-tinted hairline borders, by emphasis. Custom namespace to avoid
         // colliding with Chakra's gray-based `border.*` defaults. Nested (not
         // dotted keys) so Chakra emits proper `--chakra-colors-line-*` vars.
@@ -343,26 +346,6 @@ export const system = createSystem(defaultConfig, defineConfig({
   },
 }))
 
-// Plain-value exports for contexts that can't reference Chakra tokens
-// (SVG props, gradient/shadow strings). All derived from BRAND_RGB above so the
-// brand color still lives in exactly one place. 50/100 mirror the brand ramp.
-export const COLORS = {
-  brand: {
-    50: '#eef4fc',
-    100: '#d9e7f7',
-    500: `rgb(${BRAND_RGB})`,
-  },
-} as const;
-
-export const SHADOWS = {
-  md: `0 2px 8px ${brand(0.08)}`,
-} as const;
-
-export const TRANSITIONS = {
-  normal: 'all 0.2s ease-in-out',
-  standard: 'all 0.2s ease',
-} as const;
-
-/** Brand color at the given alpha, for raw color strings. */
+/** Brand color at the given alpha, for raw strings where tokens do not resolve (shadows, motion props). */
 export const brandAlpha = (a: number) => brand(a);
 
