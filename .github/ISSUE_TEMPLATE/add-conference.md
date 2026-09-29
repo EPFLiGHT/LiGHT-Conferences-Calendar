@@ -28,7 +28,6 @@ start: YYYY-MM-DD
 end: YYYY-MM-DD
 
 paperslink:
-hindex:
 note:
 ```
 

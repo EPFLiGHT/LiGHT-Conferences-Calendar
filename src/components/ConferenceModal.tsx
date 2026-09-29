@@ -7,7 +7,7 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
-import { Globe, FileText, Code, Calendar } from 'lucide-react';
+import { Globe, FileText, Calendar } from 'lucide-react';
 import DeadlineCard from './DeadlineCard';
 import ExternalLinkButton from './ExternalLinkButton';
 import ConferenceDetails from './ConferenceDetails';
@@ -98,14 +98,6 @@ export default function ConferenceModal({ conference, onClose }: ConferenceModal
                       <Flex align="center" gap="2">
                         <FileText size={14} strokeWidth={1.75} />
                         <span>Paper Submission</span>
-                      </Flex>
-                    </ExternalLinkButton>
-                  )}
-                  {conference.pwclink && (
-                    <ExternalLinkButton href={conference.pwclink} variant="secondary" size="md" px="5">
-                      <Flex align="center" gap="2">
-                        <Code size={14} strokeWidth={1.75} />
-                        <span>Papers with Code</span>
                       </Flex>
                     </ExternalLinkButton>
                   )}

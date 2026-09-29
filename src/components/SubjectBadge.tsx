@@ -1,11 +1,10 @@
 import type { JSX } from 'react';
 import { Flex, FlexProps, Text } from '@chakra-ui/react';
 import InfoTooltip from './InfoTooltip';
-import { getSubjectsArray } from '@/utils/parser';
 import { SUBJECT_LABELS } from '@/constants/subjects';
 
 interface SubjectBadgeProps extends Omit<FlexProps, 'children'> {
-  subjects: string | string[];
+  subjects: string[];
 }
 
 export default function SubjectBadge({
@@ -14,13 +13,11 @@ export default function SubjectBadge({
   wrap = 'wrap',
   ...flexProps
 }: SubjectBadgeProps): JSX.Element | null {
-  const normalizedSubjects = getSubjectsArray(subjects);
-
-  if (normalizedSubjects.length === 0) return null;
+  if (subjects.length === 0) return null;
 
   return (
     <Flex gap={gap} wrap={wrap} {...flexProps}>
-      {normalizedSubjects.map((subject) => (
+      {subjects.map((subject) => (
         <InfoTooltip key={subject} label={SUBJECT_LABELS[subject] || subject}>
           <Text
             as="span"

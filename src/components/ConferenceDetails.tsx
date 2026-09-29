@@ -1,10 +1,9 @@
 import type { JSX } from 'react';
 import { Flex, Grid, Text, VStack } from '@chakra-ui/react';
-import { MapPin, Calendar as CalendarIcon, BarChart3, type LucideIcon } from 'lucide-react';
+import { MapPin, Calendar as CalendarIcon, type LucideIcon } from 'lucide-react';
 import SubjectBadge from './SubjectBadge';
 import NoteBadge from './NoteBadge';
 import type { Conference } from '@/types/conference';
-import { getSubjectsArray } from '@/utils/parser';
 
 interface ConferenceDetailsProps {
   conference: Conference;
@@ -31,12 +30,6 @@ const CARD_FIELDS: Array<{
     label: 'Date:',
     getValue: (conf) => conf.date || 'TBA',
   },
-  {
-    key: 'hindex',
-    Icon: BarChart3,
-    label: 'H-Index:',
-    getValue: (conf) => conf.hindex ?? 0,
-  },
 ];
 
 const MODAL_FIELDS: Array<{
@@ -57,12 +50,6 @@ const MODAL_FIELDS: Array<{
     getValue: (conf) => conf.date || 'TBA',
     isPresent: () => true,
   },
-  {
-    key: 'hindex',
-    label: 'H-Index',
-    getValue: (conf) => conf.hindex ?? 0,
-    isPresent: (conf) => (conf.hindex ?? 0) > 0,
-  },
 ];
 
 export default function ConferenceDetails({
@@ -71,7 +58,7 @@ export default function ConferenceDetails({
   showSubjects = variant === 'modal',
   showNote = variant === 'modal',
 }: ConferenceDetailsProps): JSX.Element {
-  const subjects = getSubjectsArray(conference.sub);
+  const subjects = conference.sub;
 
   if (variant === 'modal') {
     return (
@@ -81,7 +68,7 @@ export default function ConferenceDetails({
             <Text textStyle="metaLabel" color="brand.400">
               {field.label}
             </Text>
-            <Text fontSize="md" color="brand.500" fontWeight="500" className={field.key === 'hindex' ? 'tabular' : undefined}>
+            <Text fontSize="md" color="brand.500" fontWeight="500">
               {field.getValue(conference)}
             </Text>
           </VStack>
@@ -110,21 +97,15 @@ export default function ConferenceDetails({
 
   return (
     <VStack align="stretch" gap="2">
-      {CARD_FIELDS.map((field) => {
-        if (field.key === 'hindex' && (conference.hindex ?? 0) <= 0) {
-          return null;
-        }
-
-        return (
-          <Flex key={field.key} fontSize="sm" align="center">
-            <Flex align="center" gap="1.5" color="gray.600" fontWeight="500" minW="100px">
-              <field.Icon size={14} />
-              <Text>{field.label}</Text>
-            </Flex>
-            <Text color="gray.800">{field.getValue(conference)}</Text>
+      {CARD_FIELDS.map((field) => (
+        <Flex key={field.key} fontSize="sm" align="center">
+          <Flex align="center" gap="1.5" color="gray.600" fontWeight="500" minW="100px">
+            <field.Icon size={14} />
+            <Text>{field.label}</Text>
           </Flex>
-        );
-      })}
+          <Text color="gray.800">{field.getValue(conference)}</Text>
+        </Flex>
+      ))}
 
       {showNote && conference.note && <NoteBadge note={conference.note} />}
     </VStack>

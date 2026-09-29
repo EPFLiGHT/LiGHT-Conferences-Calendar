@@ -114,7 +114,6 @@ A fourth file, `speakers.yaml`, powers the Speakers page. It has its own format 
   start: 2025-05-21
   end: 2025-05-25
   paperslink: https://...
-  hindex: 150.0                 # Google Scholar h5-index
   sub: ML                       # subject tag
   note: Additional information  # optional
   type: conference              # conference | summit | workshop

@@ -15,15 +15,14 @@ export interface Conference {
   start?: string;
   end?: string;
   place?: string;
-  sub: string | string[];
+  sub: string[];
   type: string;
   note?: string;
-  hindex?: number;
   paperslink?: string;
-  pwclink?: string;
 }
 
 export interface DeadlineInfo {
+  kind: 'abstract' | 'paper';
   label: string;
   datetime: DateTime;
   localDatetime: DateTime;

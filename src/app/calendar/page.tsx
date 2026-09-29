@@ -32,7 +32,7 @@ import ErrorState from '@/components/ErrorState';
 import { useConferences } from '@/hooks/useConferences';
 import { useConferenceFilters, type ConferenceFiltersState } from '@/hooks/useConferenceFilters';
 import { useURLSync, useInitialURLParams } from '@/utils/urlSync';
-import { getEventColorFromSubjects, toISOFormat } from '@/utils/parser';
+import { getDeadlineInfo, getEventColor } from '@/utils/parser';
 import { conferenceToICSEvents, createICSContent, downloadICS } from '@/utils/ics';
 import { secondaryButtonStyle, primaryButtonStyle } from '@/styles/buttonStyles';
 import type { Conference } from '@/types/conference';
@@ -45,6 +45,8 @@ const HEADER_TOOLBAR = {
   center: 'title',
   right: 'dayGridMonth,timeGridWeek,listMonth',
 };
+
+const SHORT_DEADLINE_LABEL = { abstract: 'Abstract', paper: 'Submission' } as const;
 
 const EVENT_TIME_FORMAT = {
   hour: '2-digit',
@@ -102,68 +104,35 @@ function CalendarContent() {
 
   const filteredConferences = useConferenceFilters(conferences, searchQuery, filters);
 
-  const calendarEvents = useMemo(() => {
-    const events: EventInput[] = [];
-
-    filteredConferences.forEach(conf => {
-      const color = getEventColorFromSubjects(conf.sub).backgroundColor;
-
-      if (conf.start && conf.end) {
-        events.push({
-          id: `conf-${conf.id}`,
-          title: `${conf.title} ${conf.year}`,
-          start: conf.start,
-          end: DateTime.fromISO(conf.end).plus({ days: 1 }).toISODate() ?? undefined,
-          allDay: true,
+  const calendarEvents = useMemo(
+    () =>
+      filteredConferences.flatMap((conf): EventInput[] => {
+        const color = getEventColor(conf.sub);
+        const extendedProps = { conference: conf };
+        const events: EventInput[] = getDeadlineInfo(conf).map((deadline) => ({
+          id: `${deadline.kind}-${conf.id}`,
+          title: `${SHORT_DEADLINE_LABEL[deadline.kind]}: ${conf.title} ${conf.year}`,
+          start: deadline.datetime.toISO() ?? undefined,
+          end: deadline.datetime.plus({ hours: 1 }).toISO() ?? undefined,
+          allDay: false,
           color,
-          extendedProps: {
-            type: 'conference',
-            conference: conf,
-          },
-        });
-      }
-
-      if (conf.abstract_deadline) {
-        const dt = DateTime.fromISO(toISOFormat(conf.abstract_deadline), { zone: conf.timezone });
-        if (dt.isValid) {
-          events.push({
-            id: `abstract-${conf.id}`,
-            title: `Abstract: ${conf.title} ${conf.year}`,
-            start: dt.toISO(),
-            end: dt.plus({ hours: 1 }).toISO(),
-            allDay: false,
+          extendedProps,
+        }));
+        if (conf.start && conf.end) {
+          events.unshift({
+            id: `conf-${conf.id}`,
+            title: `${conf.title} ${conf.year}`,
+            start: conf.start,
+            end: DateTime.fromISO(conf.end).plus({ days: 1 }).toISODate() ?? undefined,
+            allDay: true,
             color,
-            extendedProps: {
-              type: 'abstract',
-              conference: conf,
-              deadline: dt,
-            },
+            extendedProps,
           });
         }
-      }
-
-      if (conf.deadline) {
-        const dt = DateTime.fromISO(toISOFormat(conf.deadline), { zone: conf.timezone });
-        if (dt.isValid) {
-          events.push({
-            id: `deadline-${conf.id}`,
-            title: `Submission: ${conf.title} ${conf.year}`,
-            start: dt.toISO(),
-            end: dt.plus({ hours: 1 }).toISO(),
-            allDay: false,
-            color,
-            extendedProps: {
-              type: 'submission',
-              conference: conf,
-              deadline: dt,
-            },
-          });
-        }
-      }
-    });
-
-    return events;
-  }, [filteredConferences]);
+        return events;
+      }),
+    [filteredConferences]
+  );
 
   const handleEventClick = (info: EventClickInfo) => {
     const conference = info.event.extendedProps.conference;

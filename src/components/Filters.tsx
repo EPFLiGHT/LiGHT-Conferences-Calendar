@@ -4,7 +4,6 @@ import { Box, Flex, Grid, Text } from '@chakra-ui/react';
 import { NativeSelectRoot, NativeSelectField } from '@chakra-ui/react';
 import InfoTooltip from './InfoTooltip';
 import { Conference } from '@/types/conference';
-import { getSubjectsArray } from '@/utils/parser';
 import { SUBJECT_LABELS } from '@/constants/subjects';
 import { VALID_TYPES } from '@/utils/conferenceSchema';
 import type { ConferenceFiltersState } from '@/hooks/useConferenceFilters';
@@ -93,7 +92,7 @@ export default function Filters({ conferences, filters, onFilterChange }: Filter
   const subjects = useMemo(() => {
     const subjectSet = new Set<string>();
     conferences.forEach(conference => {
-      getSubjectsArray(conference.sub).forEach(subject => subjectSet.add(subject));
+      conference.sub.forEach(subject => subjectSet.add(subject));
     });
     return [...subjectSet].sort();
   }, [conferences]);
@@ -102,7 +101,6 @@ export default function Filters({ conferences, filters, onFilterChange }: Filter
 
   const sortLabel =
     filters.sortBy === 'deadline' ? 'Upcoming Deadline' :
-    filters.sortBy === 'hindex' ? 'H-Index' :
     'Start Date';
 
   const selectStyle = {
@@ -129,7 +127,6 @@ export default function Filters({ conferences, filters, onFilterChange }: Filter
               {...selectStyle}
             >
               <option value="deadline">Upcoming Deadline</option>
-              <option value="hindex">H-Index</option>
               <option value="start">Start Date</option>
             </NativeSelectField>
           </NativeSelectRoot>

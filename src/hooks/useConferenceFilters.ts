@@ -2,7 +2,7 @@
  * useConferenceFilters Hook
  *
  * Custom hook that handles filtering and sorting of conferences.
- * Supports search, year filter, subject filter, and three sorting modes.
+ * Supports search, year filter, subject filter, and two sorting modes.
  *
  * @param conferences - Array of conferences to filter
  * @param searchQuery - Search query string
@@ -115,8 +115,6 @@ export function useConferenceFilters(
         }
         // Both past events with no deadline: most recent first
         return eventStartMs(b) - eventStartMs(a);
-      } else if (filters.sortBy === 'hindex') {
-        return (b.hindex || 0) - (a.hindex || 0);
       } else if (filters.sortBy === 'start') {
         const aStart = a.start ? DateTime.fromISO(a.start) : DateTime.fromMillis(0);
         const bStart = b.start ? DateTime.fromISO(b.start) : DateTime.fromMillis(0);

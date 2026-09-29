@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
-import { Conference } from '@/types/conference';
-import { toISOFormat } from './parser';
+import type { Conference } from '@/types/conference';
+import { getDeadlineInfo } from './parser';
 
 interface ICSEvent {
   uid: string;
@@ -70,13 +70,18 @@ export function downloadICS(content: string, filename: string): void {
   URL.revokeObjectURL(link.href);
 }
 
+// Imported calendars key events by UID and show these titles, so neither may change.
+const DEADLINE_EVENTS = {
+  abstract: { uid: 'abstract', title: 'Abstract Deadline', description: 'Abstract submission deadline' },
+  paper: { uid: 'deadline', title: 'Paper Deadline', description: 'Paper submission deadline' },
+} as const;
+
 export function conferenceToICSEvents(conference: Conference): ICSEvent[] {
   const events: ICSEvent[] = [];
 
-  // Conference event (all-day)
   if (conference.start && conference.end) {
-    const start = DateTime.fromISO(toISOFormat(conference.start));
-    const end = DateTime.fromISO(toISOFormat(conference.end));
+    const start = DateTime.fromISO(conference.start);
+    const end = DateTime.fromISO(conference.end);
     if (start.isValid && end.isValid) {
       events.push({
         uid: `conf-${conference.id}@conference-deadlines`,
@@ -91,36 +96,17 @@ export function conferenceToICSEvents(conference: Conference): ICSEvent[] {
     }
   }
 
-  // Abstract deadline
-  if (conference.abstract_deadline) {
-    const dt = DateTime.fromISO(toISOFormat(conference.abstract_deadline), { zone: conference.timezone });
-    if (dt.isValid) {
-      events.push({
-        uid: `abstract-${conference.id}@conference-deadlines`,
-        title: `Abstract Deadline: ${conference.title} ${conference.year}`,
-        start: dt,
-        end: dt.plus({ hours: 1 }),
-        isAllDay: false,
-        description: `Abstract submission deadline for ${conference.full_name}`,
-        url: conference.link,
-      });
-    }
-  }
-
-  // Paper submission deadline
-  if (conference.deadline) {
-    const dt = DateTime.fromISO(toISOFormat(conference.deadline), { zone: conference.timezone });
-    if (dt.isValid) {
-      events.push({
-        uid: `deadline-${conference.id}@conference-deadlines`,
-        title: `Paper Deadline: ${conference.title} ${conference.year}`,
-        start: dt,
-        end: dt.plus({ hours: 1 }),
-        isAllDay: false,
-        description: `Paper submission deadline for ${conference.full_name}`,
-        url: conference.link,
-      });
-    }
+  for (const deadline of getDeadlineInfo(conference)) {
+    const { uid, title, description } = DEADLINE_EVENTS[deadline.kind];
+    events.push({
+      uid: `${uid}-${conference.id}@conference-deadlines`,
+      title: `${title}: ${conference.title} ${conference.year}`,
+      start: deadline.datetime,
+      end: deadline.datetime.plus({ hours: 1 }),
+      isAllDay: false,
+      description: `${description} for ${conference.full_name}`,
+      url: conference.link,
+    });
   }
 
   return events;

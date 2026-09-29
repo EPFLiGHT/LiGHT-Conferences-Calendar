@@ -34,6 +34,7 @@ describe('buildConferenceItemBlocks — deadline', () => {
     kind: 'deadline',
     conference: conf(),
     deadline: {
+      kind: 'paper' as const,
       label: 'Paper deadline',
       datetime: DateTime.fromISO('2026-03-01T23:59:00', { zone: 'UTC-12' }),
       localDatetime: DateTime.fromISO('2026-03-01T23:59:00'),
@@ -118,6 +119,7 @@ describe('buildUserDeadlineNotification', () => {
   const deadlines = [{
     conference: conf(),
     deadline: {
+      kind: 'paper' as const,
       label: 'Paper deadline',
       datetime: DateTime.fromISO('2026-03-01T23:59:00'),
       localDatetime: DateTime.fromISO('2026-03-01T23:59:00'),
@@ -148,6 +150,7 @@ function dl(id: string, daysLeft: number) {
   return {
     conference: conf({ id, title: id.toUpperCase() }),
     deadline: {
+      kind: 'paper' as const,
       label: 'Paper deadline',
       datetime: DateTime.fromISO('2026-03-01T23:59:00'),
       localDatetime: DateTime.fromISO('2026-03-01T23:59:00'),
@@ -200,6 +203,7 @@ describe('buildDeadlineList (/conf-search, /conf-subject results)', () => {
   const deadlines = [{
     conference: conf(),
     deadline: {
+      kind: 'paper' as const,
       label: 'Paper deadline',
       datetime: DateTime.fromISO('2026-03-01T23:59:00'),
       localDatetime: DateTime.fromISO('2026-03-01T23:59:00'),

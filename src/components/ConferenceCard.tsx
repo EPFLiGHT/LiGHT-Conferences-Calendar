@@ -146,15 +146,6 @@ export default function ConferenceCard({ conference, onClick, index = 0 }: Confe
             Papers
           </ExternalLinkButton>
         )}
-        {conference.pwclink && (
-          <ExternalLinkButton
-            href={conference.pwclink}
-            variant="primary"
-            onClick={(e) => e.stopPropagation()}
-          >
-            Papers w/ Code
-          </ExternalLinkButton>
-        )}
       </Flex>
     </MotionBox>
   );
