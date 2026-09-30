@@ -1,14 +1,11 @@
-import { NextResponse } from 'next/server';
-import { withSlackMiddleware, SlackRequestType } from '@/slack-bot/lib/middleware';
-import { acknowledgeResponse } from '@/slack-bot/lib/responses';
-import {
-  subscribeChannel,
-  unsubscribeChannel,
-  unsubscribeTeamChannels,
-} from '@/slack-bot/lib/channelSubscriptions';
-import { getSlackClient, clearTeamClient } from '@/slack-bot/lib/slackClient';
-import { getTeamMetadata, removeTeamData } from '@/slack-bot/lib/teamStorage';
-import { logger } from '@/slack-bot/utils/logger';
+import type { NextResponse } from 'next/server';
+import { withSlackMiddleware } from '@/slack-bot/lib/middleware';
+import { acknowledgeResponse, successResponse } from '@/slack-bot/lib/responses';
+import { subscribeChannel, unsubscribeChannel } from '@/slack-bot/lib/channelSubscriptions';
+import { getSlackClient, isBotUser } from '@/slack-bot/lib/slackClient';
+import { purgeTeam } from '@/slack-bot/lib/purgeTeam';
+import { section } from '@/slack-bot/lib/messages/blocks';
+import { logger } from '@/slack-bot/lib/logger';
 import type {
   SlackEventPayload,
   MemberJoinedChannelEvent,
@@ -18,197 +15,69 @@ import type {
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-/**
- * Handle Slack Event API callbacks
- */
-async function handleSlackEvent(
-  payload: SlackEventPayload,
-  _request: unknown,
-  teamId?: string
-): Promise<NextResponse> {
-  // Slack sends this when setting up the Events API
+async function handleSlackEvent(payload: SlackEventPayload, teamId?: string): Promise<NextResponse> {
+  // Slack sends this once when the Events API URL is configured
   if (payload.type === 'url_verification') {
-    return NextResponse.json({ challenge: payload.challenge });
+    return successResponse({ challenge: payload.challenge });
   }
 
-  if (payload.type === 'event_callback' && payload.event) {
-    logger.info('Received event', { type: payload.event.type, teamId });
+  const event = payload.event;
+  if (payload.type !== 'event_callback' || !event || !teamId) return acknowledgeResponse();
+  logger.info('Received event', { type: event.type, teamId });
 
-    // Handle bot being added to a channel
-    if (payload.event.type === 'member_joined_channel') {
-      const event = payload.event as MemberJoinedChannelEvent;
-      if (await isBotUser(event.user, teamId || event.team)) {
-        await handleBotJoinedChannel(event, teamId);
-      }
+  switch (event.type) {
+    case 'member_joined_channel': {
+      const joined = event as MemberJoinedChannelEvent;
+      if (await isBotUser(joined.user, teamId)) await handleBotJoinedChannel(joined, teamId);
+      break;
     }
-
-    // Handle bot being removed from a channel
-    if (payload.event.type === 'member_left_channel') {
-      const event = payload.event as MemberLeftChannelEvent;
-      if (await isBotUser(event.user, teamId || event.team)) {
-        await handleBotLeftChannel(event, teamId);
-      }
+    case 'member_left_channel': {
+      const left = event as MemberLeftChannelEvent;
+      if (await isBotUser(left.user, teamId)) await handleBotLeftChannel(left, teamId);
+      break;
     }
-
-    // Workspace uninstalled the app - purge tokens and subscriptions
-    if (payload.event.type === 'app_uninstalled' || payload.event.type === 'tokens_revoked') {
-      await handleAppUninstalled(teamId || payload.team_id);
-    }
-
-    return acknowledgeResponse();
+    case 'app_uninstalled':
+    case 'tokens_revoked':
+      await purgeTeam(teamId);
+      break;
   }
-
   return acknowledgeResponse();
 }
 
-/**
- * Check whether a Slack user ID refers to this app's bot user for the team.
- * Prefers cached botUserId from team metadata, falls back to auth.test.
- */
-const botUserIdCache = new Map<string, string>();
+/** Subscribes the channel the bot was added to, and says hello. */
+async function handleBotJoinedChannel(event: MemberJoinedChannelEvent, teamId: string): Promise<void> {
+  const { channel, inviter } = event;
+  const client = await getSlackClient(teamId);
+  // The name is only a label; a failed lookup (e.g. no groups:read on an old install) must not block the subscription.
+  const channelName = await client.conversations
+    .info({ channel })
+    .then((info) => info.channel?.name || 'unknown')
+    .catch((error) => {
+      logger.warn('Channel name lookup failed', { channelId: channel, teamId, error });
+      return 'unknown';
+    });
 
-async function isBotUser(userId: string | undefined, teamId?: string): Promise<boolean> {
-  if (!userId) return false;
-  const cacheKey = teamId || 'default';
+  await subscribeChannel(channel, channelName, teamId, inviter);
+  logger.info('Channel subscribed', { channelId: channel, channelName, teamId, invitedBy: inviter });
 
-  let botUserId = botUserIdCache.get(cacheKey);
-  if (!botUserId && teamId) {
-    const metadata = await getTeamMetadata(teamId);
-    if (metadata?.botUserId) {
-      botUserId = metadata.botUserId;
-      botUserIdCache.set(cacheKey, botUserId);
-    }
-  }
-
-  if (!botUserId) {
-    try {
-      const client = await getSlackClient(teamId);
-      const auth = await client.auth.test();
-      if (auth.user_id) {
-        botUserId = auth.user_id;
-        botUserIdCache.set(cacheKey, botUserId);
-      }
-    } catch (error) {
-      logger.warn('auth.test failed while identifying bot user', { teamId, error });
-      return false;
-    }
-  }
-
-  return botUserId === userId;
-}
-
-/**
- * Handle bot being added to a channel
- * Automatically subscribes the channel to receive deadline reminders
- */
-async function handleBotJoinedChannel(
-  event: MemberJoinedChannelEvent,
-  teamId?: string
-): Promise<void> {
   try {
-    const { channel, user, inviter, team } = event;
-    const actualTeamId = teamId || team;
-
-    logger.info('Bot joined channel', {
-      channelId: channel,
-      botUserId: user,
-      invitedBy: inviter,
-      teamId: actualTeamId,
-    });
-
-    // Get channel info to get the channel name
-    const client = await getSlackClient(actualTeamId);
-    const channelInfo = await client.conversations.info({ channel });
-
-    const channelName = channelInfo.channel?.name || 'unknown';
-
-    // Subscribe the channel
-    await subscribeChannel(channel, channelName, actualTeamId, inviter);
-
-    logger.info('Channel automatically subscribed', {
-      channelId: channel,
-      channelName,
-      teamId: actualTeamId,
-    });
-
-    // Optionally, send a welcome message to the channel
-    try {
-      await client.chat.postMessage({
-        channel,
-        text: 'Thanks for adding me! I\'ll post conference deadline reminders here automatically.',
-        blocks: [
-          {
-            type: 'section',
-            text: {
-              type: 'mrkdwn',
-              text: '👋 *Thanks for adding me!*\n\nI\'ll automatically post conference deadline reminders to this channel. Use `/conf-help` to see all available commands.',
-            },
-          },
-        ],
-      });
-    } catch (msgError) {
-      // Don't fail if we can't send the welcome message
-      logger.warn('Failed to send welcome message', { channel, error: msgError });
-    }
-  } catch (error) {
-    logger.error('Failed to handle bot joined channel event', error, {
-      event,
-    });
-  }
-}
-
-/**
- * Handle bot being removed from a channel
- * Automatically unsubscribes the channel from reminders
- */
-async function handleBotLeftChannel(
-  event: MemberLeftChannelEvent,
-  teamId?: string
-): Promise<void> {
-  try {
-    const { channel, user, team } = event;
-    const actualTeamId = teamId || team;
-
-    logger.info('Bot left channel', {
-      channelId: channel,
-      botUserId: user,
-      teamId: actualTeamId,
-    });
-
-    // Unsubscribe the channel
-    await unsubscribeChannel(channel);
-
-    logger.info('Channel automatically unsubscribed', {
-      channelId: channel,
-      teamId: actualTeamId,
+    await client.chat.postMessage({
+      channel,
+      text: "Thanks for adding me! I'll post conference deadline reminders here automatically.",
+      blocks: [
+        section(
+          "👋 *Thanks for adding me!*\n\nI'll automatically post conference deadline reminders to this channel. Use `/conf-help` to see all available commands."
+        ),
+      ],
     });
   } catch (error) {
-    logger.error('Failed to handle bot left channel event', error, {
-      event,
-    });
+    logger.warn('Welcome message failed', { channelId: channel, teamId, error });
   }
 }
 
-/**
- * Workspace removed the app or its tokens were revoked.
- * Purge stored token, metadata, channel subscriptions, and cached client.
- */
-async function handleAppUninstalled(teamId: string | undefined): Promise<void> {
-  if (!teamId) {
-    logger.warn('app_uninstalled received without teamId');
-    return;
-  }
-  try {
-    logger.info('App uninstalled - cleaning up team data', { teamId });
-    await unsubscribeTeamChannels(teamId);
-    await removeTeamData(teamId);
-    clearTeamClient(teamId);
-  } catch (error) {
-    logger.error('Failed to clean up after app uninstall', error, { teamId });
-  }
+async function handleBotLeftChannel(event: MemberLeftChannelEvent, teamId: string): Promise<void> {
+  await unsubscribeChannel(event.channel);
+  logger.info('Channel unsubscribed', { channelId: event.channel, teamId });
 }
 
-export const POST = withSlackMiddleware<SlackEventPayload>({
-  requestType: SlackRequestType.JSON,
-  handler: handleSlackEvent,
-});
+export const POST = withSlackMiddleware<SlackEventPayload>('json', handleSlackEvent);

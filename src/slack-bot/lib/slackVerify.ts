@@ -4,7 +4,7 @@
  */
 
 import crypto from 'crypto';
-import { logger } from '../utils/logger';
+import { logger } from './logger';
 
 /**
  * Verify Slack request signature

@@ -1,102 +1,67 @@
 import { NextResponse } from 'next/server';
 import { storeTeamToken, storeTeamMetadata } from '@/slack-bot/lib/teamStorage';
+import { appUrl } from '@/slack-bot/lib/appUrl';
+import { logger } from '@/slack-bot/lib/logger';
+import { ROUTES, SITE_URL } from '@/constants/routes';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-/**
- * OAuth Callback Endpoint
- *
- * Slack redirects here after user authorizes the app.
- * We exchange the authorization code for tokens and store them.
- */
+const failure = (error: string, message: string, status: number) =>
+  NextResponse.json({ error, message }, { status });
+
+/** Slack redirects here after authorization: exchange the code for a bot token and store it. */
 export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const code = url.searchParams.get('code');
-  const error = url.searchParams.get('error');
+  const params = new URL(request.url).searchParams;
+  const code = params.get('code');
 
-  // Handle user denial
-  if (error) {
-    return NextResponse.json(
-      { error: 'Installation cancelled', message: 'You denied the installation request.' },
-      { status: 400 }
-    );
+  if (params.get('error')) {
+    return failure('Installation cancelled', 'You denied the installation request.', 400);
   }
-
   if (!code) {
-    return NextResponse.json(
-      { error: 'No authorization code', message: 'No authorization code received.' },
-      { status: 400 }
-    );
+    return failure('No authorization code', 'No authorization code received.', 400);
   }
 
   const clientId = process.env.SLACK_CLIENT_ID;
   const clientSecret = process.env.SLACK_CLIENT_SECRET;
-  const appUrl = process.env.APP_URL || 'https://conferences-calendar.vercel.app';
-  const redirectUri = `${appUrl}/api/slack/oauth/callback`;
-
   if (!clientId || !clientSecret) {
-    return NextResponse.json(
-      { error: 'Configuration error', message: 'Slack OAuth credentials not configured.' },
-      { status: 500 }
-    );
+    return failure('Configuration error', 'Slack OAuth credentials not configured.', 500);
   }
 
   try {
-    // Exchange authorization code for access token
     const tokenResponse = await fetch('https://slack.com/api/oauth.v2.access', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         client_id: clientId,
         client_secret: clientSecret,
-        code: code,
-        redirect_uri: redirectUri,
+        code,
+        redirect_uri: `${appUrl()}/api/slack/oauth/callback`,
       }),
     });
-
     const data = await tokenResponse.json();
 
     if (!data.ok) {
-      console.error('OAuth token exchange failed:', data);
-      return NextResponse.json(
-        { error: 'Installation failed', message: data.error || 'Unknown error' },
-        { status: 400 }
-      );
+      logger.error('OAuth token exchange failed', { slackError: data.error });
+      return failure('Installation failed', data.error || 'Unknown error', 400);
     }
 
-    // Extract team and token information
-    const teamId = data.team.id;
-    const teamName = data.team.name;
-    const botToken = data.access_token;
-    const botUserId = data.bot_user_id;
-
-    // Store the bot token for this team
-    await storeTeamToken(teamId, botToken);
-
-    // Store team metadata
+    const { id: teamId, name: teamName } = data.team;
+    await storeTeamToken(teamId, data.access_token);
     await storeTeamMetadata(teamId, {
       teamName,
-      botUserId,
+      botUserId: data.bot_user_id,
       installedAt: new Date().toISOString(),
       scope: data.scope,
       appId: data.app_id,
     });
+    logger.info('Bot installed', { teamId, teamName });
 
-    console.log(`✅ Bot installed successfully for team: ${teamName} (${teamId})`);
-
-    // Redirect to success page on main user-facing domain
-    const successUrl = new URL('/slack-install/success', 'https://conferences.light-laboratory.org');
+    const successUrl = new URL(ROUTES.slackSuccess, SITE_URL);
     successUrl.searchParams.set('team', teamName);
-
     return NextResponse.redirect(successUrl.toString());
   } catch (error) {
-    console.error('OAuth callback error:', error);
-    return NextResponse.json(
-      { error: 'Installation failed', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+    logger.error('OAuth callback failed', { error });
+    return failure('Installation failed', error instanceof Error ? error.message : 'Unknown error', 500);
   }
 }

@@ -1,162 +1,45 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextResponse } from 'next/server';
 import { verifySlackRequest } from './slackVerify';
+import { badRequestResponse, errorResponse } from './responses';
+import { logger } from './logger';
 
-/**
- * Types for Slack request handlers
- */
-type SlackRequestHandler<T = unknown> = (
-  parsedBody: T,
-  request: NextRequest,
-  teamId?: string
-) => Promise<NextResponse> | NextResponse;
+/** Slash commands and interactions are form posts; the Events API sends JSON. */
+type BodyFormat = 'form' | 'json';
 
-type SlackAuthConfig = {
-  requireAuth?: boolean;
-  authSecret?: string;
-};
+type SlackHandler<T> = (payload: T, teamId: string | undefined) => Promise<NextResponse>;
 
-/**
- * Configuration for different Slack request types
- */
-export enum SlackRequestType {
-  FORM_URLENCODED = 'form', // Slash commands, interactions
-  JSON = 'json',             // Events API
-  CRON = 'cron',            // Cron jobs (no Slack verification)
+function parseBody(body: string, format: BodyFormat): unknown {
+  if (format === 'json') return JSON.parse(body);
+  const params = new URLSearchParams(body);
+  // Interactions wrap their JSON in a `payload` field; slash commands are plain fields.
+  const payload = params.get('payload');
+  return payload ? JSON.parse(payload) : Object.fromEntries(params);
 }
 
-/**
- * Middleware options
- */
-export interface MiddlewareOptions<T> {
-  requestType: SlackRequestType;
-  handler: SlackRequestHandler<T>;
-  authConfig?: SlackAuthConfig;
+/** Commands and events carry `team_id`; interactions carry `team.id`. */
+function extractTeamId(payload: unknown): string | undefined {
+  if (typeof payload !== 'object' || payload === null) return undefined;
+  const { team_id, team } = payload as { team_id?: string; team?: { id?: string } };
+  return team_id ?? team?.id;
 }
 
-/**
- * Parse request body based on content type
- */
-async function parseRequestBody(
-  body: string,
-  requestType: SlackRequestType
-): Promise<unknown> {
-  switch (requestType) {
-    case SlackRequestType.FORM_URLENCODED: {
-      const params = new URLSearchParams(body);
-      const payload = params.get('payload');
-
-      // interactions come as JSON in payload field
-      if (payload) {
-        return JSON.parse(payload);
-      }
-
-      // slash commands are form fields
-      return Object.fromEntries(params.entries());
-    }
-
-    case SlackRequestType.JSON:
-      return JSON.parse(body);
-
-    case SlackRequestType.CRON:
-      return {}; // cron jobs don't have a body
-
-    default:
-      throw new Error(`Unsupported request type: ${requestType}`);
-  }
-}
-
-/**
- * Extract team_id from Slack request
- * Different request types have team_id in different locations
- */
-function extractTeamId(parsedBody: any): string | undefined {
-  // Slash commands and interactions
-  if (parsedBody.team_id) {
-    return parsedBody.team_id;
-  }
-
-  // Interactions and Events API requests use nested team object
-  if (parsedBody.team?.id) {
-    return parsedBody.team.id;
-  }
-
-  return undefined;
-}
-
-/**
- * Verify cron request authentication.
- * Fails closed: a route that requires auth rejects everyone until a secret is set.
- */
-function verifyCronAuth(
-  headers: Headers,
-  authConfig?: SlackAuthConfig
-): boolean {
-  if (!authConfig?.requireAuth) {
-    return true;
-  }
-
-  const cronSecret = authConfig.authSecret || process.env.CRON_SECRET;
-  if (!cronSecret) {
-    console.error('Cron auth required but CRON_SECRET is not set; rejecting request');
-    return false;
-  }
-
-  return headers.get('authorization') === `Bearer ${cronSecret}`;
-}
-
-/**
- * Main middleware wrapper for Slack API routes
- * Handles verification, parsing, error handling, and response formatting
- */
+/** Verifies the Slack signature, parses the body and extracts the team; a thrown handler becomes a 500. */
 export function withSlackMiddleware<T>(
-  options: MiddlewareOptions<T>
-): (request: NextRequest) => Promise<NextResponse> {
-  return async (request: NextRequest): Promise<NextResponse> => {
+  format: BodyFormat,
+  handler: SlackHandler<T>
+): (request: Request) => Promise<NextResponse> {
+  return async (request) => {
     try {
       const body = await request.text();
-
-      // cron jobs need auth check
-      if (options.requestType === SlackRequestType.CRON) {
-        const isAuthorized = verifyCronAuth(request.headers, options.authConfig);
-        if (!isAuthorized) {
-          return NextResponse.json(
-            { error: 'Unauthorized' },
-            { status: 401 }
-          );
-        }
-
-        return await options.handler({} as T, request);
+      if (!(await verifySlackRequest(request.headers, body))) {
+        return errorResponse('Invalid signature', 401);
       }
-
-      // verify slack signature
-      const isValid = await verifySlackRequest(request.headers, body);
-      if (!isValid) {
-        return NextResponse.json(
-          { error: 'Invalid signature' },
-          { status: 401 }
-        );
-      }
-
-      const parsedBody = await parseRequestBody(body, options.requestType);
-
-      // Extract team_id for multi-workspace support
-      const teamId = extractTeamId(parsedBody);
-
-      return await options.handler(parsedBody as T, request, teamId);
+      const payload = parseBody(body, format);
+      return await handler(payload as T, extractTeamId(payload));
     } catch (error) {
-      console.error('Error in Slack middleware:', error);
-
-      if (error instanceof SyntaxError) {
-        return NextResponse.json(
-          { error: 'Invalid request format' },
-          { status: 400 }
-        );
-      }
-
-      return NextResponse.json(
-        { error: 'Internal server error' },
-        { status: 500 }
-      );
+      if (error instanceof SyntaxError) return badRequestResponse('Invalid request format');
+      logger.error('Slack request failed', { path: new URL(request.url).pathname, error });
+      return errorResponse('Internal server error');
     }
   };
 }

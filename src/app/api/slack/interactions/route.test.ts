@@ -1,62 +1,23 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import crypto from 'crypto';
-import { NextRequest } from 'next/server';
+import { resetKv } from '@/slack-bot/testing/fakeKv';
+import { SIGNING_SECRET, buttonClick } from '@/slack-bot/testing/slackRequest';
 
-const { store } = vi.hoisted(() => ({ store: new Map<string, unknown>() }));
-
-vi.mock('@/slack-bot/lib/kv', () => ({
-  kv: {
-    async get(key: string) {
-      return store.get(key) ?? null;
-    },
-    async set(key: string, value: unknown) {
-      store.set(key, structuredClone(value));
-      return 'OK';
-    },
-    async sadd() {
-      return 1;
-    },
-  },
-}));
+vi.mock('@/slack-bot/lib/kv', async () => ({ kv: (await import('@/slack-bot/testing/fakeKv')).fakeKv }));
 
 import { POST } from './route';
 import { getUserPreferences } from '@/slack-bot/lib/userPreferences';
 
-const SIGNING_SECRET = 'test-signing-secret';
-
-function buttonClick(actionId: string, teamId: string): NextRequest {
-  const payload = {
-    type: 'block_actions',
-    user: { id: 'U1', username: 'u1', name: 'u1', team_id: teamId },
-    team: { id: teamId, domain: 'example' },
-    api_app_id: 'A1',
-    token: 'legacy',
-    actions: [{ action_id: actionId, block_id: 'b', type: 'button', action_ts: '1' }],
-  };
-  const body = new URLSearchParams({ payload: JSON.stringify(payload) }).toString();
-  const timestamp = String(Math.floor(Date.now() / 1000));
-  const signature =
-    'v0=' + crypto.createHmac('sha256', SIGNING_SECRET).update(`v0:${timestamp}:${body}`).digest('hex');
-
-  return new NextRequest('http://localhost/api/slack/interactions', {
-    method: 'POST',
-    body,
-    headers: {
-      'content-type': 'application/x-www-form-urlencoded',
-      'x-slack-request-timestamp': timestamp,
-      'x-slack-signature': signature,
-    },
-  });
-}
-
-describe('settings panel notification buttons', () => {
+describe('interactions', () => {
   beforeEach(() => {
-    store.clear();
+    resetKv();
     vi.stubEnv('SLACK_SIGNING_SECRET', SIGNING_SECRET);
+    vi.stubEnv('APP_URL', '');
+    vi.spyOn(console, 'log').mockImplementation(() => {});
   });
 
   afterEach(() => {
     vi.unstubAllEnvs();
+    vi.restoreAllMocks();
   });
 
   it('records the workspace when enabling, so DMs use that workspace token', async () => {
@@ -66,5 +27,21 @@ describe('settings panel notification buttons', () => {
     const prefs = await getUserPreferences('U1');
     expect(prefs?.notificationsEnabled).toBe(true);
     expect(prefs?.teamId).toBe('T2');
+  });
+
+  it('answers Add to Calendar buttons on older reminders with the production download link', async () => {
+    const res = await POST(buttonClick('calendar_pets26', 'T1', 'pets26'));
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.response_type).toBe('ephemeral');
+    expect(body.text).toContain('https://conferences-calendar.vercel.app/api/calendar/pets26');
+  });
+
+  it('acknowledges link-button clicks without replying', async () => {
+    const res = await POST(buttonClick('ics_pets26'));
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ ok: true });
   });
 });

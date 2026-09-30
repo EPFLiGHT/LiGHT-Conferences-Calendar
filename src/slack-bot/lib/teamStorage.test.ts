@@ -1,29 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { fakeKv, resetKv } from '@/slack-bot/testing/fakeKv';
 
-// In-memory stand-in that serializes like @upstash/redis: non-strings are
-// JSON-encoded on write, and reads JSON-decode whatever text is stored.
-const { store } = vi.hoisted(() => ({ store: new Map<string, string>() }));
-
-vi.mock('./kv', () => ({
-  kv: {
-    async set(key: string, value: unknown) {
-      store.set(key, typeof value === 'string' ? value : JSON.stringify(value));
-      return 'OK';
-    },
-    async get(key: string) {
-      const raw = store.get(key);
-      if (raw === undefined) return null;
-      try {
-        return JSON.parse(raw);
-      } catch {
-        return raw;
-      }
-    },
-    async del(key: string) {
-      return store.delete(key) ? 1 : 0;
-    },
-  },
-}));
+vi.mock('./kv', async () => ({ kv: (await import('@/slack-bot/testing/fakeKv')).fakeKv }));
 
 import { storeTeamMetadata, getTeamMetadata, removeTeamData } from './teamStorage';
 import { kvKeys } from './kvKeys';
@@ -38,8 +16,7 @@ const META = {
 
 describe('team metadata storage', () => {
   beforeEach(() => {
-    store.clear();
-    vi.spyOn(console, 'log').mockImplementation(() => {});
+    resetKv();
   });
 
   it('round-trips metadata', async () => {
@@ -48,7 +25,7 @@ describe('team metadata storage', () => {
   });
 
   it('reads entries stored as JSON strings by older versions', async () => {
-    store.set(kvKeys.team.metadata('T1'), JSON.stringify(META));
+    await fakeKv.set(kvKeys.team.metadata('T1'), JSON.stringify(META));
     expect(await getTeamMetadata('T1')).toEqual(META);
   });
 

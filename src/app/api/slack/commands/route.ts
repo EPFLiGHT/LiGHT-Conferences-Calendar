@@ -1,91 +1,36 @@
-import { NextResponse } from 'next/server';
-import { withSlackMiddleware, SlackRequestType } from '@/slack-bot/lib/middleware';
-import { textResponse, badRequestResponse } from '@/slack-bot/lib/responses';
+import type { NextResponse } from 'next/server';
+import { withSlackMiddleware } from '@/slack-bot/lib/middleware';
+import { badRequestResponse, ephemeralResponse, textResponse } from '@/slack-bot/lib/responses';
+import { ConferenceFetchError } from '@/slack-bot/lib/conferences';
+import { commandHandler } from '@/slack-bot/commands';
+import { logger } from '@/slack-bot/lib/logger';
 import type { SlackCommandPayload } from '@/types/slack-payloads';
-import { handleHelp } from '@/slack-bot/commands/user/help';
-import { handleUpcoming } from '@/slack-bot/commands/user/upcoming';
-import { handleSearch } from '@/slack-bot/commands/user/search';
-import { handleSubscribe } from '@/slack-bot/commands/user/subscribe';
-import { handleUnsubscribe } from '@/slack-bot/commands/user/unsubscribe';
-import { handleSettings } from '@/slack-bot/commands/user/settings';
-import { handleSubject } from '@/slack-bot/commands/user/subject';
-import { handleInfo } from '@/slack-bot/commands/user/info';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-/**
- * Command router - maps slash commands to their handlers
- */
-const commandHandlers: Record<
-  string,
-  (userId: string, text: string, teamId?: string) => Promise<unknown>
-> = {
-  '/conf-help': (userId) => handleHelp(userId),
-  '/conf-upcoming': (userId) => handleUpcoming(userId),
-  '/conf-search': (userId, text) => handleSearch(userId, text),
-  '/conf-subscribe': (userId, _text, teamId) => handleSubscribe(userId, teamId),
-  '/conf-unsubscribe': (userId) => handleUnsubscribe(userId),
-  '/conf-settings': (userId) => handleSettings(userId),
-  '/conf-subject': (userId, text) => handleSubject(userId, text),
-  '/conf-info': (userId, text) => handleInfo(userId, text),
-};
+const TIMEOUT_TEXT =
+  '⏱️ The request timed out while fetching conference data. This usually happens when the data source is slow to respond. Please try again in a moment.';
+const ERROR_TEXT =
+  '❌ An error occurred processing your command. Please try again or contact support if the issue persists.';
 
-/**
- * POST handler for Slack slash commands
- */
-async function handleSlashCommand(
-  payload: SlackCommandPayload,
-  _request: unknown,
-  teamId?: string
-): Promise<NextResponse> {
+/** Runs the command's handler; the one place a failed command turns into a reply. */
+async function handleSlashCommand(payload: SlackCommandPayload, teamId?: string): Promise<NextResponse> {
   const { command, text = '', user_id: userId } = payload;
+  if (!userId) return badRequestResponse('Missing user information');
 
-  // Log team context for debugging
-  if (teamId) {
-    console.log(`[Commands] Request from team: ${teamId}`);
-  }
-
-  if (!userId) {
-    return badRequestResponse('Missing user information');
-  }
-
-  const handler = commandHandlers[command];
-
+  const handler = commandHandler(command);
   if (!handler) {
-    return textResponse(
-      `Unknown command: ${command}. Use \`/conf-help\` to see available commands.`,
-      'ephemeral'
-    );
+    return textResponse(`Unknown command: ${command}. Use \`/conf-help\` to see available commands.`);
   }
 
+  logger.info('Slash command', { command, userId, teamId });
   try {
-    const result = await handler(userId, text, teamId);
-    return NextResponse.json({
-      ...(result as Record<string, unknown>),
-      response_type: 'ephemeral',
-    });
+    return ephemeralResponse(await handler({ userId, text: text.trim(), teamId }));
   } catch (error) {
-    console.error(`Error handling command ${command}:`, error);
-
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    const isTimeout = errorMessage.includes('timeout') || errorMessage.includes('Request timeout');
-
-    if (isTimeout) {
-      return textResponse(
-        '⏱️ The request timed out while fetching conference data. This usually happens when the data source is slow to respond. Please try again in a moment.',
-        'ephemeral'
-      );
-    }
-
-    return textResponse(
-      '❌ An error occurred processing your command. Please try again or contact support if the issue persists.',
-      'ephemeral'
-    );
+    logger.error('Slash command failed', { command, userId, teamId, error });
+    return textResponse(error instanceof ConferenceFetchError && error.timedOut ? TIMEOUT_TEXT : ERROR_TEXT);
   }
 }
 
-export const POST = withSlackMiddleware<SlackCommandPayload>({
-  requestType: SlackRequestType.FORM_URLENCODED,
-  handler: handleSlashCommand,
-});
+export const POST = withSlackMiddleware<SlackCommandPayload>('form', handleSlashCommand);

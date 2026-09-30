@@ -1,100 +1,42 @@
-/**
- * Team Token Storage
- *
- * Manages storage and retrieval of Slack workspace tokens in Upstash Redis.
- * Supports multiple workspace installations with OAuth.
- */
+/** Per-workspace bot tokens and install metadata from the OAuth flow, stored in Redis. */
 
+import type { TeamMetadata } from '@/types/slack';
 import { kv } from './kv';
 import { kvKeys } from './kvKeys';
+import { logger } from './logger';
 
-interface TeamMetadata {
-  teamName: string;
-  botUserId: string;
-  installedAt: string;
-  scope: string;
-  appId: string;
-}
-
-/**
- * Store a bot token for a specific team
- */
 export async function storeTeamToken(teamId: string, botToken: string): Promise<void> {
-  const key = kvKeys.team.token(teamId);
-  await kv.set(key, botToken);
-  console.log(`✅ Stored token for team: ${teamId}`);
+  await kv.set(kvKeys.team.token(teamId), botToken);
 }
 
-/**
- * Retrieve a bot token for a specific team
- */
-async function getTeamToken(teamId: string): Promise<string | null> {
-  const key = kvKeys.team.token(teamId);
-  const token = await kv.get<string>(key);
-
-  if (!token) {
-    console.warn(`⚠️  No token found for team: ${teamId}`);
-    return null;
-  }
-
-  return token;
+export async function storeTeamMetadata(teamId: string, metadata: TeamMetadata): Promise<void> {
+  await kv.set(kvKeys.team.metadata(teamId), metadata);
 }
 
-/**
- * Store metadata about a team installation
- */
-export async function storeTeamMetadata(
-  teamId: string,
-  metadata: TeamMetadata
-): Promise<void> {
-  const key = kvKeys.team.metadata(teamId);
-  await kv.set(key, metadata);
-  console.log(`✅ Stored metadata for team: ${teamId}`);
+export function getTeamToken(teamId: string): Promise<string | null> {
+  return kv.get<string>(kvKeys.team.token(teamId));
 }
 
-/**
- * Retrieve metadata about a team installation
- */
-export async function getTeamMetadata(teamId: string): Promise<TeamMetadata | null> {
-  const key = kvKeys.team.metadata(teamId);
+export function getTeamMetadata(teamId: string): Promise<TeamMetadata | null> {
   // The client JSON-decodes on read, including entries stored as JSON strings
-  return kv.get<TeamMetadata>(key);
+  return kv.get<TeamMetadata>(kvKeys.team.metadata(teamId));
 }
 
-/**
- * Remove all data for a team (when app is uninstalled)
- */
 export async function removeTeamData(teamId: string): Promise<void> {
-  const tokenKey = kvKeys.team.token(teamId);
-  const metadataKey = kvKeys.team.metadata(teamId);
-
-  await Promise.all([
-    kv.del(tokenKey),
-    kv.del(metadataKey),
-  ]);
-
-  console.log(`🗑️  Removed all data for team: ${teamId}`);
+  await kv.del(kvKeys.team.token(teamId), kvKeys.team.metadata(teamId));
 }
 
-/**
- * Fallback to environment variable token (for backward compatibility)
- * This allows the bot to work with both OAuth and legacy single-token mode
- */
+/** The workspace's OAuth token, else SLACK_BOT_TOKEN for single-workspace installs. */
 export async function getTokenWithFallback(teamId?: string): Promise<string> {
   if (teamId) {
-    const oauthToken = await getTeamToken(teamId);
-    if (oauthToken) {
-      return oauthToken;
-    }
-    console.warn(`⚠️  No OAuth token for team ${teamId}, falling back to env var`);
+    const token = await getTeamToken(teamId);
+    if (token) return token;
+    logger.warn('No stored token for team, using SLACK_BOT_TOKEN', { teamId });
   }
 
   const envToken = process.env.SLACK_BOT_TOKEN;
   if (!envToken) {
-    throw new Error(
-      'No Slack token available. Either configure SLACK_BOT_TOKEN or complete OAuth installation.'
-    );
+    throw new Error('No Slack token available. Either configure SLACK_BOT_TOKEN or complete OAuth installation.');
   }
-
   return envToken;
 }

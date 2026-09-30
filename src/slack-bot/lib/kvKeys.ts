@@ -4,14 +4,14 @@
  * All keys live under the `slackbot:` root so the Upstash/Vercel data
  * browser groups them together and supports prefix filtering.
  *
- * Conventions — every new key MUST fit one of these sub-namespaces:
+ * Conventions: every new key MUST fit one of these sub-namespaces:
  *
  *   slackbot:<entity>:<id>[:field]   Persistent records.
  *                                    Stored as a single JSON blob per entity
  *                                    (channel, user) or split per field
  *                                    (team:<id>:token, team:<id>:metadata).
  *                                    New fields on existing entities go INSIDE
- *                                    the blob — do not create sibling keys.
+ *                                    the blob; do not create sibling keys.
  *
  *   slackbot:cache:<name>            Long-lived caches with TTL.
  *                                    Reads are best-effort; data must be
@@ -45,8 +45,8 @@ export const kvKeys = {
     sent: (target: string, day: string) => `${KV_ROOT}:reminder:${target}:${day}`,
   },
   cache: {
-    conferences: `${KV_ROOT}:cache:conferences`,
-    conferencesTimestamp: `${KV_ROOT}:cache:conferences:ts`,
+    // Bump the version when the cached Conference shape changes.
+    conferences: `${KV_ROOT}:cache:conferences:v2`,
   },
   idx: {
     channel: `${KV_ROOT}:idx:channel`,

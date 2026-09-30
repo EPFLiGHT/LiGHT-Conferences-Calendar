@@ -1,89 +1,57 @@
-/**
- * Slack Web API Client
- * Supports multi-workspace installations with OAuth
- */
+/** Slack Web API access per workspace, with clients and bot user IDs cached per team. */
 
 import { WebClient } from '@slack/web-api';
-import type { BlockElement } from '@/types/slack';
-import { getTokenWithFallback } from './teamStorage';
+import type { BlockKitMessage } from '@/types/slack';
+import { getTeamMetadata, getTokenWithFallback } from './teamStorage';
+import { logger } from './logger';
 
-// Cache of WebClient instances per team
-const clientCache = new Map<string, WebClient>();
+// Keyed by team ID; 'default' is the SLACK_BOT_TOKEN client.
+const clients = new Map<string, WebClient>();
+const botUserIds = new Map<string, string>();
 
-/**
- * Get or create a Slack Web API client for a specific team
- *
- * @param teamId - The Slack team/workspace ID (optional, falls back to env var)
- * @returns WebClient instance configured for the team
- */
+const cacheKey = (teamId?: string) => teamId || 'default';
+
+/** A client for the workspace's current token; a cached client whose token was replaced is dropped. */
 export async function getSlackClient(teamId?: string): Promise<WebClient> {
-  // Use a cache key based on team ID or 'default' for env var mode
-  const cacheKey = teamId || 'default';
-
-  // Return cached client if available
-  if (clientCache.has(cacheKey)) {
-    return clientCache.get(cacheKey)!;
-  }
-
-  // Get token (OAuth or fallback to env var)
+  const key = cacheKey(teamId);
   const token = await getTokenWithFallback(teamId);
-
-  // Create new client
-  const client = new WebClient(token);
-  clientCache.set(cacheKey, client);
-
+  let client = clients.get(key);
+  if (client?.token !== token) {
+    client = new WebClient(token);
+    clients.set(key, client);
+  }
   return client;
 }
 
-/**
- * Drop the cached client for a single team (call after token rotation/uninstall).
- */
+/** Forgets a team's cached client and bot user, e.g. after uninstall. */
 export function clearTeamClient(teamId?: string): void {
-  clientCache.delete(teamId || 'default');
+  clients.delete(cacheKey(teamId));
+  botUserIds.delete(cacheKey(teamId));
 }
 
-/**
- * Post a message to a Slack channel
- *
- * @param channelId - The channel ID to post to
- * @param blocks - Block Kit blocks for the message
- * @param text - Fallback text for notifications
- * @param teamId - The team ID (for multi-workspace support)
- */
-export async function postToChannel(
-  channelId: string,
-  blocks: BlockElement[],
-  text: string,
-  teamId?: string
-): Promise<void> {
+/** Posts to a channel, or DMs a user when `channel` is a user ID. */
+export async function postMessage(channel: string, message: BlockKitMessage, teamId?: string): Promise<void> {
   const client = await getSlackClient(teamId);
-
-  await client.chat.postMessage({
-    channel: channelId,
-    blocks,
-    text, // Fallback text for notifications
-  });
+  await client.chat.postMessage({ channel, blocks: message.blocks, text: message.text });
 }
 
-/**
- * Send a direct message to a Slack user
- *
- * @param userId - The user ID to send DM to
- * @param blocks - Block Kit blocks for the message
- * @param text - Fallback text for notifications
- * @param teamId - The team ID (for multi-workspace support)
- */
-export async function sendDM(
-  userId: string,
-  blocks: BlockElement[],
-  text?: string,
-  teamId?: string
-): Promise<void> {
-  const client = await getSlackClient(teamId);
-
-  await client.chat.postMessage({
-    channel: userId, // For DMs, the channel is the user ID
-    blocks,
-    text: text || 'Conference deadline notification', // Fallback text for notifications
-  });
+/** Whether `userId` is this app's bot user in the team, from install metadata or auth.test. */
+export async function isBotUser(userId: string, teamId?: string): Promise<boolean> {
+  const key = cacheKey(teamId);
+  let botUserId = botUserIds.get(key);
+  if (!botUserId) {
+    // Storage errors propagate so Slack retries the event; only a failed auth.test counts as "not the bot".
+    botUserId = (teamId && (await getTeamMetadata(teamId))?.botUserId) || undefined;
+    if (!botUserId) {
+      const client = await getSlackClient(teamId);
+      try {
+        botUserId = (await client.auth.test()).user_id;
+      } catch (error) {
+        logger.warn('Could not identify the bot user', { teamId, error });
+        return false;
+      }
+    }
+    if (botUserId) botUserIds.set(key, botUserId);
+  }
+  return botUserId === userId;
 }

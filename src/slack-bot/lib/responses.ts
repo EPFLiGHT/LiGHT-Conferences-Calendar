@@ -1,64 +1,39 @@
+/** HTTP responses for the Slack and cron routes. */
+
 import { NextResponse } from 'next/server';
+import type { BlockKitMessage } from '@/types/slack';
 
-/**
- * Standard response builders for consistent API responses
- */
+/** A reply only the user who ran the command or clicked the button sees. */
+export type EphemeralReply = (BlockKitMessage | { text: string }) & {
+  response_type: 'ephemeral';
+  replace_original?: boolean;
+};
 
-export interface SlackResponse {
-  ok?: boolean;
-  text?: string;
-  error?: string;
-  [key: string]: unknown;
+export function ephemeralReply(message: BlockKitMessage | { text: string }, replaceOriginal?: boolean): EphemeralReply {
+  return { ...message, response_type: 'ephemeral', ...(replaceOriginal !== undefined && { replace_original: replaceOriginal }) };
 }
 
-/**
- * Create a success response
- */
-export function successResponse(
-  data: SlackResponse = {},
-  status = 200
-): NextResponse {
-  return NextResponse.json(data, { status });
+export function ephemeralResponse(message: BlockKitMessage | { text: string }): NextResponse {
+  return NextResponse.json(ephemeralReply(message));
 }
 
-/**
- * Create an error response
- */
-export function errorResponse(
-  message: string,
-  status = 500
-): NextResponse {
-  return NextResponse.json(
-    { error: message },
-    { status }
-  );
+export function textResponse(text: string): NextResponse {
+  return ephemeralResponse({ text });
 }
 
-/**
- * Create a Slack-formatted text response
- */
-export function textResponse(
-  text: string,
-  responseType: 'ephemeral' | 'in_channel' = 'in_channel'
-): NextResponse {
-  return NextResponse.json({
-    text,
-    response_type: responseType,
-  });
+export function successResponse(data: object): NextResponse {
+  return NextResponse.json(data);
 }
 
-/**
- * Create a bad request response
- */
-export function badRequestResponse(
-  message = 'Bad request'
-): NextResponse {
+export function errorResponse(message: string, status = 500): NextResponse {
+  return NextResponse.json({ error: message }, { status });
+}
+
+export function badRequestResponse(message = 'Bad request'): NextResponse {
   return errorResponse(message, 400);
 }
 
-/**
- * Acknowledge Slack request immediately (for async processing)
- */
+/** Acknowledges a Slack request that needs no reply. */
 export function acknowledgeResponse(): NextResponse {
   return NextResponse.json({ ok: true });
 }

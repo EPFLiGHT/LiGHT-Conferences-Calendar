@@ -1,10 +1,6 @@
-/**
- * Type definitions for Slack API payloads
- */
+/** Slack request payloads, as parsed by the Slack middleware. */
 
-/**
- * Slash command payload (parsed from form data)
- */
+/** Slash command form fields. */
 export interface SlackCommandPayload {
   command: string;
   text: string;
@@ -20,9 +16,6 @@ export interface SlackCommandPayload {
   [key: string]: string;
 }
 
-/**
- * Event API payload structure
- */
 export interface SlackEventPayload {
   token: string;
   team_id: string;
@@ -34,49 +27,30 @@ export interface SlackEventPayload {
   event_time?: number;
 }
 
-/**
- * Generic Slack event
- */
 interface SlackEvent {
   type: string;
   user?: string;
-  text?: string;
-  ts?: string;
   channel?: string;
-  event_ts?: string;
   [key: string]: unknown;
 }
 
-/**
- * Member joined channel event
- * Fired when the bot is added to a channel
- */
+/** Someone joined a channel; the bot itself when it is added. */
 export interface MemberJoinedChannelEvent extends SlackEvent {
   type: 'member_joined_channel';
-  user: string; // Bot user ID
-  channel: string; // Channel ID
-  channel_type: string; // e.g., 'C' for public channel
-  team: string; // Team ID
-  inviter?: string; // User who invited the bot
+  user: string;
+  channel: string;
+  inviter?: string;
 }
 
-/**
- * Member left channel event
- * Fired when the bot is removed from a channel
- */
+/** Someone left a channel; the bot itself when it is removed. */
 export interface MemberLeftChannelEvent extends SlackEvent {
   type: 'member_left_channel';
-  user: string; // Bot user ID
-  channel: string; // Channel ID
-  channel_type: string;
-  team: string; // Team ID
+  user: string;
+  channel: string;
 }
 
-/**
- * Interactive components payload
- */
 export interface SlackInteractionPayload {
-  type: 'block_actions' | 'view_submission' | 'view_closed' | 'shortcut';
+  type: string;
   user: {
     id: string;
     username: string;
@@ -92,38 +66,14 @@ export interface SlackInteractionPayload {
   trigger_id?: string;
   response_url?: string;
   actions?: SlackAction[];
-  view?: SlackView;
-  container?: unknown;
   [key: string]: unknown;
 }
 
-/**
- * Slack action (button, select menu, etc.)
- */
 interface SlackAction {
   type: string;
   action_id: string;
   block_id: string;
   value?: string;
-  selected_option?: {
-    text: { type: string; text: string };
-    value: string;
-  };
   action_ts: string;
-  [key: string]: unknown;
-}
-
-/**
- * Slack modal view
- */
-interface SlackView {
-  id: string;
-  team_id: string;
-  type: 'modal' | 'home';
-  callback_id: string;
-  state: {
-    values: Record<string, Record<string, unknown>>;
-  };
-  hash: string;
   [key: string]: unknown;
 }

@@ -1,136 +1,60 @@
-/**
- * User Preferences Management
- * Uses Upstash Redis for storing user settings
- */
+/** Per-user DM reminder opt-in, stored in Redis. */
 
-import { kv } from './kv';
 import type { UserPreferences } from '@/types/slack';
-import { logger } from '../utils/logger';
-import { NOTIFICATION_CONFIG } from '../config/constants';
 import { kvKeys } from './kvKeys';
+import { recordStore } from './records';
 
-const USERS_LIST_KEY = kvKeys.idx.user;
+const users = recordStore<UserPreferences>({
+  key: kvKeys.user.record,
+  index: kvKeys.idx.user,
+  pick: ({ slackUserId, teamId, notificationsEnabled, createdAt, updatedAt }) => ({
+    slackUserId,
+    teamId,
+    notificationsEnabled,
+    createdAt,
+    updatedAt,
+  }),
+});
 
-/**
- * Get user preferences
- */
-export async function getUserPreferences(
-  userId: string
-): Promise<UserPreferences | null> {
-  try {
-    const key = kvKeys.user.record(userId);
-    const prefs = await kv.get<UserPreferences>(key);
-    return prefs;
-  } catch (error) {
-    logger.error('Failed to get user preferences', error, { userId });
-    return null;
-  }
+export function getUserPreferences(userId: string): Promise<UserPreferences | null> {
+  return users.get(userId);
 }
 
-/**
- * Create default user preferences
- */
-function createDefaultPreferences(userId: string): UserPreferences {
+/** Preferences of a user who never subscribed. */
+export function defaultPreferences(userId: string): UserPreferences {
   const now = new Date().toISOString();
-  return {
-    slackUserId: userId,
-    notificationsEnabled: false,
-    timezone: NOTIFICATION_CONFIG.DEFAULT_TIMEZONE,
-    reminderDays: [...NOTIFICATION_CONFIG.DEFAULT_REMINDER_DAYS],
-    subjects: [],
-    lastNotified: now,
-    createdAt: now,
-    updatedAt: now,
-  };
+  return { slackUserId: userId, notificationsEnabled: false, createdAt: now, updatedAt: now };
 }
 
-/**
- * Update user preferences (creates if doesn't exist)
- */
-export async function updateUserPreferences(
+async function updateUserPreferences(
   userId: string,
-  updates: Partial<Omit<UserPreferences, 'slackUserId' | 'createdAt'>>
+  updates: Partial<Pick<UserPreferences, 'teamId' | 'notificationsEnabled'>>
 ): Promise<UserPreferences> {
-  try {
-    const key = kvKeys.user.record(userId);
-    const existing = await getUserPreferences(userId);
-
-    const prefs: UserPreferences = existing
-      ? {
-          ...existing,
-          ...updates,
-          updatedAt: new Date().toISOString(),
-        }
-      : {
-          ...createDefaultPreferences(userId),
-          ...updates,
-        };
-
-    await kv.set(key, prefs);
-
-    // Add to users list for bulk operations
-    await kv.sadd(USERS_LIST_KEY, userId);
-
-    logger.info('User preferences updated', { userId, updates });
-    return prefs;
-  } catch (error) {
-    logger.error('Failed to update user preferences', error, { userId });
-    throw error;
-  }
+  const existing = (await users.get(userId)) ?? defaultPreferences(userId);
+  const prefs = { ...existing, ...updates, updatedAt: new Date().toISOString() };
+  await users.put(userId, prefs);
+  return prefs;
 }
 
-/**
- * Enable notifications for user
- * Resets reminderDays to defaults if user is enabling for the first time or re-enabling
- */
-export async function enableNotifications(
-  userId: string,
-  teamId?: string
-): Promise<UserPreferences> {
-  const existing = await getUserPreferences(userId);
-
-  const updates: Partial<Omit<UserPreferences, 'slackUserId' | 'createdAt'>> = {
-    notificationsEnabled: true
-  };
-
-  if (teamId) {
-    updates.teamId = teamId;
-  }
-
-  if (!existing || !existing.notificationsEnabled) {
-    updates.reminderDays = [...NOTIFICATION_CONFIG.DEFAULT_REMINDER_DAYS];
-  }
-
-  return updateUserPreferences(userId, updates);
+/** Turns DMs on, sent with the token of the workspace the user enabled them from. */
+export function enableNotifications(userId: string, teamId?: string): Promise<UserPreferences> {
+  return updateUserPreferences(userId, { notificationsEnabled: true, ...(teamId && { teamId }) });
 }
 
-/**
- * Disable notifications for user
- */
-export async function disableNotifications(userId: string): Promise<UserPreferences> {
+export function disableNotifications(userId: string): Promise<UserPreferences> {
   return updateUserPreferences(userId, { notificationsEnabled: false });
 }
 
-/**
- * Get all users with notifications enabled
- */
 export async function getAllUsersWithNotifications(): Promise<UserPreferences[]> {
-  try {
-    const userIds = await kv.smembers(USERS_LIST_KEY);
-    if (!userIds || userIds.length === 0) return [];
+  return (await users.all()).filter((user) => user.notificationsEnabled);
+}
 
-    const users = await Promise.all(
-      userIds.map(async (userId: string) => {
-        return kv.get<UserPreferences>(kvKeys.user.record(userId));
-      })
-    );
-
-    return users.filter(
-      (user: UserPreferences | null): user is UserPreferences =>
-        user !== null && user.notificationsEnabled
-    );
-  } catch (error) {
-    logger.error('Failed to get users with notifications', error);
-    return [];
-  }
+/** Turns DMs off for every subscribed user of a workspace, keeping their records. */
+export async function disableTeamUsers(teamId: string): Promise<number> {
+  const teamUsers = (await getAllUsersWithNotifications()).filter((user) => user.teamId === teamId);
+  const updatedAt = new Date().toISOString();
+  await Promise.all(
+    teamUsers.map((user) => users.put(user.slackUserId, { ...user, notificationsEnabled: false, updatedAt }))
+  );
+  return teamUsers.length;
 }
