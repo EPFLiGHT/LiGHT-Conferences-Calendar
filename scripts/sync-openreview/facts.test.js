@@ -23,4 +23,17 @@ describe('buildFacts', () => {
     const facts = buildFacts({ location: { value: 'TBD' } });
     expect(facts.location).toBeNull();
   });
+
+  it('ignores fields served as numbers instead of strings', () => {
+    const facts = buildFacts({
+      title: { value: 7 },
+      location: { value: 12345 },
+      start_date: { value: 1808769600000 },
+      date: { value: 0 },
+      submission_id: { value: 99 },
+    });
+    expect(facts).toMatchObject({
+      fullName: null, location: null, startIso: null, submissionId: null, deadline: null,
+    });
+  });
 });

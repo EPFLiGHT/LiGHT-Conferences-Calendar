@@ -8,13 +8,22 @@ import fs from 'fs';
 import { load, dump, JSON_SCHEMA } from 'js-yaml';
 
 /**
- * Load a data file as plain objects (JSON schema: every scalar stays a string,
- * matching scripts/validate.js).
+ * Parse data-file text as plain objects (JSON schema: dates and times stay
+ * strings, matching scripts/validate.js).
+ * @param {string} text YAML text.
+ * @returns {object[]} The entries.
+ */
+export function parseEntries(text) {
+  return load(text, { schema: JSON_SCHEMA });
+}
+
+/**
+ * Load a data file with parseEntries.
  * @param {string} filePath Path to the YAML file.
  * @returns {object[]} The entries.
  */
 export function loadEntries(filePath) {
-  return load(fs.readFileSync(filePath, 'utf8'), { schema: JSON_SCHEMA });
+  return parseEntries(fs.readFileSync(filePath, 'utf8'));
 }
 
 /**

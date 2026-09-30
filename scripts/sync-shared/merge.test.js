@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { DateTime } from 'luxon';
-import { updateEntry, draftEntry, SYNC_PINNABLE_FIELDS } from './merge.js';
+import { updateEntry, draftEntry } from './merge.js';
+import { SYNC_PINNABLE_FIELDS } from '../../src/utils/conferenceSchema.js';
 
 // The facts a source hands in, using the values scripts/sync-openreview
 // produces for the NeurIPS 2026 Sydney edition (see its facts.test.js).

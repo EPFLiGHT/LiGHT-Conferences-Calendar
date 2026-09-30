@@ -1,6 +1,9 @@
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 import { describe, it, expect } from 'vitest';
 import { load, JSON_SCHEMA } from 'js-yaml';
-import { serializeEntries } from './yamlio.js';
+import { loadEntries, parseEntries, serializeEntries } from './yamlio.js';
 
 const entry = {
   title: 'COLM',
@@ -38,5 +41,25 @@ describe('serializeEntries', () => {
   it('separates entries with a blank line', () => {
     const text = serializeEntries([entry, { ...entry, id: 'colm27', year: 2027 }]);
     expect(text).toContain('\n\n- title:');
+  });
+});
+
+describe('parseEntries', () => {
+  it('keeps unquoted dates as strings and years as numbers', () => {
+    const [parsed] = parseEntries('- id: colm26\n  year: 2026\n  start: 2026-10-06\n  deadline: 2026-04-01 12:15\n');
+    expect(parsed).toEqual({ id: 'colm26', year: 2026, start: '2026-10-06', deadline: '2026-04-01 12:15' });
+  });
+});
+
+describe('loadEntries', () => {
+  it('reads what serializeEntries wrote', () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'yamlio-'));
+    try {
+      const file = path.join(dir, 'conferences.yaml');
+      fs.writeFileSync(file, serializeEntries([entry]));
+      expect(loadEntries(file)).toEqual([entry]);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

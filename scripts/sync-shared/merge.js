@@ -3,8 +3,8 @@
  * conference entry. Only "factual" fields are ever touched (deadline,
  * abstract_deadline, start, end, date, and place and full_name when the entry
  * has none); curated fields (sub, type, note, link, paperslink, id, timezone,
- * deadline_status, hindex, pwclink) are protected by construction because they
- * are never passed to the setter. A value the source does not state is left
+ * deadline_status) are protected by construction because they are never passed
+ * to the setter. A value the source does not state is left
  * alone, never derived from the old one.
  * An entry can also pin individual factual fields via `sync_pin` (a list of
  * field names) when a curated value should win over the source, e.g. a venue
@@ -21,14 +21,9 @@
  * Building it from a source's payload is the source's own job (see
  * scripts/sync-openreview/facts.js and scripts/sync-llm/facts.js).
  */
-import { DateTime } from 'luxon';
+import { parseEntryDateTime } from '../../src/utils/conferenceSchema.js';
 import { toZoneString, formatDateRange, nextId, namesYear } from './dates.js';
 import { cleanFullName, sameConferenceName } from './names.js';
-
-/** Fields a sync may write into an entry, i.e. the ones `sync_pin` accepts. */
-export const SYNC_PINNABLE_FIELDS = [
-  'deadline', 'abstract_deadline', 'place', 'start', 'end', 'date',
-];
 
 /**
  * The curated place and the source's name one city when a curated segment
@@ -81,7 +76,7 @@ export function updateEntry(entry, facts, opts = {}) {
 
   const setDeadline = (field, dt) => {
     if (!dt) return;
-    const old = entry[field] && DateTime.fromISO(entry[field].replace(' ', 'T'), { zone: entry.timezone });
+    const old = entry[field] && parseEntryDateTime(entry[field], entry.timezone);
     if (today && old?.isValid && old < today && dt < today) return;
     set(field, toZoneString(dt, entry.timezone));
   };

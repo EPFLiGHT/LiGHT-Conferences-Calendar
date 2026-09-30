@@ -3,6 +3,8 @@
  * file in the sync that touches the network; `fetch` is injectable so tests
  * never make real requests.
  */
+import { setTimeout as delay } from 'timers/promises';
+
 const BASE = 'https://api2.openreview.net';
 const MAX_RATE_LIMIT_RETRIES = 3;
 
@@ -31,7 +33,7 @@ async function getJson(url, fetchFn, sleep) {
  * @param {{sleep?: (ms: number) => Promise<void>}} [opts] sleep is injectable
  *   so tests do not wait out rate limits.
  * @returns {{
- *   getVenueGroup: (prefix: string, year: number, suffix?: string) => Promise<object|null>,
+ *   getVenueGroup: (prefix: string, year: number) => Promise<object|null>,
  *   getSubmissionDuedate: (submissionId: string) => Promise<number|null>,
  * }} `getVenueGroup` resolves to the venue group's `content` object (title,
  *   location, start_date, date, submission_id, ...) or null when the group
@@ -39,10 +41,10 @@ async function getJson(url, fetchFn, sleep) {
  *   Submission invitation's `duedate` in ms since epoch (UTC) or null;
  *   `expired=true` is required or the API 400s once the deadline has passed.
  */
-export function createApi(fetchFn = fetch, { sleep = (ms) => new Promise((r) => setTimeout(r, ms)) } = {}) {
+export function createApi(fetchFn = fetch, { sleep = delay } = {}) {
   return {
-    async getVenueGroup(prefix, year, suffix = 'Conference') {
-      const id = `${prefix}/${year}/${suffix}`;
+    async getVenueGroup(prefix, year) {
+      const id = `${prefix}/${year}/Conference`;
       const data = await getJson(`${BASE}/groups?id=${encodeURIComponent(id)}`, fetchFn, sleep);
       return data?.groups?.[0]?.content ?? null;
     },

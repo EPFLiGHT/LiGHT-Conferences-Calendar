@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { DateTime } from 'luxon';
-import { syncEdition } from './main.js';
+import { syncEdition, syncVenue } from './main.js';
 
 const TODAY = DateTime.fromISO('2026-09-28T12:00:00Z', { zone: 'utc' });
 
@@ -92,5 +92,52 @@ describe('syncEdition', () => {
     expect(draft.place).toBe('San Francisco, CA, USA');
     expect(draft.deadline).toBeUndefined();
     expect(draft.start).toBeUndefined();
+  });
+
+  it('flags a new edition that has no previous edition to clone', async () => {
+    const entries = [];
+    const out = await syncEdition({
+      api: apiServing(ICLR27), entries, title: 'ICLR', venue: { prefix: 'ICLR.cc' }, year: 2027, today: TODAY,
+    });
+    expect(entries).toEqual([]);
+    expect(out.skipped).toEqual([]);
+    expect(out.flags).toContain('ICLR 2027: no previous edition in the YAML to clone; add it manually');
+  });
+
+  it('flags a new edition of a venue with several entries per year, with the location OpenReview states', async () => {
+    const entries = [iclr26()];
+    const out = await syncEdition({
+      api: apiServing(ICLR27), entries, title: 'ICLR', venue: { prefix: 'ICLR.cc', multiEntry: true }, year: 2027, today: TODAY,
+    });
+    expect(entries).toHaveLength(1);
+    expect(out.flags).toContain(
+      'ICLR 2027: new edition found; this venue has multiple entries per year, add them manually (location: San Francisco, CA, USA)',
+    );
+  });
+
+  it('flags a large deadline move', async () => {
+    const entries = [{ title: 'COLM', year: 2026, id: 'colm26', link: 'https://colmweb.org/', deadline: '2025-12-01 23:59',
+      timezone: 'UTC-12', place: 'San Francisco, CA, USA', start: '2026-10-06', end: '2026-10-09', sub: 'NLP', type: 'conference' }];
+    const early = DateTime.fromISO('2026-03-01T00:00:00Z', { zone: 'utc' });
+    const out = await syncEdition({
+      api: apiServing(COLM26), entries, title: 'COLM', venue: { prefix: 'colmweb.org/COLM' }, year: 2026, today: early,
+    });
+    expect(out.flags.some((f) => f.startsWith('colm26: large deadline move on deadline'))).toBe(true);
+  });
+});
+
+describe('syncVenue', () => {
+  it('syncs this year and the next two, collecting every outcome', async () => {
+    const requested = [];
+    const api = {
+      getVenueGroup: async (...args) => {
+        requested.push(args);
+        if (args[1] === 2028) throw new Error('http 500');
+        return null;
+      },
+    };
+    const out = await syncVenue({ api, entries: [], title: 'ICLR', venue: { prefix: 'ICLR.cc' }, today: TODAY });
+    expect(requested).toEqual([['ICLR.cc', 2026], ['ICLR.cc', 2027], ['ICLR.cc', 2028]]);
+    expect(out).toEqual({ updates: [], drafts: [], flags: [], skipped: ['ICLR 2028: request failed (http 500)'] });
   });
 });
