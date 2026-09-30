@@ -1,20 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { DateTime } from 'luxon';
 import { EDITIONS_SCHEMA, extractFromPage } from './extract.js';
-import { createLlm } from './llm.js';
-
-const TODAY = DateTime.fromISO('2026-07-09T00:00:00Z', { zone: 'utc' });
+import { TODAY, edition, deadline, fakeLlm, jsonReply } from './test-helpers.js';
 
 const RESULT = {
   page_has_dates: true,
-  editions: [{
-    year: 2026, full_name: null, location: 'Verona, Italy',
-    start_date: '2026-06-22', end_date: '2026-06-25',
-    deadlines: [{
-      kind: 'paper', date: '2026-05-06', time: null, timezone_text: null,
-      evidence: 'Paper submission deadline | May 6, 2026',
-    }],
-  }],
+  editions: [edition({
+    location: 'Verona, Italy', start_date: '2026-06-22', end_date: '2026-06-25',
+    deadlines: [deadline({ date: '2026-05-06', evidence: 'Paper submission deadline | May 6, 2026' })],
+  })],
 };
 
 describe('EDITIONS_SCHEMA', () => {
@@ -33,17 +26,13 @@ describe('EDITIONS_SCHEMA', () => {
 
 describe('extractFromPage', () => {
   it('sends the page as delimited untrusted data and parses the reply', async () => {
-    let req;
-    const client = { responses: { create: async (r) => {
-      req = r;
-      return { output: [], output_text: JSON.stringify(RESULT), usage: {} };
-    } } };
-    const llm = createLlm({ client });
+    const llm = fakeLlm(jsonReply(RESULT));
     const out = await extractFromPage(llm, {
       venueTitle: 'Fixture Conf', pageText: 'Paper submission deadline | May 6, 2026',
       url: 'https://fixture.example/dates', today: TODAY,
     });
     expect(out).toEqual(RESULT);
+    const [req] = llm.requests;
     expect(req.text.format.name).toBe('conference_editions');
     const user = req.input.find((m) => m.role === 'user').content;
     expect(user).toContain('<page>');
@@ -54,34 +43,27 @@ describe('extractFromPage', () => {
   });
 
   it('returns null instead of throwing when the response came back incomplete', async () => {
-    const client = { responses: { create: async () => ({
-      status: 'incomplete', output: [], output_text: '{"page_has_dates": tru', usage: {},
-    }) } };
-    const out = await extractFromPage(createLlm({ client }), {
+    const llm = fakeLlm({ status: 'incomplete', output_text: '{"page_has_dates": tru' });
+    const out = await extractFromPage(llm, {
       venueTitle: 'Fixture Conf', pageText: 'x', url: 'https://fixture.example/dates', today: TODAY,
     });
     expect(out).toBeNull();
   });
 
   it('returns null instead of throwing on empty or unparseable output text', async () => {
-    const client = { responses: { create: async () => ({ output: [], output_text: '', usage: {} }) } };
-    const out = await extractFromPage(createLlm({ client }), {
+    const out = await extractFromPage(fakeLlm(), {
       venueTitle: 'Fixture Conf', pageText: 'x', url: 'https://fixture.example/dates', today: TODAY,
     });
     expect(out).toBeNull();
   });
 
   it('tells the model what today is and which edition years are in scope', async () => {
-    let req;
-    const client = { responses: { create: async (r) => {
-      req = r;
-      return { output: [], output_text: JSON.stringify(RESULT), usage: {} };
-    } } };
-    await extractFromPage(createLlm({ client }), {
+    const llm = fakeLlm(jsonReply(RESULT));
+    await extractFromPage(llm, {
       venueTitle: 'Fixture Conf', pageText: 'x', url: 'https://fixture.example/dates', today: TODAY,
     });
-    const prompt = req.input.map((m) => m.content).join('\n');
-    expect(prompt).toContain('2026-07-09');
+    const prompt = llm.requests[0].input.map((m) => m.content).join('\n');
+    expect(prompt).toContain('2026-07-08');
     expect(prompt).toContain('2026');
     expect(prompt).toContain('2028');
   });

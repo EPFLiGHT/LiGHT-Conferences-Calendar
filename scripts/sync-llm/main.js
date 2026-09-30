@@ -5,46 +5,46 @@
  * dates page, first as it would be for the next edition's year (tier 0), let
  * the agent follow links from the venue homepage (tier 1), then let it search
  * the web as well (tier 2). Whatever survives validation is merged into
- * conferences.yaml.
+ * conferences.yaml (see scripts/sync-shared/run.js for the flags, the
+ * write-back and the report). The report adds the page quote behind every
+ * change and the tokens each venue cost.
  *
- * The report it prints lists every change, the page quote behind it, and the
- * tokens each venue cost. When $SYNC_REPORT_PATH is set the report is written
- * there too, and the workflow opens its pull request with that as the body.
- *
- * Flags: --venue <title> syncs one venue; --dry-run skips all writes.
+ * venues.json format, one entry per synced venue:
+ *   { "<title as it appears in conferences.yaml>": {
+ *       "url": "<page listing the deadlines, read at tier 0>",
+ *       "home": "<where the agent starts; defaults to the entry's link>",
+ *       "multiEntry": true,  // optional, as in scripts/sync-openreview/venues.json
+ *       "note": "<free-form comment for humans; the sync ignores it>"
+ *   } }
+ * When the deadlines turn up elsewhere, the sync rewrites url (and moves a
+ * year-specific home along). A venue belongs to one sync only.
  */
-import fs from 'fs';
-import path from 'path';
 import { fileURLToPath } from 'url';
-import { DateTime } from 'luxon';
 import OpenAI from 'openai';
-import { loadEntries, serializeEntries } from '../sync-shared/yamlio.js';
-import { renderReport } from '../sync-shared/report.js';
+import { runSync, runIfMain } from '../sync-shared/run.js';
+import { rollUrl, urlYear } from '../sync-shared/dates.js';
 import { loadApiKey, createLlm } from './llm.js';
-import { createFetcher, searchWeb, normalizeUrl } from './fetch.js';
-import { createBudget, createRunBudget } from './budget.js';
+import { createFetcher } from './fetcher.js';
+import { searchWeb } from './search.js';
+import { createTokenBudget, createTierBudget } from './budget.js';
 import { extractFromPage } from './extract.js';
-import { validateEditions } from './facts.js';
+import { validateEditions } from './gates.js';
 import { runAgent } from './agent.js';
 import { applyEditions, resolveDraftLinks } from './apply.js';
-import { rollUrl, urlYear } from '../sync-shared/dates.js';
+import { followSource } from './venue-config.js';
+import { renderExtraSections } from './report.js';
 
-const DIR = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.join(DIR, '../..');
-const DATA_PATH = path.join(REPO_ROOT, 'public/data/conferences.yaml');
-const CONFIG_PATH = path.join(DIR, 'venues.json');
-const OPENREVIEW_CONFIG_PATH = path.join(DIR, '../sync-openreview/venues.json');
-
-// gpt-5.6-sol list prices, USD per million tokens.
-const INPUT_PRICE_PER_M = 5;
-const OUTPUT_PRICE_PER_M = 30;
+const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
+const CONFIG_PATH = fileURLToPath(new URL('./venues.json', import.meta.url));
+const RUN_MAX_TOKENS = 500_000;
+const VENUE_MAX_TOKENS = 80_000;
 
 /**
  * Climb the tiers for one venue, stopping at the first that yields deadlines
- * the gates in facts.js accept. Exported for tests.
+ * the gates in gates.js accept. Exported for tests.
  * @param {{llm, fetcher, search, entries, today, makeBudget}} ctx
  * @param {string} title Venue title as in conferences.yaml.
- * @param {{url: string, home?: string, multiEntry?: boolean}} cfg
+ * @param {{url: string, home?: string}} cfg
  * @returns {Promise<{outcome: string, tier: number, editions?: Array,
  *   sourceUrl?: string, reason?: string, flags: string[]}>}
  */
@@ -63,38 +63,30 @@ export async function syncVenue(ctx, title, cfg) {
     return hasDeadlines ? valid : null;
   };
 
+  // Tier 0 on one page: the surviving editions, else why there are none
+  // (reason null when the gates rejected them and have flagged why).
+  const tryPage = async (url) => {
+    const page = await fetcher.fetchPage(url);
+    if (!page.ok) return { reason: `configured URL failed (${page.error})` };
+    if (page.tooShort) return { reason: `page appears to be JS-rendered (only ${page.text.length} chars)` };
+    const result = await extractFromPage(llm, { venueTitle: title, pageText: page.text, url, today });
+    if (!result) return { reason: 'tier 0 extraction produced no usable output' };
+    if (!result.page_has_dates) return { reason: 'configured page has no deadline information' };
+    const editions = validate(result.editions, page.finalUrl);
+    return editions ? { editions, sourceUrl: page.finalUrl } : { reason: null };
+  };
+  const found = (tier, { editions, sourceUrl }) => ({ outcome: 'submitted', tier, editions, sourceUrl, flags });
+
   // Try next year's version of the URL first: old edition pages stay up with stale dates.
   const year = urlYear(cfg.url);
   const nextUrl = year && year < today.year + 2 ? rollUrl(cfg.url, year, year + 1) : null;
   if (nextUrl) {
-    const next = await fetcher.fetchPage(nextUrl);
-    if (next.ok && !next.tooShort) {
-      const result = await extractFromPage(llm, { venueTitle: title, pageText: next.text, url: nextUrl, today });
-      if (result?.page_has_dates) {
-        const valid = validate(result.editions, next.finalUrl);
-        if (valid) return { outcome: 'submitted', tier: 0, editions: valid, sourceUrl: next.finalUrl, flags };
-      }
-    }
+    const next = await tryPage(nextUrl);
+    if (next.editions) return found(0, next);
   }
-
-  // Tier 0: guided extraction from the configured URL.
-  const page = await fetcher.fetchPage(cfg.url);
-  if (page.ok && page.tooShort) {
-    flags.push(`${title}: page appears to be JS-rendered (only ${page.text.length} chars); agent fallback`);
-  }
-  if (page.ok && !page.tooShort) {
-    const result = await extractFromPage(llm, { venueTitle: title, pageText: page.text, url: cfg.url, today });
-    if (!result) {
-      flags.push(`${title}: tier 0 extraction produced no usable output; agent fallback`);
-    } else if (result.page_has_dates) {
-      const valid = validate(result.editions, page.finalUrl);
-      if (valid) return { outcome: 'submitted', tier: 0, editions: valid, sourceUrl: page.finalUrl, flags };
-    } else {
-      flags.push(`${title}: configured page has no deadline information; agent fallback`);
-    }
-  } else if (!page.ok) {
-    flags.push(`${title}: configured URL failed (${page.error}); agent fallback`);
-  }
+  const configured = await tryPage(cfg.url);
+  if (configured.editions) return found(0, configured);
+  if (configured.reason) flags.push(`${title}: ${configured.reason}; agent fallback`);
 
   // Tiers 1 and 2: bounded agent, search unlocked only at tier 2.
   const home = cfg.home ?? entries.find((e) => e.title === title)?.link ?? cfg.url;
@@ -111,8 +103,8 @@ export async function syncVenue(ctx, title, cfg) {
       searchEnabled: tier === 2,
     });
     if (out.outcome === 'submitted') {
-      const valid = validate(out.editions, out.sourceUrl);
-      if (valid) return { outcome: 'submitted', tier, editions: valid, sourceUrl: out.sourceUrl, flags };
+      const editions = validate(out.editions, out.sourceUrl);
+      if (editions) return found(tier, { editions, sourceUrl: out.sourceUrl });
       lastReason = 'submission failed validation';
     } else {
       lastReason = out.reason;
@@ -122,205 +114,69 @@ export async function syncVenue(ctx, title, cfg) {
   return { outcome: 'not_found', tier: 2, reason: lastReason, flags };
 }
 
-/**
- * Whether venues.json should start pointing at the page the deadlines were
- * found on. A configured URL too malformed to normalize counts as different:
- * it needs the update most of all. Exported for tests.
- */
-export function urlNeedsUpdate(configuredUrl, sourceUrl) {
-  try {
-    return normalizeUrl(configuredUrl) !== sourceUrl;
-  } catch {
-    return true;
-  }
-}
-
-/**
- * The venue home moved to the year the deadlines were found for, if that page
- * loads, so the agent starts from the current edition. Exported for tests.
- * @returns {Promise<string|null>} The new home, or null to keep the old one.
- */
-export async function nextHome(cfg, sourceUrl, fetcher) {
-  const from = cfg.home ? urlYear(cfg.home) : null;
-  const to = urlYear(sourceUrl);
-  if (!from || !to || to <= from) return null;
-  const home = rollUrl(cfg.home, from, to);
-  if (!home) return null;
-  const page = await fetcher.fetchPage(home);
-  return page.ok ? home : null;
-}
-
-/** Exported for tests. */
-export function renderExtraSections({ evidence, usageByVenue, totals }) {
-  const lines = [];
-  if (evidence.length > 0) {
-    lines.push('### Evidence', '', '| Entry | Field | Source quote | Page |', '|---|---|---|---|');
-    for (const e of evidence) {
-      // Quotes span table rows and headings, so they carry newlines and pipes;
-      // either one would break out of the markdown row.
-      const quote = e.quote.replace(/\s+/g, ' ').replace(/\|/g, '\\|').trim().slice(0, 200);
-      lines.push(`| ${e.id} | ${e.field} | ${quote} | ${e.url} |`);
-    }
-    lines.push('');
-  }
-  lines.push('### Usage', '');
-  for (const [venue, u] of Object.entries(usageByVenue)) {
-    // "tier N" alone reads as success; empty-handed venues must not look synced.
-    const where =
-      u.tier == null ? 'failed'
-      : u.outcome === 'submitted' ? `tier ${u.tier}`
-      : `tier ${u.tier}, found nothing`;
-    lines.push(`- ${venue}: ${where}, ${u.inputTokens + u.outputTokens} tokens`);
-  }
-  const cost =
-    (totals.inputTokens * INPUT_PRICE_PER_M + totals.outputTokens * OUTPUT_PRICE_PER_M) / 1_000_000;
-  lines.push(
-    '',
-    `Total: ${totals.inputTokens} input + ${totals.outputTokens} output tokens, est. $${cost.toFixed(3)}`,
-    '',
-  );
-  return lines.join('\n');
-}
-
 async function main() {
-  const args = process.argv.slice(2);
-  const dryRun = args.includes('--dry-run');
-  const venueIdx = args.indexOf('--venue');
-  if (venueIdx !== -1 && !args[venueIdx + 1]) {
-    console.error('--venue requires a venue title');
-    process.exit(1);
-  }
-  const venueFilter = venueIdx !== -1 ? args[venueIdx + 1] : null;
-
   const apiKey = loadApiKey(REPO_ROOT);
   if (!apiKey) {
     console.error('OPENAI_API_KEY is not set (env or .env.local); aborting.');
     process.exit(1);
   }
 
-  const config = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
-  const openreviewConfig = JSON.parse(fs.readFileSync(OPENREVIEW_CONFIG_PATH, 'utf8'));
-  const overlap = Object.keys(config).filter((t) => t in openreviewConfig);
-  if (overlap.length > 0) {
-    console.error(`Venues owned by both syncs (remove from one config): ${overlap.join(', ')}`);
-    process.exit(1);
-  }
-
-  const raw = fs.readFileSync(DATA_PATH, 'utf8');
-  const entries = loadEntries(DATA_PATH);
-  const today = DateTime.utc();
-  const runBudget = createRunBudget();
+  // The run and each venue cap tokens; each agent tier caps its own turns and time.
+  const runBudget = createTokenBudget(RUN_MAX_TOKENS);
   let venueBudget = null;
-  const onUsage = (u) => {
-    runBudget.addUsage(u);
-    venueBudget?.addUsage(u);
-  };
-
-  const client = new OpenAI({ apiKey, maxRetries: 3 });
-  const llm = createLlm({ client, onUsage });
-  const fetcher = createFetcher({});
-
-  const updates = [];
-  const drafts = [];
-  const flags = [];
-  const skipped = [];
+  const llm = createLlm({
+    client: new OpenAI({ apiKey, maxRetries: 3 }),
+    onUsage: (u) => {
+      runBudget.addUsage(u);
+      venueBudget?.addUsage(u);
+    },
+  });
+  const fetcher = createFetcher();
   const evidence = [];
   const usageByVenue = {};
-  let configChanged = false;
 
-  for (const [title, cfg] of Object.entries(config)) {
-    if (venueFilter && title !== venueFilter) continue;
-    if (runBudget.exceeded()) {
-      skipped.push(`${title}: run token budget exhausted`);
-      continue;
-    }
-    // Tiers bound effort (turns, seconds); the venue and the run bound spend
-    // (tokens). A tier that ends is not a venue that ended, so the venue budget
-    // must not carry a clock or a turn count of its own.
-    venueBudget = createBudget({ maxTurns: Infinity, maxMs: Infinity });
-    const makeBudget = () => {
-      const tierBudget = createBudget({ maxTokens: Infinity });
-      return {
-        turn: tierBudget.turn,
-        limits: tierBudget.limits,
-        exceeded: () => tierBudget.exceeded() ?? venueBudget.exceeded(),
-      };
-    };
+  const perVenue = async (title, cfg, { entries, today }) => {
+    if (runBudget.exceeded()) return { skipped: [`${title}: run token budget exhausted`] };
+    venueBudget = createTokenBudget(VENUE_MAX_TOKENS);
     let out;
     try {
       out = await syncVenue(
-        { llm, fetcher, search: searchWeb, entries, today, makeBudget },
+        { llm, fetcher, search: searchWeb, entries, today, makeBudget: () => createTierBudget(venueBudget) },
         title,
         cfg,
       );
     } catch (err) {
-      skipped.push(`${title}: ${err.message}`);
+      return { skipped: [`${title}: ${err.message}`] };
     } finally {
       // A venue that threw still spent its tokens; leaving it out of the
       // breakdown makes the Usage rows disagree with the run total.
       const { inputTokens, outputTokens } = venueBudget.snapshot();
-      usageByVenue[title] = {
-        tier: out?.tier ?? null,
-        outcome: out?.outcome ?? null,
-        inputTokens,
-        outputTokens,
-      };
+      usageByVenue[title] = { tier: out?.tier ?? null, outcome: out?.outcome ?? null, inputTokens, outputTokens };
     }
-    if (!out) continue;
-    flags.push(...out.flags);
 
     if (out.outcome !== 'submitted') {
-      flags.push(`${title}: no deadlines found (${out.reason}); check the venue site and venues.json`);
-      continue;
+      return {
+        flags: [...out.flags, `${title}: no deadlines found (${out.reason}); check the venue site and venues.json`],
+      };
     }
     const multiEntry = Boolean(cfg.multiEntry);
     const links = await resolveDraftLinks({
       entries, title, editions: out.editions, multiEntry, sourceUrl: out.sourceUrl, fetcher,
     });
     const applied = applyEditions({
-      entries,
-      title,
-      editions: out.editions,
-      multiEntry,
-      sourceUrl: out.sourceUrl,
-      today,
-      links,
+      entries, title, editions: out.editions, multiEntry, sourceUrl: out.sourceUrl, today, links,
     });
-    updates.push(...applied.updates);
-    drafts.push(...applied.drafts);
-    flags.push(...applied.flags);
     evidence.push(...applied.evidence);
+    const moved = await followSource(title, cfg, out.sourceUrl, fetcher);
+    return { ...applied, flags: [...out.flags, ...applied.flags, ...moved] };
+  };
 
-    if (urlNeedsUpdate(cfg.url, out.sourceUrl)) {
-      flags.push(`${title}: deadlines found at ${out.sourceUrl}, not the configured URL; venues.json updated`);
-      cfg.url = out.sourceUrl;
-      configChanged = true;
-      const home = await nextHome(cfg, out.sourceUrl, fetcher);
-      if (home) {
-        flags.push(`${title}: venue home moved to ${home}`);
-        cfg.home = home;
-      }
-    }
-  }
-
-  const after = serializeEntries(entries);
-  if (!dryRun && after !== raw) fs.writeFileSync(DATA_PATH, after);
-  if (!dryRun && configChanged) {
-    fs.writeFileSync(CONFIG_PATH, `${JSON.stringify(config, null, 2)}\n`);
-  }
-
-  const report =
-    renderReport({ updates, drafts, flags, skipped, title: 'LLM web sync report' }) +
-    '\n' +
-    renderExtraSections({ evidence, usageByVenue, totals: runBudget.snapshot() });
-  console.log(dryRun ? '[dry run, nothing written]\n' + report : report);
-  if (process.env.SYNC_REPORT_PATH) fs.writeFileSync(process.env.SYNC_REPORT_PATH, report);
-}
-
-const isDirectRun = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (isDirectRun) {
-  main().catch((err) => {
-    console.error(err);
-    process.exit(1);
+  await runSync({
+    title: 'LLM web sync report',
+    configPath: CONFIG_PATH,
+    perVenue,
+    extraReport: () => renderExtraSections({ evidence, usageByVenue, totals: runBudget.snapshot() }),
   });
 }
+
+runIfMain(import.meta.url, main);

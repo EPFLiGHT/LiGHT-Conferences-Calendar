@@ -1,19 +1,17 @@
 /**
- * Turns validated editions into edits on conferences.yaml. An edition whose
- * title and year already exist updates that entry; an unknown year is drafted
- * from the venue's most recent earlier edition. Venues that keep several
- * entries for one year are never drafted into, only flagged, since there is no
- * way to guess which of them the new dates belong to. Editions that have
- * already ended are left alone. Every deadline that lands gets an evidence
- * row, so a reviewer can check the value against the sentence it came from
- * without opening the venue site.
+ * Turns validated editions into edits on conferences.yaml through the shared
+ * scripts/sync-shared/apply.js, adding what only a web page needs: deadlines
+ * are checked against the conference start one more time, a draft gets a link
+ * for its own year, and every deadline that lands gets an evidence row, so a
+ * reviewer can check the value against the sentence it came from without
+ * opening the venue site.
  */
 import { DateTime } from 'luxon';
-import { updateEntry, draftEntry } from '../sync-shared/merge.js';
-import { editionEnded, namesYear, rollUrl } from '../sync-shared/dates.js';
-import { editionToFacts, bigMoveFlags } from './facts.js';
+import { applyEdition, previousEdition } from '../sync-shared/apply.js';
+import { namesYear, rollUrl } from '../sync-shared/dates.js';
+import { editionToFacts } from './facts.js';
 
-const DEADLINE_FIELDS = new Set(['deadline', 'abstract_deadline']);
+const DEADLINE_KINDS = { abstract_deadline: 'abstract', deadline: 'paper' };
 
 /**
  * A submission deadline cannot fall after its own conference has begun. Venues
@@ -60,11 +58,11 @@ function flagUncheckedAgainstStart(facts, id) {
   ];
 }
 
-const previousEdition = (entries, title, year) =>
-  entries
-    .filter((e) => e.title === title && e.year < year)
-    .sort((a, b) => a.year - b.year)
-    .at(-1);
+/** The after-start check for an entry, or a draft stub, when the page named no start. */
+function screenAgainstCuratedStart(facts, target) {
+  const flags = dropDeadlinesAfterStart(facts, target);
+  return target.start ? flags : [...flags, ...flagUncheckedAgainstStart(facts, target.id)];
+}
 
 /**
  * Links for the editions applyEditions will draft: the previous link moved to
@@ -103,76 +101,33 @@ export async function resolveDraftLinks({ entries, title, editions, multiEntry =
  *   evidence: Array<{id: string, field: string, quote: string, url: string}>}}
  */
 export function applyEditions({ entries, title, editions, multiEntry = false, sourceUrl, today = null, links = {} }) {
-  const updates = [];
-  const drafts = [];
-  const flags = [];
-  const evidence = [];
-
-  const quoteFor = (edition, field) => {
-    const kind = field === 'abstract_deadline' ? 'abstract' : 'paper';
-    return edition.deadlines.find((d) => d.kind === kind)?.evidence ?? '';
-  };
-  const record = (edition, changes) => {
-    updates.push(...changes);
-    flags.push(...bigMoveFlags(changes));
-    for (const c of changes) {
-      if (DEADLINE_FIELDS.has(c.field)) {
-        evidence.push({ id: c.id, field: c.field, quote: quoteFor(edition, c.field), url: sourceUrl });
-      }
-    }
-  };
-
+  const out = { updates: [], drafts: [], flags: [], evidence: [] };
   for (const edition of editions) {
-    const existing = entries.filter((e) => e.title === title && e.year === edition.year);
-    if (existing.length > 0) {
-      for (const entry of existing) {
-        if (today && editionEnded(entry, today)) continue;
-        const facts = editionToFacts(edition, entry.timezone);
-        if (!edition.start_date) {
-          flags.push(...dropDeadlinesAfterStart(facts, entry));
-          if (!entry.start) flags.push(...flagUncheckedAgainstStart(facts, entry.id));
-        }
-        const { changes, flags: updateFlags } = updateEntry(entry, facts, {
-          deadlinesOnly: multiEntry,
-          today,
-        });
-        record(edition, changes);
-        flags.push(...updateFlags);
+    const applied = applyEdition({
+      entries,
+      title,
+      year: edition.year,
+      today,
+      multiEntry,
+      factsFor: (zone) => ({ ...editionToFacts(edition, zone), link: links[edition.year] ?? null }),
+      screen: edition.start_date ? undefined : screenAgainstCuratedStart,
+    });
+    out.updates.push(...applied.updates);
+    out.drafts.push(...applied.drafts);
+    out.flags.push(...applied.flags);
+
+    const written = applied.updates.map(({ id, field }) => ({ id, field }));
+    if (applied.drafted) {
+      for (const field of Object.keys(DEADLINE_KINDS)) {
+        if (applied.drafted[field] !== undefined) written.push({ id: applied.drafted.id, field });
       }
-      continue;
     }
-    if (multiEntry) {
-      flags.push(
-        `${title} ${edition.year}: new edition found on the venue site; this venue has multiple entries per year, add them manually`,
-      );
-      continue;
-    }
-    const previous = previousEdition(entries, title, edition.year);
-    if (!previous) {
-      flags.push(`${title} ${edition.year}: no previous edition in the YAML to clone; skipped`);
-      continue;
-    }
-    const facts = { ...editionToFacts(edition, previous.timezone), link: links[edition.year] ?? null };
-    const { entry, flags: draftFlags } = draftEntry(previous, facts, edition.year);
-    entries.splice(entries.indexOf(previous) + 1, 0, entry);
-    drafts.push({ id: entry.id, title, year: edition.year });
-    flags.push(...draftFlags.map((f) => `${entry.id}: ${f}`));
-    // A draft has no curated start, so edition.start_date is the only anchor.
-    if (!edition.start_date) flags.push(...flagUncheckedAgainstStart(facts, entry.id));
-    for (const kind of ['abstract', 'paper']) {
-      const d = edition.deadlines.find((x) => x.kind === kind);
-      if (d) {
-        const field = kind === 'abstract' ? 'abstract_deadline' : 'deadline';
-        if (entry[field] !== undefined) {
-          evidence.push({
-            id: entry.id,
-            field,
-            quote: d.evidence,
-            url: sourceUrl,
-          });
-        }
-      }
+    for (const { id, field } of written) {
+      const kind = DEADLINE_KINDS[field];
+      if (!kind) continue;
+      const quote = edition.deadlines.find((d) => d.kind === kind)?.evidence ?? '';
+      out.evidence.push({ id, field, quote, url: sourceUrl });
     }
   }
-  return { updates, drafts, flags, evidence };
+  return out;
 }

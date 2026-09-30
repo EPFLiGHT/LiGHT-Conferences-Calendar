@@ -1,11 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { DateTime } from 'luxon';
 import { applyEditions, resolveDraftLinks } from './apply.js';
+import { edition as baseEdition, deadline, fakeFetcher } from './test-helpers.js';
 
-const edition = (year, date, evidence = `Deadline: ${date}`) => ({
-  year, full_name: null, location: null, start_date: null, end_date: null,
-  deadlines: [{ kind: 'paper', date, time: null, timezone_text: null, evidence }],
-});
+const edition = (year, date) =>
+  baseEdition({ year, deadlines: [deadline({ date, evidence: `Deadline: ${date}` })] });
 
 const entry = (over = {}) => ({
   title: 'HealthConf', year: 2026, id: 'hc26', link: 'https://hc.example',
@@ -117,7 +116,7 @@ describe('applyEditions', () => {
 
   it('drafts an unknown year from the latest previous edition', () => {
     const entries = [entry()];
-    const { drafts } = applyEditions({
+    const { drafts, evidence } = applyEditions({
       entries, title: 'HealthConf', editions: [edition(2027, '2027-02-01')],
       sourceUrl: 'https://hc.example/dates',
     });
@@ -125,6 +124,9 @@ describe('applyEditions', () => {
     expect(entries).toHaveLength(2);
     expect(entries[1].id).toBe('hc27');
     expect(entries[1].deadline).toBe('2027-02-01 23:59');
+    expect(evidence).toEqual([
+      { id: 'hc27', field: 'deadline', quote: 'Deadline: 2027-02-01', url: 'https://hc.example/dates' },
+    ]);
   });
 
   it('never drafts for multiEntry venues, only flags', () => {
@@ -182,11 +184,7 @@ describe('applyEditions', () => {
 });
 
 describe('resolveDraftLinks', () => {
-  const fetcherFor = (okUrls) => ({
-    fetchPage: async (url) => (okUrls.includes(url)
-      ? { ok: true, finalUrl: url, text: 'x'.repeat(500), links: [], tooShort: false }
-      : { ok: false, error: 'http 404' }),
-  });
+  const fetcherFor = (okUrls) => fakeFetcher(Object.fromEntries(okUrls.map((url) => [url, 'x'.repeat(500)])));
   const args = (over) => ({
     entries: [entry({ link: 'https://hc.example/2026/' })], title: 'HealthConf',
     editions: [edition(2027, '2027-02-01')], sourceUrl: 'https://hc.example/2027/dates', ...over,

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createBudget, createRunBudget } from './budget.js';
+import { createBudget, createTokenBudget, createTierBudget } from './budget.js';
 
 describe('createBudget', () => {
   it('reports nothing exceeded when fresh', () => {
@@ -44,12 +44,27 @@ describe('createBudget', () => {
   });
 });
 
-describe('createRunBudget', () => {
+describe('createTokenBudget', () => {
   it('only trips on tokens', () => {
-    const b = createRunBudget({ maxTokens: 10 });
+    const b = createTokenBudget(10);
     for (let i = 0; i < 100; i++) b.turn();
     expect(b.exceeded()).toBeNull();
     b.addUsage({ input_tokens: 11 });
     expect(b.exceeded()).toBe('tokens');
+  });
+});
+
+describe('createTierBudget', () => {
+  it('counts its own turns and shares the parent token ceiling', () => {
+    const parent = createTokenBudget(10);
+    const first = createTierBudget(parent, { maxTurns: 1 });
+    first.turn();
+    first.turn();
+    expect(first.exceeded()).toBe('turns');
+    const second = createTierBudget(parent, { maxTurns: 1 });
+    expect(second.exceeded()).toBeNull();
+    expect(second.limits().maxTurns).toBe(1);
+    parent.addUsage({ output_tokens: 11 });
+    expect(second.exceeded()).toBe('tokens');
   });
 });

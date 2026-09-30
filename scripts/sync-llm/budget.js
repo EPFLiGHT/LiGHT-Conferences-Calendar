@@ -36,9 +36,25 @@ export function createBudget({ maxTurns = 6, maxTokens = 80_000, maxMs = 120_000
 }
 
 /**
- * Whole-run token ceiling; turn and time limits disabled.
- * @param {{maxTokens?: number}} [opts]
+ * A token ceiling alone, for the whole run or one venue; turn and time limits disabled.
+ * @param {number} maxTokens
  */
-export function createRunBudget({ maxTokens = 500_000 } = {}) {
+export function createTokenBudget(maxTokens) {
   return createBudget({ maxTokens, maxTurns: Infinity, maxMs: Infinity });
+}
+
+/**
+ * One agent tier's budget: its own turns and clock, with tokens counted
+ * against the parent (the venue's token budget), since a tier that ends is not
+ * a venue that ended.
+ * @param {{exceeded: () => string|null}} parent
+ * @param {{maxTurns?: number, maxMs?: number}} [opts] As for createBudget.
+ */
+export function createTierBudget(parent, opts = {}) {
+  const tier = createBudget({ ...opts, maxTokens: Infinity });
+  return {
+    turn: tier.turn,
+    limits: tier.limits,
+    exceeded: () => tier.exceeded() ?? parent.exceeded(),
+  };
 }

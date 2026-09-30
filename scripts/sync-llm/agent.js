@@ -10,7 +10,7 @@
  * unless its source_url is a page the run actually fetched.
  */
 import { functionCalls } from './llm.js';
-import { isAllowedUrl, normalizeUrl, searchWeb } from './fetch.js';
+import { isAllowedUrl, normalizeUrl } from './urls.js';
 import { EDITIONS_SCHEMA, PAGE_RULES, dateContext } from './extract.js';
 
 const MAX_SEARCHES = 2;
@@ -66,7 +66,8 @@ function buildTools(searchEnabled) {
 }
 
 /**
- * @param {object} deps { llm, fetcher, search?, budget, venueTitle, startUrl, today, searchEnabled? }
+ * @param {object} deps { llm, fetcher, search, budget, venueTitle, startUrl, today, searchEnabled? }
+ *   search is searchWeb from search.js, or a fake in tests.
  * @returns {Promise<{outcome: 'submitted', editions: Array, sourceUrl: string}
  *   | {outcome: 'not_found', reason: string}
  *   | {outcome: 'aborted', reason: string}>}
@@ -74,7 +75,7 @@ function buildTools(searchEnabled) {
 export async function runAgent({
   llm,
   fetcher,
-  search = searchWeb,
+  search,
   budget,
   venueTitle,
   startUrl,

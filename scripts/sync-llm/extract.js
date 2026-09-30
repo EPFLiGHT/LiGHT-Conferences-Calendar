@@ -94,7 +94,7 @@ export const PAGE_RULES = `Rules:
 /**
  * A model's sense of "now" is its training cutoff, so the date has to be said
  * out loud. Left unsaid, it reports whichever edition it remembers and the
- * gates in facts.js throw the lot away. The window here matches those gates:
+ * gates in gates.js throw the lot away. The window here matches those gates:
  * a deadline up to six months old still belongs to the edition being tracked.
  * @param {DateTime} today Luxon instant for the current day.
  * @returns {string} A line for the prompt.
