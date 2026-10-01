@@ -47,12 +47,11 @@ CONFERENCES_DATA_URL=https://your-app-domain.vercel.app
 CHANNEL_REMINDER_DAYS=30,7,3
 
 # Upstash Redis (or UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN)
-KV_URL=rediss://...
 KV_REST_API_URL=https://...
 KV_REST_API_TOKEN=...
 ```
 
-The redirect URI is always `APP_URL` + `/api/slack/oauth/callback`, so `APP_URL` must match the redirect URL you registered in step 1.
+The redirect URI is always `APP_URL` + `/api/slack/oauth/callback`, so `APP_URL` must match the redirect URL you registered in step 1. Without `APP_URL` it is `https://conferences-calendar.vercel.app`.
 
 If you want to keep an existing single-workspace install working at the same time, leave `SLACK_BOT_TOKEN` in place. The bot falls back to it when no OAuth token is found.
 
@@ -83,11 +82,10 @@ A simple landing page with the standard "Add to Slack" button:
 
 ## 6. Test it
 
-Visit `https://your-app-domain.vercel.app/api/slack/install` and authorize. You should land on the success page at `conferences.light-laboratory.org/slack-install/success`, and the Vercel logs should show something like:
+Visit `https://your-app-domain.vercel.app/api/slack/install` and authorize. You should land on the success page at `conferences.light-laboratory.org/slack-install/success`, and the Vercel logs should show a line like:
 
 ```text
-Bot installed successfully for team: <name> (T01234567)
-Stored token for team: T01234567
+{"level":"INFO","message":"Bot installed","teamId":"T01234567","teamName":"<name>",...}
 ```
 
 Then try `/conf-help`, `/conf-subscribe`, `/conf-upcoming` in Slack. To install to other workspaces, share the same `/api/slack/install` link.
@@ -104,13 +102,13 @@ When someone installs the bot:
 
 For each incoming request, middleware reads `team_id` from the payload and `slackClient.ts` looks up that workspace's token. If there's no stored token, it falls back to `SLACK_BOT_TOKEN`.
 
-When a workspace uninstalls the app, Slack sends an `app_uninstalled` (or `tokens_revoked`) event and the bot purges that workspace's stored tokens and subscriptions.
+When a workspace uninstalls the app, Slack sends an `app_uninstalled` (or `tokens_revoked`) event and the bot purges that workspace: its stored token, metadata and channel subscriptions are deleted and its users' DM reminders are switched off (their records are kept). The reminder crons purge a workspace the same way when Slack answers a post with `token_revoked` or `account_inactive`.
 
 ## Troubleshooting
 
 **"Invalid redirect_uri"**: the URL in Slack settings must match exactly, including `/api/slack/oauth/callback`.
 
-**"No token found for team"**: check the Upstash Redis integration is connected, confirm the team finished the OAuth flow, and check logs for storage errors.
+**"No stored token for team, using SLACK_BOT_TOKEN"**: check the Upstash Redis integration is connected, confirm the team finished the OAuth flow, and check logs for storage errors. A workspace that uninstalled the app also has no token.
 
 **Commands not working after OAuth**: make sure the slash command URLs point at the deployment (not localhost) and that signature verification is still passing.
 

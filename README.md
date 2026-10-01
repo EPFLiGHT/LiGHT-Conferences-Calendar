@@ -66,12 +66,15 @@ flowchart TB
     MAIN --> API[Vercel bot]
 ```
 
-The merge step is deliberately narrow. It writes only factual fields (`deadline`, `abstract_deadline`,
-`place`, `start`, `end`, `date`) and never touches curated ones like `sub`, `note` or `link`.
-Anything a venue's config pins with `sync_pin` is left alone, and a disagreement is reported in the PR body
-rather than overwritten. `full_name` is only filled in when an entry has none or a new edition is
+The merge step is deliberately narrow. It writes only what a source states for the factual fields
+(`deadline`, `abstract_deadline`, `start`, `end`, `date`, and `place` when an entry has none) and never
+touches curated ones like `sub`, `note` or `link`. A field an entry pins with `sync_pin` is left alone, and
+a disagreement (including a source naming another city) is reported in the PR body rather than overwritten. `full_name` is only filled in when an entry has none or a new edition is
 drafted, with any trailing year or acronym stripped; an existing one is never rewritten, and a source
 that names the conference differently is reported instead.
+
+Both syncs also run by hand: `--venue "<title>"` syncs a single venue and `--dry-run` writes nothing, e.g.
+`pnpm sync:openreview --dry-run --venue ICLR`.
 
 ## Quickstart
 
@@ -126,22 +129,22 @@ Only `title`, `year`, `id`, `type` and `timezone` are required. Missing fields s
 
 Venues hosted on OpenReview (NeurIPS, ICML, ICLR, COLM, AAAI, CVPR, WACV, ECCV, LoG, UAI, MIDL, MLHC, CHIL)
 are kept fresh by the monthly `pnpm sync:openreview` Action, which reads deadlines, dates and location from the
-[OpenReview API](https://docs.openreview.net/). Hand edits to the synced fields of these venues get overwritten
-by the next sync PR; anything not covered by a sync (summits, workshops, venues in neither config) is
+[OpenReview API](https://docs.openreview.net/). Hand edits to deadlines and dates of these venues get
+overwritten by the next sync PR unless the entry pins them with `sync_pin`; anything not covered by a sync (summits, workshops, venues in neither config) is
 hand-maintained in the YAML. To sync another OpenReview venue, add one line to
 `scripts/sync-openreview/venues.json`.
 
 ### Automated updates from venue websites
 
 Most health conferences are not on OpenReview, so a second monthly Action (`pnpm sync:llm`) fetches each
-venue's important-dates page and asks a small OpenAI model to pull out the deadlines. Every deadline has to
+venue's important-dates page and asks an OpenAI model to pull out the deadlines. Every deadline has to
 come with the exact sentence it was found in; the quote is checked against the page and shown in the PR body.
 When a venue moves its dates page (they love doing this every year), a fallback agent finds the new one and
 fixes `scripts/sync-llm/venues.json` in the same PR.
 
-To run it locally, put `OPENAI_API_KEY=...` in `.env.local`. `--venue "<title>"` syncs a single venue,
-`--dry-run` writes nothing. If a synced value keeps coming out wrong, pin it with `sync_pin: [place]` (or
-`deadline`, `start`, `end`, `date`, `abstract_deadline`) and both syncs will leave that field alone.
+To run it locally, put `OPENAI_API_KEY=...` in `.env.local`. If a synced value keeps coming out wrong, pin
+it with `sync_pin: [place]` (or `deadline`, `start`, `end`, `date`, `abstract_deadline`) and both syncs will
+leave that field alone.
 
 ## Stack
 
