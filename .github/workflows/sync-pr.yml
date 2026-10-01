@@ -1,0 +1,54 @@
+name: Sync PR
+
+on:
+  workflow_call:
+    inputs:
+      script:
+        description: pnpm script that runs the sync
+        required: true
+        type: string
+      branch:
+        description: Branch the pull request is opened from
+        required: true
+        type: string
+      add-paths:
+        description: Files the sync may change, one per line
+        required: true
+        type: string
+      title:
+        description: Commit message and pull request title
+        required: true
+        type: string
+    secrets:
+      OPENAI_API_KEY:
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup
+        uses: ./.github/actions/setup
+      - name: Sync
+        run: pnpm run "$SYNC_SCRIPT"
+        env:
+          SYNC_SCRIPT: ${{ inputs.script }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SYNC_REPORT_PATH: ${{ runner.temp }}/sync-report.md
+      - name: Validate YAML data
+        run: pnpm validate
+      - name: Open or update PR
+        uses: peter-evans/create-pull-request@v8
+        with:
+          branch: ${{ inputs.branch }}
+          add-paths: ${{ inputs.add-paths }}
+          commit-message: ${{ inputs.title }}
+          title: ${{ inputs.title }}
+          body-path: ${{ runner.temp }}/sync-report.md
+          delete-branch: true

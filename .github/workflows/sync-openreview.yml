@@ -11,31 +11,9 @@ permissions:
 
 jobs:
   sync:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-      - name: Install pnpm
-        uses: pnpm/action-setup@v6
-      - name: Setup Node
-        uses: actions/setup-node@v7
-        with:
-          node-version: "22"
-          cache: 'pnpm'
-      - name: Install dependencies
-        run: pnpm install
-      - name: Sync from OpenReview
-        run: pnpm sync:openreview
-        env:
-          SYNC_REPORT_PATH: ${{ runner.temp }}/sync-report.md
-      - name: Validate YAML data
-        run: pnpm validate
-      - name: Open or update PR
-        uses: peter-evans/create-pull-request@v8
-        with:
-          branch: auto/sync-openreview
-          add-paths: public/data/conferences.yaml
-          commit-message: "chore(data): sync deadlines from OpenReview"
-          title: "chore(data): sync deadlines from OpenReview"
-          body-path: ${{ runner.temp }}/sync-report.md
-          delete-branch: true
+    uses: ./.github/workflows/sync-pr.yml
+    with:
+      script: sync:openreview
+      branch: auto/sync-openreview
+      add-paths: public/data/conferences.yaml
+      title: "chore(data): sync deadlines from OpenReview"
