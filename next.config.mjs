@@ -1,8 +1,7 @@
 /** @type {import('next').NextConfig} */
+// GitHub Pages serves a static export (its workflow moves src/app/api aside);
+// Vercel serves the API routes.
 const nextConfig = {
-  basePath: '',
-  // Note: For GitHub Pages, the workflow temporarily excludes the API directory
-  // For Vercel, API routes are included and deployed as serverless functions
   images: {
     unoptimized: true,
   },

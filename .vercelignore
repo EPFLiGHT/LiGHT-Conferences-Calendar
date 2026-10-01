@@ -1,12 +1,3 @@
-# Vercel will deploy both API routes and static pages
-# The API routes are deployed as serverless functions
-# The static pages are used for the 404/error pages
-
 .github/
-.git/
-
-## Documentation
-
-README.md
 LICENSE
 *.md
