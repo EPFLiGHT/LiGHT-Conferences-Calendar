@@ -22,7 +22,7 @@ describe('buildConferenceCard: deadline', () => {
       kind: 'paper',
       label: 'Paper deadline',
       datetime: DateTime.fromISO('2026-03-01T23:59:00', { zone: 'UTC-12' }),
-      localDatetime: DateTime.fromISO('2026-03-01T23:59:00'),
+      localDatetime: DateTime.fromISO('2026-03-02T11:59:00', { zone: 'UTC' }),
     },
     daysLeft: 1,
   };
@@ -35,12 +35,12 @@ describe('buildConferenceCard: deadline', () => {
     vi.unstubAllEnvs();
   });
 
-  it('renders date-only, urgency words, and subject emoji+word', () => {
+  it('renders the date in the conference zone, urgency words, and subject emoji+word', () => {
     const t = sectionText(buildConferenceCard(item));
     expect(t).toContain('*PETS 2026*');
-    expect(t).toContain('Mar 1, 2026');
+    expect(t).toContain('*Mar 1, 2026* (UTC-12)');
+    expect(t).not.toContain('Mar 2');
     expect(t).not.toContain('23:59');
-    expect(t).not.toContain('UTC');
     expect(t).toContain('1 day left');
     expect(t).toContain('Security');
   });

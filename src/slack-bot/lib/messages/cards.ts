@@ -21,7 +21,9 @@ export function buildConferenceCard(item: ConferenceCardItem): KnownBlock[] {
   const lines = [`${urgencyEmoji(item.daysLeft)} *${conference.title} ${conference.year}*  ${subjectTags(conference.sub)}`];
 
   if (item.kind === 'deadline') {
-    lines.push(`📝 ${item.deadline.label}: *${item.deadline.localDatetime.toFormat('MMM d, yyyy')}*`);
+    // The conference's own zone, as its website states it; local would be the server's (UTC).
+    const { datetime } = item.deadline;
+    lines.push(`📝 ${item.deadline.label}: *${datetime.toFormat('MMM d, yyyy')}* (${datetime.zoneName})`);
     lines.push(`⏰ ${formatDeadlineUrgency(item.daysLeft)}`);
   } else {
     if (conference.place) lines.push(`📍 ${conference.place}`);
