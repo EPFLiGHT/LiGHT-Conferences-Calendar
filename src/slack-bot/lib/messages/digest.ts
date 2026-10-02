@@ -53,7 +53,7 @@ function renderDigest(params: DigestParams, maxItems: number): BlockKitMessage {
 
   const parts: KnownBlock[][] = [];
   if (deadlines.length > 0) {
-    parts.push(digestSection('*🔴 Deadlines approaching*', deadlines.map((d) => ({ kind: 'deadline' as const, ...d }))));
+    parts.push(digestSection('*⏳ Deadlines approaching*', deadlines.map((d) => ({ kind: 'deadline' as const, ...d }))));
   }
   if (eventStarts.length > 0) {
     parts.push(digestSection('*🎟️ Starting soon*', eventStarts.map((e) => ({ kind: 'event' as const, ...e }))));
