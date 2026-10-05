@@ -131,10 +131,10 @@ export default function Header(): JSX.Element {
                 lineHeight="1.15"
                 letterSpacing="-0.015em"
               >
-                Conference Deadlines
+                Events Radar
               </Text>
               <Text textStyle="metaLabel" color="brand.400" mt="1.5">
-                Track research deadlines
+                Global health & AI events
               </Text>
             </Box>
           </Flex>

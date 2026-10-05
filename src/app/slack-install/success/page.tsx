@@ -30,7 +30,7 @@ function SuccessContent() {
         <PageMasthead
           eyebrow="LiGHT · Slack Integration"
           title="Installation complete."
-          description="The Conferences Calendar bot can now post deadline reminders in your workspace."
+          description="The LiGHT Events Radar bot can now post deadline reminders in your workspace."
         />
 
         {/* Installation receipt */}

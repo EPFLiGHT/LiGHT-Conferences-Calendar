@@ -61,9 +61,9 @@ function HomeContent() {
       <Header />
       <PageShell>
           <ConferenceFiltersPanel
-            title="Research Conferences"
+            title="Conferences & Events"
             eyebrow="LiGHT · Index"
-            description="Track upcoming conferences and never miss a deadline. Click on any entry for full details and to export."
+            description="Discover conferences and events in global health, humanitarian response and AI, and track their key dates and submission deadlines. Click any entry for full details and to export."
             searchValue={searchQuery}
             onSearchChange={setSearchQuery}
             conferences={conferences}

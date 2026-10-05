@@ -1,8 +1,8 @@
 <div align="center">
 
-# Conference Deadlines
+# LiGHT Events Radar
 
-**Track research conference deadlines across AI/ML and global health.**
+**Conferences, summits and workshops in global health, humanitarian response and AI, with their key dates and submission deadlines.**
 Calendar, timezone-aware countdowns, search and filters, ICS export, and a Slack bot that reminds you before you miss one.
 
 [**conferences.light-laboratory.org**](https://conferences.light-laboratory.org/)

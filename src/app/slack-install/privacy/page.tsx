@@ -130,11 +130,11 @@ export default function PrivacyPolicyPage() {
         <PageMasthead
           eyebrow="LiGHT · Slack Bot"
           title="Privacy Policy"
-          description="How the Conferences Calendar Bot collects, uses, and protects your information."
+          description="How the LiGHT Events Radar Slack bot collects, uses, and protects your information."
           mb="0"
           trailing={
             <Text textStyle="metaLabel" color="brand.400" className="tabular" whiteSpace="nowrap">
-              Updated 30 Sep 2026
+              Updated 5 Oct 2026
             </Text>
           }
         />
@@ -142,10 +142,10 @@ export default function PrivacyPolicyPage() {
         {/* Intro */}
         <Box py={{ base: '8', md: '10' }} borderBottom="1px solid" borderColor="line.default">
           <Text fontSize={{ base: 'md', md: 'lg' }} color="gray.700" lineHeight="1.65">
-            The Conferences Calendar Bot (&ldquo;the Bot&rdquo;) is operated by LiGHT Laboratory.
+            The LiGHT Events Radar Slack bot (&ldquo;the Bot&rdquo;) is operated by LiGHT Laboratory.
             This Privacy Policy explains how we collect, use, and protect your information when
-            you use our Slack bot to receive conference deadline notifications and search
-            academic conferences.
+            you use our Slack bot to receive deadline notifications and search conferences
+            and events.
           </Text>
         </Box>
 
@@ -301,7 +301,7 @@ export default function PrivacyPolicyPage() {
               Consent
             </Text>
             <Text fontSize="sm" color="brand.700" fontWeight="500" lineHeight="1.7">
-              By installing and using the Conferences Calendar Bot, you acknowledge that you
+              By installing and using the LiGHT Events Radar Slack bot, you acknowledge that you
               have read and understood this Privacy Policy and consent to the collection, use,
               and storage of your information as described herein.
             </Text>

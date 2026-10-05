@@ -17,7 +17,7 @@ export function createICSContent(events: ICSEvent[]): string {
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Conference Deadlines//LiGHT Lab//EN',
+    'PRODID:-//LiGHT Events Radar//LiGHT Lab//EN',
     'CALSCALE:GREGORIAN',
   ];
 

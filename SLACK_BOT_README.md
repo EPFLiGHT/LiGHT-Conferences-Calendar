@@ -1,6 +1,6 @@
 # Slack bot
 
-The Slack side of [Conference Deadlines](README.md): slash commands to look up deadlines, plus daily
+The Slack side of [LiGHT Events Radar](README.md): slash commands to look up deadlines, plus daily
 reminders in DMs and channels.
 
 ## What it does
@@ -22,7 +22,7 @@ Two options:
 
 ### 1. Create the Slack app
 
-At [api.slack.com/apps](https://api.slack.com/apps), create a new app from scratch. Name it `LiGHT Conferences` and pick your workspace.
+At [api.slack.com/apps](https://api.slack.com/apps), create a new app from scratch. Name it `LiGHT Events Radar` and pick your workspace.
 
 ### 2. Bot scopes
 

@@ -66,9 +66,9 @@ A simple landing page with the standard "Add to Slack" button:
 ```html
 <!DOCTYPE html>
 <html>
-<head><title>Install Conferences Calendar Bot</title></head>
+<head><title>Install LiGHT Events Radar</title></head>
 <body>
-  <h1>Conferences Calendar Bot</h1>
+  <h1>LiGHT Events Radar</h1>
   <p>Never miss a conference deadline.</p>
   <a href="https://your-app-domain.vercel.app/api/slack/install">
     <img alt="Add to Slack" height="40" width="139"

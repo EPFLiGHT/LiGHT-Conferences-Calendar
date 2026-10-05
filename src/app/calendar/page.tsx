@@ -123,9 +123,9 @@ function CalendarContent() {
       <Header />
       <PageShell>
           <ConferenceFiltersPanel
-            title="Conference Calendar"
+            title="Events Calendar"
             eyebrow="LiGHT · Calendar"
-            description="View every tracked conference and its deadlines in a calendar. Click any event for details."
+            description="View every tracked event and its deadlines in a calendar. Click any event for details."
             searchValue={searchQuery}
             onSearchChange={setSearchQuery}
             conferences={conferences}

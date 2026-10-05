@@ -46,7 +46,7 @@ export default function SlackInstallPage() {
           <Flex justify="center" mb="8">
             <Image
               src="/slack-bot-logo.png"
-              alt="Conferences Calendar Slack Bot"
+              alt="LiGHT Events Radar Slack bot"
               h={{ base: '88px', md: '104px' }}
               w="auto"
               borderRadius="hero"
@@ -64,7 +64,7 @@ export default function SlackInstallPage() {
             lineHeight="1.1"
             mb="5"
           >
-            Conferences Calendar Bot
+            LiGHT Events Radar for Slack
           </Heading>
 
           <Text

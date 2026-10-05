@@ -42,13 +42,13 @@ export function buildHelpMessage(): BlockKitMessage {
 
   return {
     blocks: [
-      header('📚 ConferenceBot Help'),
-      section('Track academic conference deadlines and get notified before important dates!'),
+      header('📚 LiGHT Events Radar Help'),
+      section('Track conference and event deadlines and get notified before important dates!'),
       divider,
       section('*Available Commands:*'),
       ...COMMANDS.map(commandLine),
     ],
-    text: 'ConferenceBot Help - Track academic conference deadlines',
+    text: 'LiGHT Events Radar Help - Track conference and event deadlines',
   };
 }
 
