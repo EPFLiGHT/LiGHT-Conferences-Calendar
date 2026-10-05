@@ -26,7 +26,7 @@ Built by [Omar Ziyad Azgaoui](https://github.com/AZOGOAT) at [LiGHT Lab](https:/
 - **Calendar.** Month, week and list views covering conference dates and submission deadlines alike.
 - **ICS export.** Export a single venue or the whole calendar into Google Calendar, Apple Calendar or Outlook.
 - **Speakers page.** Lab members and the talks they are giving.
-- **Slack bot.** Slash commands and opt-in DM reminders 30, 7 and 3 days before each deadline.
+- **Slack bot.** Slash commands, a Home tab, and opt-in DM reminders 30, 7 and 3 days before each deadline.
 
 <div align="center">
   <img src="docs/images/site-calendar.png" alt="Calendar view" width="100%">

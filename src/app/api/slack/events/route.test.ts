@@ -3,9 +3,10 @@ import { NextRequest } from 'next/server';
 import { fakeKv, resetKv } from '@/slack-bot/testing/fakeKv';
 import { SIGNING_SECRET, event } from '@/slack-bot/testing/slackRequest';
 
-const { conversationsInfo, postMessage } = vi.hoisted(() => ({
+const { conversationsInfo, postMessage, viewsPublish } = vi.hoisted(() => ({
   conversationsInfo: vi.fn(),
   postMessage: vi.fn(),
+  viewsPublish: vi.fn(),
 }));
 
 vi.mock('@/slack-bot/lib/kv', async () => ({ kv: (await import('@/slack-bot/testing/fakeKv')).fakeKv }));
@@ -15,6 +16,7 @@ vi.mock('@slack/web-api', async (importOriginal) => ({
     constructor(readonly token: string) {}
     conversations = { info: conversationsInfo };
     chat = { postMessage };
+    views = { publish: viewsPublish };
     auth = { test: async () => ({ user_id: 'UBOT' }) };
   },
 }));
@@ -24,6 +26,7 @@ import { subscribeChannel, getSubscribedChannels } from '@/slack-bot/lib/channel
 import { enableNotifications, getUserPreferences } from '@/slack-bot/lib/userPreferences';
 import { storeTeamMetadata, storeTeamToken } from '@/slack-bot/lib/teamStorage';
 import { kvKeys } from '@/slack-bot/lib/kvKeys';
+import { conference } from '@/slack-bot/testing/fixtures';
 
 const channelIds = async () => (await getSubscribedChannels()).map((c) => c.channelId).sort();
 
@@ -33,6 +36,8 @@ beforeEach(async () => {
   for (const method of ['log', 'warn', 'error'] as const) vi.spyOn(console, method).mockImplementation(() => {});
   conversationsInfo.mockReset().mockResolvedValue({ channel: { name: 'general' } });
   postMessage.mockReset().mockResolvedValue({ ok: true });
+  viewsPublish.mockReset().mockResolvedValue({ ok: true });
+  await fakeKv.set(kvKeys.cache.conferences, [conference({ deadline: '2099-01-15 23:59', start: '2099-03-01' })]);
   await storeTeamToken('T1', 'xoxb-t1');
   await storeTeamToken('T2', 'xoxb-t2');
   await subscribeChannel('C1', 'c1', 'T1');
@@ -81,6 +86,29 @@ describe('Slack events', () => {
 
     expect(res.status).toBe(200);
     expect(await channelIds()).toEqual(['C1', 'C2', 'C9']);
+  });
+
+  it('publishes the Home tab with current events when a user opens it', async () => {
+    const res = await POST(event('T1', { type: 'app_home_opened', user: 'U1', channel: 'D1', tab: 'home' }));
+
+    expect(res.status).toBe(200);
+    expect(viewsPublish).toHaveBeenCalledOnce();
+    const { user_id, view } = viewsPublish.mock.calls[0][0];
+    expect(user_id).toBe('U1');
+    expect(view.type).toBe('home');
+    expect(JSON.stringify(view.blocks)).toContain('*PETS 2026*');
+    expect(JSON.stringify(view.blocks)).toContain('disable_notifications');
+  });
+
+  it('leaves the Messages tab alone', async () => {
+    await POST(event('T1', { type: 'app_home_opened', user: 'U1', channel: 'D1', tab: 'messages' }));
+    expect(viewsPublish).not.toHaveBeenCalled();
+  });
+
+  it('answers 200 when the Home tab publish fails, since the next open retries it', async () => {
+    viewsPublish.mockRejectedValue(new Error('not_enabled'));
+    const res = await POST(event('T1', { type: 'app_home_opened', user: 'U1', channel: 'D1', tab: 'home' }));
+    expect(res.status).toBe(200);
   });
 
   it("purges the workspace and stops its users' reminders, leaving other workspaces alone", async () => {

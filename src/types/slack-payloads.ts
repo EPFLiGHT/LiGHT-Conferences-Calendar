@@ -49,6 +49,13 @@ export interface MemberLeftChannelEvent extends SlackEvent {
   channel: string;
 }
 
+/** A user opened the app's Home or Messages tab. */
+export interface AppHomeOpenedEvent extends SlackEvent {
+  type: 'app_home_opened';
+  user: string;
+  tab: 'home' | 'messages';
+}
+
 export interface SlackInteractionPayload {
   type: string;
   user: {
@@ -65,6 +72,8 @@ export interface SlackInteractionPayload {
   token: string;
   trigger_id?: string;
   response_url?: string;
+  /** The view a button was clicked in; Home tab clicks carry no `response_url`. */
+  view?: { type: string };
   actions?: SlackAction[];
   [key: string]: unknown;
 }

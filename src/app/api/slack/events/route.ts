@@ -4,10 +4,12 @@ import { acknowledgeResponse, successResponse } from '@/slack-bot/lib/responses'
 import { subscribeChannel, unsubscribeChannel } from '@/slack-bot/lib/channelSubscriptions';
 import { getSlackClient, isBotUser } from '@/slack-bot/lib/slackClient';
 import { purgeTeam } from '@/slack-bot/lib/purgeTeam';
+import { publishHome } from '@/slack-bot/lib/appHome';
 import { section } from '@/slack-bot/lib/messages/blocks';
 import { logger } from '@/slack-bot/lib/logger';
 import type {
   SlackEventPayload,
+  AppHomeOpenedEvent,
   MemberJoinedChannelEvent,
   MemberLeftChannelEvent,
 } from '@/types/slack-payloads';
@@ -36,6 +38,9 @@ async function handleSlackEvent(payload: SlackEventPayload, teamId?: string): Pr
       if (await isBotUser(left.user, teamId)) await handleBotLeftChannel(left, teamId);
       break;
     }
+    case 'app_home_opened':
+      await handleHomeOpened(event as AppHomeOpenedEvent, teamId);
+      break;
     case 'app_uninstalled':
     case 'tokens_revoked':
       await purgeTeam(teamId);
@@ -72,6 +77,16 @@ async function handleBotJoinedChannel(event: MemberJoinedChannelEvent, teamId: s
     });
   } catch (error) {
     logger.warn('Welcome message failed', { channelId: channel, teamId, error });
+  }
+}
+
+// Not retried: the next open publishes again.
+async function handleHomeOpened(event: AppHomeOpenedEvent, teamId: string): Promise<void> {
+  if (event.tab !== 'home') return;
+  try {
+    await publishHome(event.user, teamId);
+  } catch (error) {
+    logger.warn('Home tab publish failed', { userId: event.user, teamId, error });
   }
 }
 

@@ -4,6 +4,7 @@ import { acknowledgeResponse, ephemeralReply, successResponse, type EphemeralRep
 import { buildErrorMessage, buildSuccessMessage, buildSettingsPanel } from '@/slack-bot/lib/messages/replies';
 import { enableNotifications, disableNotifications } from '@/slack-bot/lib/userPreferences';
 import { appUrl } from '@/slack-bot/lib/appUrl';
+import { publishHome } from '@/slack-bot/lib/appHome';
 import { logger } from '@/slack-bot/lib/logger';
 import type { SlackInteractionPayload } from '@/types/slack-payloads';
 
@@ -35,11 +36,32 @@ async function replyToAction(actionId: string, userId: string, teamId?: string):
   return null;
 }
 
+/** Home tab clicks: a reminders toggle saves and republishes the tab; link buttons need nothing. */
+async function handleHomeAction(actionId: string, userId: string, teamId?: string): Promise<void> {
+  const toggle =
+    actionId === 'enable_notifications'
+      ? () => enableNotifications(userId, teamId)
+      : actionId === 'disable_notifications'
+        ? () => disableNotifications(userId)
+        : null;
+  if (!toggle) return;
+  try {
+    await publishHome(userId, teamId, await toggle());
+  } catch (error) {
+    logger.error('Home tab action failed', { actionId, userId, teamId, error });
+  }
+}
+
 async function handleInteraction(payload: SlackInteractionPayload, teamId?: string): Promise<NextResponse> {
   const actionId = payload.actions?.[0]?.action_id;
   if (payload.type !== 'block_actions' || !actionId) return acknowledgeResponse();
 
   const userId = payload.user.id;
+  if (payload.view?.type === 'home') {
+    await handleHomeAction(actionId, userId, teamId);
+    return acknowledgeResponse();
+  }
+
   let reply: EphemeralReply | null;
   try {
     reply = await replyToAction(actionId, userId, teamId);

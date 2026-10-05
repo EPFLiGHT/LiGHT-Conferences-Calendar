@@ -9,6 +9,7 @@ reminders in DMs and channels.
 - Opt-in DM reminders 30, 7 and 3 days before each deadline
 - Deadline posts in any channel the bot is added to
 - Subject filters (ML, CV, NLP, SEC, etc.)
+- A Home tab with your reminder toggle and the next deadlines and events
 - Multi-workspace install via OAuth
 
 ## Installing
@@ -72,8 +73,13 @@ Under **Event Subscriptions**, enable events with request URL `https://your-proj
 
 - `member_joined_channel` and `member_left_channel`: the bot uses these to track which channels should get channel reminders
 - `app_uninstalled` and `tokens_revoked`: cleanup when a workspace removes the app
+- `app_home_opened`: the bot redraws the Home tab each time someone opens it
 
-Skipping this step means channel reminders won't work (personal DM reminders still will).
+Skipping this step means channel reminders and the Home tab won't work (personal DM reminders still will).
+
+### 8. Home tab
+
+Under **App Home**, turn on **Home Tab**. It needs no extra scopes, so existing installs pick it up without reinstalling.
 
 ## Deploying
 
@@ -164,7 +170,7 @@ curl -X POST http://localhost:3000/api/slack/commands \
 src/app/api/slack/
 ├── commands/route.ts             # slash commands: dispatch and the one error boundary
 ├── interactions/route.ts         # button clicks
-├── events/route.ts               # channel joins/leaves, uninstalls
+├── events/route.ts               # channel joins/leaves, Home tab opens, uninstalls
 ├── install/route.ts              # OAuth "Add to Slack" entry point
 ├── oauth/callback/route.ts       # OAuth token exchange
 ├── cron/daily-check/route.ts     # personal DM reminders
@@ -174,7 +180,7 @@ src/slack-bot/
 ├── config/constants.ts      # settings and the COMMANDS catalog (pure data, also used by the install page)
 ├── commands/                # one handler per command, bound to COMMANDS in commands/index.ts
 ├── lib/                     # everything else: storage, Slack client, middleware, reminder job, logger
-│   └── messages/            # Block Kit builders: cards, digest, command replies
+│   └── messages/            # Block Kit builders: cards, digest, command replies, Home tab
 └── testing/                 # in-memory Redis and signed-request helpers for tests
 
 src/utils/                   # shared with the frontend (YAML parsing, queries)
@@ -192,6 +198,8 @@ src/types/                   # conference + Slack types
 **"Failed to fetch conferences"**: `CONFERENCES_DATA_URL` is wrong, or the YAML files aren't accessible. Curl all three to confirm.
 
 **Calendar links broken**: `APP_URL` should be the public Vercel URL, not localhost.
+
+**Home tab is empty**: turn on **Home Tab** under App Home and subscribe to the `app_home_opened` bot event.
 
 Vercel logs: `vercel logs --follow`. Slack event logs are under your app at api.slack.com/apps.
 

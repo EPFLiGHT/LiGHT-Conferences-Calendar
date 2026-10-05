@@ -1,5 +1,6 @@
 /** Replies to slash commands and buttons. */
 
+import type { Button } from '@slack/web-api';
 import type { Conference, DeadlineInfo } from '@/types/conference';
 import type { BlockKitMessage, UserPreferences } from '@/types/slack';
 import { getDaysUntilDeadline } from '@/utils/conferenceQueries';
@@ -67,17 +68,20 @@ export function buildSettingsPanel(prefs: UserPreferences): BlockKitMessage {
       divider,
       {
         type: 'actions',
-        elements: [
-          {
-            type: 'button',
-            text: { type: 'plain_text', text: enabled ? 'Disable Notifications' : 'Enable Notifications', emoji: true },
-            action_id: enabled ? 'disable_notifications' : 'enable_notifications',
-            ...(!enabled && { style: 'primary' as const }),
-          },
-        ],
+        elements: [remindersButton(enabled, enabled ? 'Disable Notifications' : 'Enable Notifications')],
       },
     ],
     text: `Notifications: ${enabled ? 'Enabled' : 'Disabled'}`,
+  };
+}
+
+/** Flips DM reminders; the interactions route handles both action IDs. */
+export function remindersButton(enabled: boolean, text: string): Button {
+  return {
+    type: 'button',
+    text: { type: 'plain_text', text, emoji: true },
+    action_id: enabled ? 'disable_notifications' : 'enable_notifications',
+    ...(!enabled && { style: 'primary' as const }),
   };
 }
 

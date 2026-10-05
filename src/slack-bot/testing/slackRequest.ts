@@ -30,15 +30,24 @@ function interaction(payload: Record<string, unknown>): NextRequest {
   return signed('/api/slack/interactions', body, 'application/x-www-form-urlencoded');
 }
 
-export function buttonClick(actionId: string, teamId = 'T1', value?: string): NextRequest {
-  return interaction({
+function clickPayload(actionId: string, teamId: string, value?: string): Record<string, unknown> {
+  return {
     type: 'block_actions',
     user: { id: 'U1', username: 'u1', name: 'u1', team_id: teamId },
     team: { id: teamId, domain: 'example' },
     api_app_id: 'A1',
     token: 'legacy',
     actions: [{ action_id: actionId, block_id: 'b', type: 'button', action_ts: '1', value }],
-  });
+  };
+}
+
+export function buttonClick(actionId: string, teamId = 'T1', value?: string): NextRequest {
+  return interaction(clickPayload(actionId, teamId, value));
+}
+
+/** A click in the App Home tab, which carries the view and no response_url. */
+export function homeButtonClick(actionId: string, teamId = 'T1'): NextRequest {
+  return interaction({ ...clickPayload(actionId, teamId), view: { type: 'home' } });
 }
 
 export function event(teamId: string, event: Record<string, unknown>): NextRequest {
