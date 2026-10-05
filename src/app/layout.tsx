@@ -3,7 +3,7 @@ import { Providers } from './providers';
 export const metadata = {
   title: 'LiGHT Events Radar',
   description:
-    'Discover conferences and events in global health, humanitarian response and AI. Track key dates and submission deadlines to find where you can contribute, present and engage.',
+    'Discover conferences and events relevant to global health and humanitarian response. Track opportunities, key dates and submission deadlines to identify where LiGHT can contribute, present and engage.',
   icons: { icon: '/icons/favicon.svg' },
 };
 

@@ -101,7 +101,7 @@ export default function Header(): JSX.Element {
                 _hover={{ opacity: 0.85 }}
               />
               <Box
-                display={{ base: 'none', lg: 'block' }}
+                display={{ base: 'none', xl: 'block' }}
                 fontSize="xs"
                 fontWeight="500"
                 lineHeight="1.4"
@@ -133,14 +133,23 @@ export default function Header(): JSX.Element {
               >
                 Events Radar
               </Text>
-              <Text textStyle="metaLabel" color="brand.400" mt="1.5">
-                Global health & AI events
+              {/* One line would squeeze the lab name beside the logo. */}
+              <Text
+                textStyle="metaLabel"
+                color="brand.400"
+                mt="1.5"
+                whiteSpace="nowrap"
+                display={{ base: 'none', md: 'block' }}
+              >
+                Global Health,
+                <br />
+                Humanitarian & AI Events
               </Text>
             </Box>
           </Flex>
 
           {/* Navigation */}
-          <HStack gap={{ base: '1.5', lg: '3' }} flexShrink="0">
+          <HStack gap={{ base: '1', lg: '3' }} flexShrink="0">
             {NAV_LINKS.map(({ href, label, Icon }) => {
               const isActive = pathname === href;
               return (
@@ -149,7 +158,7 @@ export default function Header(): JSX.Element {
                   as={NextLink}
                   href={href}
                   px={{ base: '2.5', lg: '4' }}
-                  py="2"
+                  py={{ base: '2.5', lg: '2' }}
                   fontWeight="500"
                   fontSize="sm"
                   color={isActive ? 'brand.500' : 'brand.400'}
@@ -175,7 +184,9 @@ export default function Header(): JSX.Element {
                   }}
                 >
                   <Flex align="center" gap="2">
-                    <Icon size={14} strokeWidth={1.5} />
+                    <Box as="span" display="inline-flex" fontSize={{ base: '20px', lg: '14px' }}>
+                      <Icon size="1em" strokeWidth={1.5} />
+                    </Box>
                     <Text as="span" display={{ base: 'none', lg: 'inline' }}>{label}</Text>
                   </Flex>
                 </Link>

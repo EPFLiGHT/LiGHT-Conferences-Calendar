@@ -63,7 +63,7 @@ function HomeContent() {
           <ConferenceFiltersPanel
             title="Conferences & Events"
             eyebrow="LiGHT · Index"
-            description="Discover conferences and events in global health, humanitarian response and AI, and track their key dates and submission deadlines. Click any entry for full details and to export."
+            description="Discover conferences and events relevant to global health and humanitarian response. Track opportunities, key dates and submission deadlines to identify where LiGHT can contribute, present and engage."
             searchValue={searchQuery}
             onSearchChange={setSearchQuery}
             conferences={conferences}

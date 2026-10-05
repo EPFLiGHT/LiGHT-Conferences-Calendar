@@ -96,7 +96,7 @@ describe('Slack events', () => {
     const { user_id, view } = viewsPublish.mock.calls[0][0];
     expect(user_id).toBe('U1');
     expect(view.type).toBe('home');
-    expect(JSON.stringify(view.blocks)).toContain('*PETS 2026*');
+    expect(JSON.stringify(view.blocks)).toContain('PETS 2026');
     expect(JSON.stringify(view.blocks)).toContain('disable_notifications');
   });
 

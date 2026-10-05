@@ -49,7 +49,6 @@ export interface MemberLeftChannelEvent extends SlackEvent {
   channel: string;
 }
 
-/** A user opened the app's Home or Messages tab. */
 export interface AppHomeOpenedEvent extends SlackEvent {
   type: 'app_home_opened';
   user: string;

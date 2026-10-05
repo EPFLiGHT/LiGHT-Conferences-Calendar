@@ -36,7 +36,6 @@ async function replyToAction(actionId: string, userId: string, teamId?: string):
   return null;
 }
 
-/** Home tab clicks: a reminders toggle saves and republishes the tab; link buttons need nothing. */
 async function handleHomeAction(actionId: string, userId: string, teamId?: string): Promise<void> {
   const toggle =
     actionId === 'enable_notifications'

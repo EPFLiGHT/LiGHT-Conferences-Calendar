@@ -45,7 +45,6 @@ export function buttonClick(actionId: string, teamId = 'T1', value?: string): Ne
   return interaction(clickPayload(actionId, teamId, value));
 }
 
-/** A click in the App Home tab, which carries the view and no response_url. */
 export function homeButtonClick(actionId: string, teamId = 'T1'): NextRequest {
   return interaction({ ...clickPayload(actionId, teamId), view: { type: 'home' } });
 }

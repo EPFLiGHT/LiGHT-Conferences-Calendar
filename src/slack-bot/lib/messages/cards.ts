@@ -77,7 +77,7 @@ function subjectTags(subjects: string[]): string {
   return subjects.map((s) => `${SUBJECT_EMOJIS[s] || '📌'} ${SUBJECT_LABELS[s] || s}`).join(', ');
 }
 
-function urgencyEmoji(daysLeft: number): string {
+export function urgencyEmoji(daysLeft: number): string {
   if (daysLeft <= URGENCY_CONFIG.CRITICAL_DAYS) return URGENCY_EMOJIS.critical;
   if (daysLeft <= URGENCY_CONFIG.URGENT_DAYS) return URGENCY_EMOJIS.urgent;
   if (daysLeft <= URGENCY_CONFIG.UPCOMING_DAYS) return URGENCY_EMOJIS.upcoming;

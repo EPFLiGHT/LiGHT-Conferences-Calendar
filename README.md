@@ -2,7 +2,7 @@
 
 # LiGHT Events Radar
 
-**Conferences, summits and workshops in global health, humanitarian response and AI, with their key dates and submission deadlines.**
+**Discover conferences and events relevant to global health and humanitarian response. Track opportunities, key dates and submission deadlines to identify where LiGHT can contribute, present and engage.**
 Calendar, timezone-aware countdowns, search and filters, ICS export, and a Slack bot that reminds you before you miss one.
 
 [**conferences.light-laboratory.org**](https://conferences.light-laboratory.org/)
