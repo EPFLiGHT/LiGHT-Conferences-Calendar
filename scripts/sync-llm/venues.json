@@ -31,5 +31,13 @@
   "Geneva Health Forum": {
     "url": "https://conference2026.genevahealthforum.com/call-for-posters/",
     "home": "https://genevahealthforum.com"
+  },
+  "Union World Conference": {
+    "url": "https://worldlunghealth.org/key-dates/",
+    "home": "https://worldlunghealth.org/"
+  },
+  "Union NAR": {
+    "url": "https://bclung.ca/lung-health/tuberculosis/annual-tb-conference-the-union-nar/",
+    "home": "https://bclung.ca/nar"
   }
 }

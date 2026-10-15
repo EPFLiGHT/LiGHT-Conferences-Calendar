@@ -1549,3 +1549,46 @@
   type: conference
   sync_pin:
     - place
+
+- title: Union World Conference
+  year: 2026
+  id: unionconf26
+  full_name: Union World Conference on Lung Health
+  link: https://theunion.org/
+  abstract_deadline: 2026-04-13 23:59
+  timezone: UTC-12
+  place: Rio de Janeiro, Brazil
+  date: November 17-20, 2026
+  start: '2026-11-17'
+  end: '2026-11-20'
+  sub: Global Health
+  type: conference
+  note: Late-breaker abstracts closed July 22, 2026.
+
+- title: Union NAR
+  year: 2027
+  id: unionnar27
+  full_name: 31st Annual TB Conference of The Union North America Region
+  link: https://bclung.ca/lung-health/tuberculosis/annual-tb-conference-the-union-nar/
+  abstract_deadline: 2026-10-10 23:59
+  timezone: UTC-12
+  place: Vancouver, Canada
+  date: February 24-27, 2027
+  start: '2027-02-24'
+  end: '2027-02-27'
+  sub: Global Health
+  type: conference
+
+- title: Union APRC
+  year: 2026
+  id: unionaprc26
+  full_name: 10th Asia Pacific Region Conference of the International Union Against Tuberculosis and Lung Disease
+  link: https://aprc2026.org/
+  abstract_deadline: 2025-11-30 23:59
+  timezone: UTC-12
+  place: Bangkok, Thailand
+  date: February 4-7, 2026
+  start: '2026-02-04'
+  end: '2026-02-07'
+  sub: Global Health
+  type: conference
