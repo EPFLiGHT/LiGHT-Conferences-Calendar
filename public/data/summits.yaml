@@ -594,3 +594,17 @@
   end: "2027-03-18"
   sub: Health AI
   type: summit
+
+- title: GESDA Summit
+  year: 2026
+  id: gesda26
+  deadline_status: attendance
+  full_name: Geneva Science Diplomacy Anticipation Summit
+  link: https://www.gesda.global/geneva-science-diplomacy-anticipation-summit/
+  timezone: Europe/Zurich
+  place: "Geneva, Switzerland"
+  date: "October 14-15, 2026"
+  start: "2026-10-14"
+  end: "2026-10-15"
+  sub: Global Health
+  type: summit
