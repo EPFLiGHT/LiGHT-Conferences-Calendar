@@ -91,10 +91,10 @@ describe('validateEvents', () => {
   });
 
   it('accepts a town off the list only where the page places it in Switzerland', () => {
-    const swiss = 'Alpine Futures Summit. 28 - 29 April 2027, Engelberg, Switzerland.';
-    expect(check([raw({ city: 'Engelberg' })], { pageText: swiss }).events).toHaveLength(1);
-    const unsaid = 'Alpine Futures Summit. 28 - 29 April 2027, Engelberg.';
-    expect(check([raw({ city: 'Engelberg' })], { pageText: unsaid }).events).toEqual([]);
+    const swiss = 'Alpine Futures Summit. 28 - 29 April 2027, Andermatt, Switzerland.';
+    expect(check([raw({ city: 'Andermatt' })], { pageText: swiss }).events).toHaveLength(1);
+    const unsaid = 'Alpine Futures Summit. 28 - 29 April 2027, Andermatt.';
+    expect(check([raw({ city: 'Andermatt' })], { pageText: unsaid }).events).toEqual([]);
     const abroad = 'Swiss embassy events. Alpine Futures Summit. 28 - 29 April 2027, 75008 Paris. Bern, Switzerland.';
     expect(check([raw({ city: 'Paris' })], { pageText: abroad }).events).toEqual([]);
   });

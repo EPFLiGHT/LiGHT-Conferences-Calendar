@@ -84,7 +84,7 @@ function dateShownInEvidence(dateIso, evidence) {
 // English, French, German and Italian weekdays, by their first three letters.
 const WEEKDAY =
   '(?:(?:mon|tue|wed|thu|fri|sat|sun|lun|mar|mer|jeu|ven|sam|dim|die|mit|don|fre|son|gio|sab|dom)[a-zà-ÿ]*\\.?,?\\s*)?';
-const RANGE_SEP = `\\s*(?:-|\\u2013|\\u2014|to|until|through|and|au|et|bis|und|al|e)\\s*${WEEKDAY}`;
+const RANGE_SEP = `\\s*(?:-|\\u2013|\\u2014|&|to|until|through|and|au|et|bis|und|al|e)\\s*${WEEKDAY}`;
 
 /**
  * Whether a quote shows a conference's start and end, as two full dates or as

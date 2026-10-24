@@ -30,6 +30,7 @@ const SWISS_CITIES = [
   ['Biel', 'Bienne'],
   ['Locarno'], ['Ascona'], ['Gstaad'], ['Crans-Montana'], ['Verbier'], ['St. Moritz', 'St Moritz'],
   ['Bürgenstock', 'Burgenstock'], ['Nyon'], ['Vevey'], ['Martigny'], ['Chur'], ['Thun'], ['Ecublens'],
+  ['Engelberg'], ['Baden'],
 ];
 const COUNTRY = '(?:switzerland|suisse|schweiz|svizzera)';
 const TRAILING_COUNTRY_RE = new RegExp(`[\\s,]+${COUNTRY}$`, 'i');
@@ -77,7 +78,7 @@ function cityOnPage(city, haystack) {
   if (!name) return null;
   const aliases = SWISS_CITIES.find((names) => names.some((a) => normalize(a) === normalize(name)));
   if (aliases) return aliases.some((a) => mentions(haystack, a)) ? aliases[0] : null;
-  // A town off the list counts only where the page places it in Switzerland: "Engelberg, Switzerland",
+  // A town off the list counts only where the page places it in Switzerland: "Andermatt, Switzerland",
   // or a Swiss postcode ("1008 Prilly") on a page that mentions Switzerland.
   const town = escapeRe(normalize(name));
   const placed = new RegExp(`(?<![\\p{L}\\p{N}])${town}[\\s,(]{1,3}${COUNTRY}`, 'iu');
