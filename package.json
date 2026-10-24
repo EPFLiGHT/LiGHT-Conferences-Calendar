@@ -11,6 +11,7 @@
     "validate": "node scripts/validate.js",
     "sync:openreview": "node scripts/sync-openreview/main.js",
     "sync:llm": "node scripts/sync-llm/main.js",
+    "discover:events": "node scripts/discover-events/main.js",
     "test": "vitest run",
     "test:watch": "vitest"
   },

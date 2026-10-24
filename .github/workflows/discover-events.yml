@@ -1,0 +1,25 @@
+name: Discover Swiss events
+
+on:
+  schedule:
+    - cron: "0 7 15 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  discover:
+    uses: ./.github/workflows/sync-pr.yml
+    with:
+      script: discover:events
+      branch: auto/discover-events
+      add-paths: |
+        public/data/conferences.yaml
+        public/data/summits.yaml
+        public/data/workshops.yaml
+        scripts/discover-events/seen.json
+      title: "chore(data): propose Swiss events for review"
+    secrets:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

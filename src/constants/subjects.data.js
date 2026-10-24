@@ -15,6 +15,7 @@ export const SUBJECTS = {
   AI: { label: 'Artificial Intelligence', emoji: '🧠', color: '#4f46e5' },
   'Global Health': { label: 'Global Health', emoji: '🏥', color: '#0891b2' },
   'Health AI': { label: 'Health AI', emoji: '🏥', color: '#7c3aed' },
+  'Global Affairs': { label: 'Global Affairs', emoji: '🌐', color: '#a16207' },
 };
 
 /** Valid values for an entry's `sub` field. */

@@ -1,0 +1,50 @@
+{
+  "GESDA": {
+    "url": "https://www.gesda.global/",
+    "note": "Anticipation Summit and Geneva Science Diplomacy Week"
+  },
+  "Geneva AI Summit": {
+    "url": "https://genevaaisummit.swiss/",
+    "note": "Global AI summit hosted by the Swiss government"
+  },
+  "St. Gallen Symposium": {
+    "url": "https://symposium.org/"
+  },
+  "Point Zero Forum": {
+    "url": "https://www.pointzeroforum.com/",
+    "note": "Zurich; finance, technology and policy"
+  },
+  "Zermatt Summit": {
+    "url": "https://www.zermattsummit.org/"
+  },
+  "Forum des 100": {
+    "url": "https://www.forumdes100.ch/",
+    "note": "Lausanne; French-language page"
+  },
+  "Building Bridges": {
+    "url": "https://www.buildingbridges.org/",
+    "note": "Geneva; sustainable finance"
+  },
+  "Swiss Biotech Day": {
+    "url": "https://swissbiotechday.ch/"
+  },
+  "AI House Davos": {
+    "url": "https://www.aihousedavos.com/"
+  },
+  "digitalswitzerland": {
+    "url": "https://digitalswitzerland.com/events",
+    "note": "Events list, including its Davos flagship"
+  },
+  "GCSP": {
+    "url": "https://www.gcsp.ch/events",
+    "note": "Geneva Centre for Security Policy; mostly talks, which the criteria skip"
+  },
+  "Geneva Graduate Institute": {
+    "url": "https://www.graduateinstitute.ch/events",
+    "note": "Mostly seminars, which the criteria skip"
+  },
+  "Geneva Environment Network": {
+    "url": "https://www.genevaenvironmentnetwork.org/events",
+    "note": "Calendar of International Geneva events"
+  }
+}
