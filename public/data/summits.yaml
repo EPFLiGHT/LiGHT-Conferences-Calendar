@@ -608,3 +608,32 @@
   end: "2026-10-15"
   sub: Global Health
   type: summit
+
+- title: AidEx Geneva
+  year: 2026
+  id: aidexgeneva26
+  deadline_status: attendance
+  full_name: AidEx Geneva
+  link: https://www.aid-expo.com/
+  timezone: Europe/Zurich
+  place: "Geneva, Switzerland"
+  date: "October 21-22, 2026"
+  start: "2026-10-21"
+  end: "2026-10-22"
+  sub: Global Health
+  type: summit
+  note: "Free to attend; co-located with Development2030."
+
+- title: AidEx Nairobi
+  year: 2027
+  id: aidexnairobi27
+  deadline_status: attendance
+  full_name: AidEx Nairobi
+  link: https://www.aidexafrica.com/
+  timezone: Africa/Nairobi
+  place: "Nairobi, Kenya"
+  date: "June 2-3, 2027"
+  start: "2027-06-02"
+  end: "2027-06-03"
+  sub: Global Health
+  type: summit
