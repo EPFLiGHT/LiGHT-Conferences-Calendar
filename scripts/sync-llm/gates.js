@@ -16,22 +16,36 @@ import { DateTime } from 'luxon';
 import { isValidDate } from '../../src/utils/conferenceSchema.js';
 import { resolveZone, parseDeadline } from './facts.js';
 
-const normalize = (s) => s.toLowerCase().replace(/\s+/g, ' ').trim();
+export const normalize = (s) => s.toLowerCase().replace(/\s+/g, ' ').trim();
 // Ignores the stray spaces some sites print inside words ("AN NUAL CONGRESS").
-const squash = (s) => s.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+export const squash = (s) => s.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
 
 // Later stages and workshop or tutorial proposals, whose rows still say "paper" or
 // "submission". Not "registration": "Abstract Registration" is a real deadline.
 const NOT_A_DEADLINE_RE = /camera.?ready|notification|acceptance|\bproposals?\b/i;
 
-// Full names and their abbreviations, both anchored on word boundaries below.
-// A bare `sep[a-z]*` would let "separate", "maybe" and "marathon" stand in for
-// a month and vouch for a date the page never states.
+// English, French, German and Italian names and abbreviations, all anchored on
+// word boundaries below. A bare `sep[a-z]*` would let "separate", "maybe" and
+// "marathon" stand in for a month and vouch for a date the page never states.
 const MONTHS = [
-  ['january', 'jan'], ['february', 'feb'], ['march', 'mar'], ['april', 'apr'],
-  ['may'], ['june', 'jun'], ['july', 'jul'], ['august', 'aug'],
-  ['september', 'sept', 'sep'], ['october', 'oct'], ['november', 'nov'], ['december', 'dec'],
+  ['january', 'jan', 'janvier', 'janv', 'januar', 'gennaio'],
+  ['february', 'feb', 'février', 'fevrier', 'févr', 'fevr', 'februar', 'febbraio'],
+  ['march', 'mar', 'mars', 'märz', 'maerz', 'marzo'],
+  ['april', 'apr', 'avril', 'avr', 'aprile'],
+  ['may', 'mai', 'maggio'],
+  ['june', 'jun', 'juin', 'juni', 'giugno'],
+  ['july', 'jul', 'juillet', 'juil', 'juli', 'luglio'],
+  ['august', 'aug', 'août', 'aout', 'agosto'],
+  ['september', 'sept', 'sep', 'septembre', 'settembre'],
+  ['october', 'oct', 'octobre', 'oktober', 'okt', 'ottobre'],
+  ['november', 'nov', 'novembre'],
+  ['december', 'dec', 'décembre', 'decembre', 'déc', 'dezember', 'dez', 'dicembre'],
 ];
+
+// "mar. 14 octobre" is a French Tuesday, not March 14: a day (or day range)
+// followed by another month's name belongs to that month.
+const notOtherMonth = (month) =>
+  `(?!(?:${RANGE_SEP}\\d{1,2}(?:st|nd|rd|th|er|\\.)?)?\\.?\\s*\\b(?:${MONTHS.filter((_, i) => i !== month - 1).flat().join('|')})\\b)`;
 
 /**
  * A page that says "April 2026" or "Closed." states no day, so a full date
@@ -51,13 +65,13 @@ function dateShownInEvidence(dateIso, evidence) {
   const pad = (n) => String(n).padStart(2, '0');
   const nameRe = `\\b(?:${names.join('|')})\\b`;
   const numRe = `(?:${month}|${pad(month)})`;
-  const dayRe = `(?:${day}(?:st|nd|rd|th)?|${pad(day)})`;
+  const dayRe = `(?:${day}(?:st|nd|rd|th|er)?|${pad(day)})`;
   const sep = '[\\s,./-]{0,4}';
   const sepReq = '[\\s,./-]{1,4}';
   const shortYear = `${sepReq}(?:${year % 100})(?!\\d)`;
   const orders = (tail) => [
     new RegExp(`(?<!\\d)${dayRe}${sep}${nameRe}${tail}`, 'i'),
-    new RegExp(`(?<!\\d)${nameRe}${sep}${dayRe}${tail}`, 'i'),
+    new RegExp(`(?<!\\d)${nameRe}${sep}${dayRe}${notOtherMonth(month)}${tail}`, 'i'),
     new RegExp(`(?<!\\d)${dayRe}${sepReq}${numRe}${tail}`, 'i'),
     new RegExp(`(?<!\\d)${numRe}${sepReq}${dayRe}${tail}`, 'i'),
   ];
@@ -67,8 +81,10 @@ function dateShownInEvidence(dateIso, evidence) {
   return fullYearShown || orders(shortYear).some((re) => re.test(evidence));
 }
 
-const WEEKDAY = '(?:(?:mon|tue|wed|thu|fri|sat|sun)[a-z]*\\.?,?\\s*)?';
-const RANGE_SEP = `\\s*(?:-|\\u2013|\\u2014|to|until|through)\\s*${WEEKDAY}`;
+// English, French, German and Italian weekdays, by their first three letters.
+const WEEKDAY =
+  '(?:(?:mon|tue|wed|thu|fri|sat|sun|lun|mar|mer|jeu|ven|sam|dim|die|mit|don|fre|son|gio|sab|dom)[a-zà-ÿ]*\\.?,?\\s*)?';
+const RANGE_SEP = `\\s*(?:-|\\u2013|\\u2014|to|until|through|and|au|et|bis|und|al|e)\\s*${WEEKDAY}`;
 
 /**
  * Whether a quote shows a conference's start and end, as two full dates or as
@@ -78,15 +94,16 @@ const RANGE_SEP = `\\s*(?:-|\\u2013|\\u2014|to|until|through)\\s*${WEEKDAY}`;
  * @param {string} evidence
  * @returns {{start: boolean, end: boolean}}
  */
-function conferenceDatesShown(startIso, endIso, evidence) {
+export function conferenceDatesShown(startIso, endIso, evidence) {
   const [year, month, startDay] = startIso.split('-').map(Number);
   const names = MONTHS[month - 1];
   const nameRe = `\\b(?:${names.join('|')})\\b\\.?`;
-  const day = (d) => `0?${d}(?:st|nd|rd|th)?`;
+  // "1er" is French; German writes "14.-15. Oktober".
+  const day = (d) => `0?${d}(?:st|nd|rd|th|er|\\.)?`;
   const inRange = (endDay) =>
     new RegExp(`(?<!\\d)${year}(?!\\d)`).test(evidence) &&
     [
-      new RegExp(`${nameRe}\\s*${day(startDay)}${RANGE_SEP}${day(endDay)}(?!\\d)`, 'i'),
+      new RegExp(`${nameRe}\\s*${day(startDay)}${RANGE_SEP}${day(endDay)}(?!\\d)${notOtherMonth(month)}`, 'i'),
       new RegExp(`(?<!\\d)${day(startDay)}${RANGE_SEP}${day(endDay)}\\s*${nameRe}`, 'i'),
     ].some((re) => re.test(evidence));
   const sameMonthEnd = endIso && Number(endIso.slice(5, 7)) === month ? Number(endIso.slice(8)) : null;
@@ -96,7 +113,7 @@ function conferenceDatesShown(startIso, endIso, evidence) {
   };
 }
 
-const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+export const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 /**
  * The rest of the table cell a quote ends in. Where a page puts the date before

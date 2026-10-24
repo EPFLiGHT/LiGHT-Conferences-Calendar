@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { DateTime } from 'luxon';
-import { validateEditions } from './gates.js';
+import { validateEditions, conferenceDatesShown } from './gates.js';
 import { editionToFacts } from './facts.js';
 import { TODAY, edition, deadline } from './test-helpers.js';
 
@@ -438,5 +438,33 @@ describe('validateEditions conference facts', () => {
       { pageText: page, today: TODAY });
     expect(bad.editions[0].full_name).toBeNull();
     expect(bad.flags).toEqual(['edition 2027: full name "Artificial Intelligence in Medicine Europe" is not on the page; dropped']);
+  });
+});
+
+describe('conferenceDatesShown in Swiss languages', () => {
+  it.each([
+    ['du 27 au 28 octobre 2026', '2026-10-27', '2026-10-28'],
+    ['14.-15. Oktober 2026', '2026-10-14', '2026-10-15'],
+    ['1er décembre 2026', '2026-12-01', null],
+    ['dal 3 al 5 marzo 2027', '2027-03-03', '2027-03-05'],
+    ['les 27 et 28 octobre 2026', '2026-10-27', '2026-10-28'],
+    ['27. und 28. Oktober 2026', '2026-10-27', '2026-10-28'],
+    ['du mardi 27 au mercredi 28 octobre 2026', '2026-10-27', '2026-10-28'],
+    ['Montag, 14. bis Dienstag, 15. Oktober 2026', '2026-10-14', '2026-10-15'],
+    ['14 déc. 2026', '2026-12-14', null],
+    ['3 juil. 2027', '2027-07-03', null],
+    ['15 août 2026', '2026-08-15', null],
+  ])('reads "%s"', (quote, start, end) => {
+    expect(conferenceDatesShown(start, end, quote)).toEqual({ start: true, end: Boolean(end) });
+  });
+
+  it('still requires the month to be a whole word', () => {
+    expect(conferenceDatesShown('2026-05-03', null, 'see email 3, 2026').start).toBe(false);
+  });
+
+  it('gives a day to the month named after it, not to a weekday that reads as one', () => {
+    expect(conferenceDatesShown('2026-03-14', null, 'mar. 14 octobre 2026').start).toBe(false);
+    expect(conferenceDatesShown('2026-03-14', '2026-03-16', 'mar. 14 au jeu. 16 octobre 2026').start).toBe(false);
+    expect(conferenceDatesShown('2026-03-14', '2026-04-02', 'Mar 14 - Apr 2, 2026')).toEqual({ start: true, end: true });
   });
 });

@@ -22,6 +22,20 @@ export function loadApiKey(repoRoot) {
   return null;
 }
 
+// gpt-5.6-sol, USD per million tokens; promotional through at least 2026-11-21
+// (launch price $5 / $30).
+const INPUT_PRICE_PER_M = 4;
+const OUTPUT_PRICE_PER_M = 20;
+
+/**
+ * What the default model cost, at the rates above.
+ * @param {{inputTokens: number, outputTokens: number}} totals
+ * @returns {number} USD.
+ */
+export function estimateCost({ inputTokens, outputTokens }) {
+  return (inputTokens * INPUT_PRICE_PER_M + outputTokens * OUTPUT_PRICE_PER_M) / 1_000_000;
+}
+
 /**
  * @param {{client: object, model?: string, onUsage?: (u: object) => void}} opts
  *   client is an openai SDK instance or a test fake with responses.create.
@@ -30,9 +44,10 @@ export function loadApiKey(repoRoot) {
 // Smaller models pair labels with the wrong dates on tables that list the date first.
 export function createLlm({ client, model = 'gpt-5.6-sol', onUsage = () => {} }) {
   return {
-    async respond({ input, tools, schema }) {
+    async respond({ input, tools, schema, maxToolCalls }) {
       const req = { model, input };
       if (tools) req.tools = tools;
+      if (maxToolCalls) req.max_tool_calls = maxToolCalls;
       if (schema) {
         req.text = { format: { type: 'json_schema', name: schema.name, schema: schema.schema, strict: true } };
       }

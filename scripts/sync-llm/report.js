@@ -2,10 +2,7 @@
  * The report sections only this sync has, appended after the shared report:
  * the page quote behind each deadline written, and what each venue cost.
  */
-
-// gpt-5.6-sol list prices, USD per million tokens.
-const INPUT_PRICE_PER_M = 5;
-const OUTPUT_PRICE_PER_M = 30;
+import { estimateCost } from './llm.js';
 
 /**
  * @param {{evidence: Array<{id: string, field: string, quote: string, url: string}>,
@@ -35,11 +32,9 @@ export function renderExtraSections({ evidence, usageByVenue, totals }) {
       : `tier ${u.tier}, found nothing`;
     lines.push(`- ${venue}: ${where}, ${u.inputTokens + u.outputTokens} tokens`);
   }
-  const cost =
-    (totals.inputTokens * INPUT_PRICE_PER_M + totals.outputTokens * OUTPUT_PRICE_PER_M) / 1_000_000;
   lines.push(
     '',
-    `Total: ${totals.inputTokens} input + ${totals.outputTokens} output tokens, est. $${cost.toFixed(3)}`,
+    `Total: ${totals.inputTokens} input + ${totals.outputTokens} output tokens, est. $${estimateCost(totals).toFixed(3)}`,
     '',
   );
   return lines.join('\n');

@@ -7,13 +7,24 @@ import { normalizeUrl, isAllowedUrl } from './urls.js';
 
 const MAX_LINKS = 200;
 
-const ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', ndash: '-', mdash: '-' };
+const ENTITIES = {
+  amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', ndash: '-', mdash: '-',
+  middot: '·', bull: '•', hellip: '…', lsquo: '‘', rsquo: '’', ldquo: '“', rdquo: '”',
+  agrave: 'à', acirc: 'â', auml: 'ä', ccedil: 'ç', eacute: 'é', egrave: 'è', ecirc: 'ê', euml: 'ë',
+  icirc: 'î', iuml: 'ï', ocirc: 'ô', ouml: 'ö', ucirc: 'û', ugrave: 'ù', uuml: 'ü', szlig: 'ß',
+  Eacute: 'É', Agrave: 'À', Auml: 'Ä', Ouml: 'Ö', Uuml: 'Ü',
+};
 
+// String.fromCodePoint throws past 0x10FFFF; substitute like a browser would.
+const fromCode = (n) => (n <= 0x10ffff ? String.fromCodePoint(n) : '�');
+
+// One pass, so "&amp;lt;" stays "&lt;" instead of being decoded twice.
 function decodeEntities(s) {
-  return s
-    // String.fromCodePoint throws past 0x10FFFF; substitute like a browser would.
-    .replace(/&#(\d+);/g, (_, n) => (Number(n) <= 0x10ffff ? String.fromCodePoint(Number(n)) : '�'))
-    .replace(/&(amp|lt|gt|quot|apos|nbsp|ndash|mdash);/g, (_, name) => ENTITIES[name]);
+  return s.replace(/&(?:#(\d+)|#x([0-9a-f]+)|([a-z]+));/gi, (m, dec, hex, name) => {
+    if (dec) return fromCode(Number(dec));
+    if (hex) return fromCode(parseInt(hex, 16));
+    return Object.hasOwn(ENTITIES, name) ? ENTITIES[name] : m;
+  });
 }
 
 /**

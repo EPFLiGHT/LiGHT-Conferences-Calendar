@@ -29,6 +29,15 @@ describe('htmlToText', () => {
   it('survives numeric character references beyond the Unicode range', () => {
     expect(htmlToText('<p>bad &#1114112; ref, good &#65; ref</p>')).toContain('good A ref');
   });
+
+  it('decodes hex references, accented letters and leaves unknown names alone', () => {
+    expect(htmlToText('<p>D&#x27;Andrea &middot; 27 octobre &agrave; Gen&egrave;ve &bogus;</p>'))
+      .toBe("D'Andrea · 27 octobre à Genève &bogus;");
+  });
+
+  it('decodes each reference once and ignores object property names', () => {
+    expect(htmlToText('<p>&amp;lt;b&amp;gt; &#38;lt; &constructor;</p>')).toBe('&lt;b&gt; &lt; &constructor;');
+  });
 });
 
 describe('extractLinks', () => {

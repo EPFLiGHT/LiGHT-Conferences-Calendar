@@ -2,7 +2,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { describe, it, expect } from 'vitest';
-import { loadApiKey, createLlm, functionCalls } from './llm.js';
+import { loadApiKey, createLlm, functionCalls, estimateCost } from './llm.js';
 
 describe('loadApiKey', () => {
   it('prefers the environment variable', () => {
@@ -68,6 +68,20 @@ describe('createLlm', () => {
       type: 'json_schema', name: 'thing', schema: { type: 'object' }, strict: true,
     });
     expect(usages).toEqual([{ input_tokens: 10, output_tokens: 2 }]);
+    expect(seen).not.toHaveProperty('max_tool_calls');
+  });
+
+  it('caps built-in tool calls when asked', async () => {
+    let seen;
+    const client = { responses: { create: async (req) => { seen = req; return { output: [] }; } } };
+    await createLlm({ client }).respond({ input: [], maxToolCalls: 3 });
+    expect(seen).toMatchObject({ model: 'gpt-5.6-sol', max_tool_calls: 3 });
+  });
+});
+
+describe('estimateCost', () => {
+  it('prices tokens at the default model\'s rates', () => {
+    expect(estimateCost({ inputTokens: 1_000_000, outputTokens: 100_000 })).toBeCloseTo(6);
   });
 });
 
