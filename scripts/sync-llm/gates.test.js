@@ -448,6 +448,7 @@ describe('conferenceDatesShown in Swiss languages', () => {
     ['1er décembre 2026', '2026-12-01', null],
     ['dal 3 al 5 marzo 2027', '2027-03-03', '2027-03-05'],
     ['les 27 et 28 octobre 2026', '2026-10-27', '2026-10-28'],
+    ['25. & 26. November 2026', '2026-11-25', '2026-11-26'],
     ['27. und 28. Oktober 2026', '2026-10-27', '2026-10-28'],
     ['du mardi 27 au mercredi 28 octobre 2026', '2026-10-27', '2026-10-28'],
     ['Montag, 14. bis Dienstag, 15. Oktober 2026', '2026-10-14', '2026-10-15'],

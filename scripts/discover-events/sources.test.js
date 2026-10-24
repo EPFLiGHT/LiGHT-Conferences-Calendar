@@ -12,9 +12,10 @@ describe('sources.json', () => {
 });
 
 describe('seen.json', () => {
-  it('records every proposal with a title, year and link', () => {
+  it('records every proposal with a title, a year and a link, null for a listing page', () => {
     for (const s of Object.values(readJson('./seen.json'))) {
-      expect(s).toMatchObject({ title: expect.any(String), year: expect.any(Number), link: expect.any(String) });
+      expect(s).toMatchObject({ title: expect.any(String), year: expect.any(Number) });
+      expect(s.link === null || typeof s.link === 'string').toBe(true);
     }
   });
 });
