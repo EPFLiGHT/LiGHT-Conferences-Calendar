@@ -157,7 +157,7 @@ describe('discover', () => {
       search: true,
     });
     expect(out.proposals.map((p) => p.entry.id)).toEqual(['alpinefuturessummit27', 'lakesidedialogue27']);
-    expect(out.proposals[1].event.origin).toBe('web search, frontier science and emerging technology');
+    expect(out.proposals[1].event.origin).toBe('web search, humanitarian aid and international cooperation');
     expect(out.stats).toEqual({ pages: 2, searches: 1 });
     expect(llm.requests[3].input[0].content).toContain('Lakeside Dialogue 2027');
     expect(out.attention).toEqual([]);

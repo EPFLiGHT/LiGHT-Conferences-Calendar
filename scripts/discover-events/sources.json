@@ -46,5 +46,13 @@
   "Geneva Environment Network": {
     "url": "https://www.genevaenvironmentnetwork.org/events",
     "note": "Calendar of International Geneva events"
+  },
+  "IC Forum": {
+    "url": "https://www.deza.eda.admin.ch/en/5th-edition-ic-forum",
+    "note": "SDC's International Cooperation Forum; the SDC has no events list, and this page announces the next edition"
+  },
+  "Medicus Mundi Switzerland": {
+    "url": "https://www.medicusmundi.ch/en/exchange-and-networking/events",
+    "note": "Basel; global health network, its symposium and its members' events"
   }
 }

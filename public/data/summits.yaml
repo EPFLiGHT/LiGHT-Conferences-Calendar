@@ -721,58 +721,6 @@
   sub: Global Affairs
   type: summit
 
-- title: International Trade Forum
-  year: 2027
-  id: internationaltradeforum27
-  deadline_status: attendance
-  link: https://www.s-ge.com/export/en/events/s-ge-event/international-trade-forum-2027
-  timezone: Europe/Zurich
-  place: Bern, Switzerland
-  date: Apr 27, 2027
-  start: '2027-04-27'
-  end: '2027-04-27'
-  sub: Global Affairs
-  type: summit
-
-- title: The 8th Continent Forum
-  year: 2027
-  id: the8thcontinentforum27
-  deadline_status: attendance
-  link: https://the8thcontinentforum.ch/
-  timezone: Europe/Zurich
-  place: Zurich, Switzerland
-  date: Mar 17-19, 2027
-  start: '2027-03-17'
-  end: '2027-03-19'
-  sub: Global Affairs
-  type: summit
-
-- title: START Summit
-  year: 2027
-  id: startsummit27
-  deadline_status: attendance
-  link: https://www.startglobal.org/start-summit
-  timezone: Europe/Zurich
-  place: St. Gallen, Switzerland
-  date: Mar 18-19, 2027
-  start: '2027-03-18'
-  end: '2027-03-19'
-  sub: Global Affairs
-  type: summit
-
-- title: Swissmem Industry Day
-  year: 2027
-  id: swissmemindustryday27
-  deadline_status: attendance
-  link: https://www.swissmem.ch/en/news/calendar-of-events/19th-swissmem-industry-day-2026.html
-  timezone: Europe/Zurich
-  place: Zurich, Switzerland
-  date: Jun 22, 2027
-  start: '2027-06-22'
-  end: '2027-06-22'
-  sub: Global Affairs
-  type: summit
-
 - title: Caritas-Forum
   year: 2027
   id: caritasforum27
@@ -785,3 +733,34 @@
   end: '2027-01-29'
   sub: Global Affairs
   type: summit
+
+- title: IC Forum
+  year: 2027
+  id: icforum27
+  deadline_status: attendance
+  full_name: International Cooperation Forum
+  link: https://www.deza.eda.admin.ch/en/5th-edition-ic-forum
+  timezone: Europe/Zurich
+  place: Baden, Switzerland
+  date: Feb 25-26, 2027
+  start: '2027-02-25'
+  end: '2027-02-26'
+  sub:
+    - Global Health
+    - Global Affairs
+  type: summit
+
+- title: MMS Symposium
+  year: 2026
+  id: mmssymposium26
+  deadline_status: attendance
+  full_name: Medicus Mundi Switzerland Symposium
+  link: https://www.medicusmundi.ch/en/symposium-2026
+  timezone: Europe/Zurich
+  place: Basel, Switzerland
+  date: Nov 4, 2026
+  start: '2026-11-04'
+  end: '2026-11-04'
+  sub: Global Health
+  type: summit
+  note: "Primary Health Care for the Next 50 Years; also online."

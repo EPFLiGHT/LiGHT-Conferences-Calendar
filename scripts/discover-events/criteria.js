@@ -3,14 +3,17 @@
  * prompts are built from this file, so tuning the discovery means editing it.
  */
 
-/** Topics an event must touch, keyed as the extraction schema reports them. */
+/**
+ * Topics an event must touch, keyed as the extraction schema reports them.
+ * Searched in this order, closest fits first, since the run caps the leads it reads.
+ */
 export const TOPICS = {
-  frontier_science: 'Frontier science and emerging technology',
-  policy: 'Public policy and regulation',
-  diplomacy: 'Diplomacy and international relations',
-  geopolitics: 'Geopolitics and global governance',
-  business: 'Business, investment and innovation',
-  societal: 'Major societal and humanitarian challenges',
+  humanitarian: 'Humanitarian aid and international cooperation',
+  global_health: 'Global health and primary care',
+  ai_digital: 'AI, robotics and digital technology',
+  governance: 'Diplomacy, peace and global governance',
+  frontier_science: 'Frontier science and its impact on society',
+  societal: 'Public policy and major societal challenges',
   foresight: 'Strategic foresight and the long-term future',
 };
 
@@ -33,13 +36,23 @@ export const EXCLUDED_KINDS = new Set([
 /** How far ahead an event may start and still be proposed. */
 export const HORIZON_MONTHS = 24;
 
+/** The examples are events the reviewer rated over 80% fit, kept, or rejected. */
 export const CRITERIA = `We track high-level events held in person in Switzerland (Geneva, Zurich, Lausanne,
-Basel, Bern, Davos and elsewhere) where leaders from science, government, diplomacy, international
-organizations, business and civil society meet. GESDA's Anticipation Summit, the St. Gallen Symposium and
-the World Economic Forum are typical. An event qualifies when it is held in Switzerland and touches at
-least one of these topics:
+Basel, Bern, Davos and elsewhere) where leaders from government, international organizations, NGOs, science
+and civil society meet. An event qualifies when it is held in Switzerland and touches at least one of these
+topics:
 ${Object.values(TOPICS).map((t) => `- ${t}`).join('\n')}
-Broad science and technology events qualify too, not only niche policy ones.
+Closest fits are events on international cooperation, humanitarian aid, global health or the governance of AI,
+often convened by the Swiss government, International Geneva, UN agencies or major NGOs: the IC Forum, the
+Geneva AI Summit, GESDA's Anticipation Summit and the Medicus Mundi Switzerland Symposium are typical.
+Also wanted: AI, robotics and digital technology events (Swiss Robotics Day, GenAI Zürich, AI+X Summit,
+digitalswitzerland @ Davos), life sciences events (Swiss Biotech Day), peace forums (Basel Peace Forum),
+cross-sector leaders' dialogues (St. Gallen Symposium) and national forums on social challenges such as
+migration, poverty or health (Caritas-Forum).
+Skip events mainly about business, finance or investment (economic or trade forums, engineering or
+manufacturing industry days, startup and investor summits, crypto and digital assets), gatherings of one
+research or industry community outside AI, digital technology, health and life sciences (quantum, space),
+and academic or learned-society conferences outside global health and AI, such as on ethics or philosophy.
 Never propose: courses, trainings or executive education; webinars or online-only events; single talks,
 lectures or seminars; formal sessions of UN bodies, committees or expert groups; recruitment or job fairs;
 product trade shows; startup pitch nights or local networking meetups; award ceremonies, galas,

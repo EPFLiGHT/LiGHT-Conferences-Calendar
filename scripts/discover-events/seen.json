@@ -41,6 +41,13 @@
     "link": "https://digitalswitzerland.com/events/digitalswitzerland-at-davos",
     "proposed": "2026-10-24"
   },
+  "eef|2026": {
+    "title": "EEF",
+    "full_name": "European Economic Forum",
+    "year": 2026,
+    "link": "https://lucerne-dialogue.ch/en",
+    "proposed": "2026-10-24"
+  },
   "genai zurich|2027": {
     "title": "GenAI Zürich",
     "full_name": "The European Summit on Applied Generative AI",
@@ -55,11 +62,32 @@
     "link": null,
     "proposed": "2026-10-24"
   },
+  "ic forum|2027": {
+    "title": "IC Forum",
+    "full_name": "International Cooperation Forum",
+    "year": 2027,
+    "link": "https://www.deza.eda.admin.ch/en/5th-edition-ic-forum",
+    "proposed": "2026-10-24"
+  },
   "international trade forum|2027": {
     "title": "International Trade Forum",
     "full_name": null,
     "year": 2027,
     "link": "https://www.s-ge.com/export/en/events/s-ge-event/international-trade-forum-2027",
+    "proposed": "2026-10-24"
+  },
+  "mms symposium|2026": {
+    "title": "MMS Symposium",
+    "full_name": "Medicus Mundi Switzerland Symposium",
+    "year": 2026,
+    "link": "https://www.medicusmundi.ch/en/symposium-2026",
+    "proposed": "2026-10-30"
+  },
+  "societas ethica|2027": {
+    "title": "Societas Ethica",
+    "full_name": "Societas Ethica Annual Conference",
+    "year": 2027,
+    "link": "https://www.societasethica.info/2027-call-for-papers",
     "proposed": "2026-10-24"
   },
   "st gallen symposium|2027": {
@@ -81,6 +109,13 @@
     "full_name": null,
     "year": 2027,
     "link": null,
+    "proposed": "2026-10-24"
+  },
+  "swiss quantum days|2027": {
+    "title": "Swiss Quantum Days",
+    "full_name": null,
+    "year": 2027,
+    "link": "https://swissquantumdays.ch/sqd2027",
     "proposed": "2026-10-24"
   },
   "swiss robotics day|2026": {
