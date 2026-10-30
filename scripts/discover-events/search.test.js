@@ -25,17 +25,17 @@ describe('findLeads', () => {
       { name: 'Odd', url: 'ftp://files.example/' },
       { name: 'Fine', url: 'https://fine.example/' },
     ] }));
-    expect((await findLeads(llm, { topic: 'business', today: TODAY, known: [] })).leads.map((l) => l.name)).toEqual(['Fine']);
+    expect((await findLeads(llm, { topic: 'ai_digital', today: TODAY, known: [] })).leads.map((l) => l.name)).toEqual(['Fine']);
   });
 
   it('strips tracking parameters from lead URLs', async () => {
     const llm = fakeLlm(jsonReply({ leads: [{ name: 'Fine', url: 'https://fine.example/event?id=3&utm_source=openai' }] }));
-    expect((await findLeads(llm, { topic: 'business', today: TODAY, known: [] })).leads[0].url)
+    expect((await findLeads(llm, { topic: 'ai_digital', today: TODAY, known: [] })).leads[0].url)
       .toBe('https://fine.example/event?id=3');
   });
 
   it('returns null leads, still counting searches, when the answer is unusable', async () => {
     const llm = fakeLlm({ output: [searchCall], output_text: '{not json' });
-    expect(await findLeads(llm, { topic: 'policy', today: TODAY, known: [] })).toEqual({ leads: null, searches: 1 });
+    expect(await findLeads(llm, { topic: 'governance', today: TODAY, known: [] })).toEqual({ leads: null, searches: 1 });
   });
 });

@@ -1592,3 +1592,31 @@
   end: '2026-02-07'
   sub: Global Health
   type: conference
+
+- title: Swiss Biotech Day
+  year: 2027
+  id: swissbiotechday27
+  deadline_status: attendance
+  link: https://swissbiotechday.ch/
+  timezone: Europe/Zurich
+  place: Basel, Switzerland
+  date: Apr 26-27, 2027
+  start: '2027-04-26'
+  end: '2027-04-27'
+  sub: Global Affairs
+  type: conference
+
+- title: Swiss Robotics Day
+  year: 2026
+  id: swissroboticsday26
+  deadline_status: attendance
+  link: https://swissroboticsday.ch/
+  timezone: Europe/Zurich
+  place: Zurich, Switzerland
+  date: Nov 13, 2026
+  start: '2026-11-13'
+  end: '2026-11-13'
+  sub:
+    - AI
+    - Global Affairs
+  type: conference

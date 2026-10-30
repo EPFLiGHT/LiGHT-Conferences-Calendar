@@ -637,3 +637,130 @@
   end: "2027-06-03"
   sub: Global Health
   type: summit
+
+- title: Geneva AI Summit
+  year: 2027
+  id: genevaaisummit27
+  deadline_status: attendance
+  link: https://genevaaisummit.swiss/
+  timezone: Europe/Zurich
+  place: Geneva, Switzerland
+  date: Jun 21-22, 2027
+  start: '2027-06-21'
+  end: '2027-06-22'
+  sub:
+    - AI
+    - Global Affairs
+  type: summit
+
+- title: St. Gallen Symposium
+  year: 2027
+  id: stgallensymposium27
+  deadline_status: attendance
+  link: https://symposium.org/sgs/theme-programme-56
+  timezone: Europe/Zurich
+  place: St. Gallen, Switzerland
+  date: Apr 28-29, 2027
+  start: '2027-04-28'
+  end: '2027-04-29'
+  sub: Global Affairs
+  type: summit
+
+- title: digitalswitzerland @ Davos
+  year: 2027
+  id: digitalswitzerlanddavos27
+  deadline_status: attendance
+  link: https://digitalswitzerland.com/events/digitalswitzerland-at-davos
+  timezone: Europe/Zurich
+  place: Davos, Switzerland
+  date: Jan 19, 2027
+  start: '2027-01-19'
+  end: '2027-01-19'
+  sub: Global Affairs
+  type: summit
+
+- title: GenAI Zürich
+  year: 2027
+  id: genaizurich27
+  deadline_status: attendance
+  full_name: The European Summit on Applied Generative AI
+  link: https://www.genaizurich.ch/
+  timezone: Europe/Zurich
+  place: Zurich, Switzerland
+  date: Feb 24-25, 2027
+  start: '2027-02-24'
+  end: '2027-02-25'
+  sub: AI
+  type: summit
+
+- title: AI+X Summit
+  year: 2027
+  id: aixsummit27
+  deadline_status: attendance
+  link: https://www.plusx.ai/
+  timezone: Europe/Zurich
+  place: Zurich, Switzerland
+  date: Sep 30, 2027
+  start: '2027-09-30'
+  end: '2027-09-30'
+  sub:
+    - AI
+    - Global Affairs
+  type: summit
+
+- title: Basel Peace Forum
+  year: 2027
+  id: baselpeaceforum27
+  deadline_status: attendance
+  link: https://basel-peace.org/bpf-2027
+  timezone: Europe/Zurich
+  place: Basel, Switzerland
+  date: Jan 21, 2027
+  start: '2027-01-21'
+  end: '2027-01-21'
+  sub: Global Affairs
+  type: summit
+
+- title: Caritas-Forum
+  year: 2027
+  id: caritasforum27
+  deadline_status: attendance
+  link: https://www.caritas.ch/de/caritas-forum-2027
+  timezone: Europe/Zurich
+  place: Bern, Switzerland
+  date: Jan 29, 2027
+  start: '2027-01-29'
+  end: '2027-01-29'
+  sub: Global Affairs
+  type: summit
+
+- title: IC Forum
+  year: 2027
+  id: icforum27
+  deadline_status: attendance
+  full_name: International Cooperation Forum
+  link: https://www.deza.eda.admin.ch/en/5th-edition-ic-forum
+  timezone: Europe/Zurich
+  place: Baden, Switzerland
+  date: Feb 25-26, 2027
+  start: '2027-02-25'
+  end: '2027-02-26'
+  sub:
+    - Global Health
+    - Global Affairs
+  type: summit
+
+- title: MMS Symposium
+  year: 2026
+  id: mmssymposium26
+  deadline_status: attendance
+  full_name: Medicus Mundi Switzerland Symposium
+  link: https://www.medicusmundi.ch/en/symposium-2026
+  timezone: Europe/Zurich
+  place: Basel, Switzerland
+  date: Nov 4, 2026
+  start: '2026-11-04'
+  end: '2026-11-04'
+  sub: Global Health
+  type: summit
+  note: "Primary Health Care for the Next 50 Years; also online."

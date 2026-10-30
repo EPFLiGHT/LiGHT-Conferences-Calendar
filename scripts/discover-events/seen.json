@@ -1,1 +1,135 @@
-{}
+{
+  "ai x summit|2027": {
+    "title": "AI+X Summit",
+    "full_name": null,
+    "year": 2027,
+    "link": "https://www.plusx.ai/",
+    "proposed": "2026-10-24"
+  },
+  "basel peace forum|2027": {
+    "title": "Basel Peace Forum",
+    "full_name": null,
+    "year": 2027,
+    "link": "https://basel-peace.org/bpf-2027",
+    "proposed": "2026-10-24"
+  },
+  "caritas forum|2027": {
+    "title": "Caritas-Forum",
+    "full_name": null,
+    "year": 2027,
+    "link": "https://www.caritas.ch/de/caritas-forum-2027",
+    "proposed": "2026-10-24"
+  },
+  "cfc st moritz|2027": {
+    "title": "CfC St. Moritz",
+    "full_name": null,
+    "year": 2027,
+    "link": "https://cfc-stmoritz.com/",
+    "proposed": "2026-10-24"
+  },
+  "continent forum|2027": {
+    "title": "The 8th Continent Forum",
+    "full_name": null,
+    "year": 2027,
+    "link": "https://the8thcontinentforum.ch/",
+    "proposed": "2026-10-24"
+  },
+  "digitalswitzerland davos|2027": {
+    "title": "digitalswitzerland @ Davos",
+    "full_name": null,
+    "year": 2027,
+    "link": "https://digitalswitzerland.com/events/digitalswitzerland-at-davos",
+    "proposed": "2026-10-24"
+  },
+  "eef|2026": {
+    "title": "EEF",
+    "full_name": "European Economic Forum",
+    "year": 2026,
+    "link": "https://lucerne-dialogue.ch/en",
+    "proposed": "2026-10-24"
+  },
+  "genai zurich|2027": {
+    "title": "GenAI Zürich",
+    "full_name": "The European Summit on Applied Generative AI",
+    "year": 2027,
+    "link": "https://www.genaizurich.ch/",
+    "proposed": "2026-10-24"
+  },
+  "geneva ai summit|2027": {
+    "title": "Geneva AI Summit",
+    "full_name": null,
+    "year": 2027,
+    "link": null,
+    "proposed": "2026-10-24"
+  },
+  "ic forum|2027": {
+    "title": "IC Forum",
+    "full_name": "International Cooperation Forum",
+    "year": 2027,
+    "link": "https://www.deza.eda.admin.ch/en/5th-edition-ic-forum",
+    "proposed": "2026-10-24"
+  },
+  "international trade forum|2027": {
+    "title": "International Trade Forum",
+    "full_name": null,
+    "year": 2027,
+    "link": "https://www.s-ge.com/export/en/events/s-ge-event/international-trade-forum-2027",
+    "proposed": "2026-10-24"
+  },
+  "mms symposium|2026": {
+    "title": "MMS Symposium",
+    "full_name": "Medicus Mundi Switzerland Symposium",
+    "year": 2026,
+    "link": "https://www.medicusmundi.ch/en/symposium-2026",
+    "proposed": "2026-10-30"
+  },
+  "societas ethica|2027": {
+    "title": "Societas Ethica",
+    "full_name": "Societas Ethica Annual Conference",
+    "year": 2027,
+    "link": "https://www.societasethica.info/2027-call-for-papers",
+    "proposed": "2026-10-24"
+  },
+  "st gallen symposium|2027": {
+    "title": "St. Gallen Symposium",
+    "full_name": null,
+    "year": 2027,
+    "link": "https://symposium.org/sgs/theme-programme-56",
+    "proposed": "2026-10-24"
+  },
+  "start summit|2027": {
+    "title": "START Summit",
+    "full_name": null,
+    "year": 2027,
+    "link": "https://www.startglobal.org/start-summit",
+    "proposed": "2026-10-24"
+  },
+  "swiss biotech day|2027": {
+    "title": "Swiss Biotech Day",
+    "full_name": null,
+    "year": 2027,
+    "link": null,
+    "proposed": "2026-10-24"
+  },
+  "swiss quantum days|2027": {
+    "title": "Swiss Quantum Days",
+    "full_name": null,
+    "year": 2027,
+    "link": "https://swissquantumdays.ch/sqd2027",
+    "proposed": "2026-10-24"
+  },
+  "swiss robotics day|2026": {
+    "title": "Swiss Robotics Day",
+    "full_name": null,
+    "year": 2026,
+    "link": "https://swissroboticsday.ch/",
+    "proposed": "2026-10-24"
+  },
+  "swissmem industry day|2027": {
+    "title": "Swissmem Industry Day",
+    "full_name": null,
+    "year": 2027,
+    "link": "https://www.swissmem.ch/en/news/calendar-of-events/19th-swissmem-industry-day-2026.html",
+    "proposed": "2026-10-24"
+  }
+}
