@@ -764,3 +764,17 @@
   sub: Global Health
   type: summit
   note: "Primary Health Care for the Next 50 Years; also online."
+
+- title: Swiss Symposium in PoC Diagnostics
+  year: 2026
+  id: pocdx26
+  deadline_status: attendance
+  full_name: Swiss Symposium in Point-of-Care Diagnostics
+  link: https://www.pocdx.ch/
+  timezone: Europe/Zurich
+  place: Winterthur, Switzerland
+  date: Oct 29-30, 2026
+  start: '2026-10-29'
+  end: '2026-10-30'
+  sub: Global Health
+  type: summit

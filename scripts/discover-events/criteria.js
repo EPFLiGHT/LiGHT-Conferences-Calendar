@@ -46,9 +46,10 @@ Closest fits are events on international cooperation, humanitarian aid, global h
 often convened by the Swiss government, International Geneva, UN agencies or major NGOs: the IC Forum, the
 Geneva AI Summit, GESDA's Anticipation Summit and the Medicus Mundi Switzerland Symposium are typical.
 Also wanted: AI, robotics and digital technology events (Swiss Robotics Day, GenAI Zürich, AI+X Summit,
-digitalswitzerland @ Davos), life sciences events (Swiss Biotech Day), peace forums (Basel Peace Forum),
-cross-sector leaders' dialogues (St. Gallen Symposium) and national forums on social challenges such as
-migration, poverty or health (Caritas-Forum).
+digitalswitzerland @ Davos), life sciences and health technology events (Swiss Biotech Day, the Swiss
+Symposium in Point-of-Care Diagnostics), peace forums (Basel Peace Forum), cross-sector leaders' dialogues
+(St. Gallen Symposium) and national forums on social challenges such as migration, poverty or health
+(Caritas-Forum).
 Skip events mainly about business, finance or investment (economic or trade forums, engineering or
 manufacturing industry days, startup and investor summits, crypto and digital assets), gatherings of one
 research or industry community outside AI, digital technology, health and life sciences (quantum, space),

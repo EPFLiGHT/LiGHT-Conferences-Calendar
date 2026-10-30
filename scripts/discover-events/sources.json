@@ -54,5 +54,9 @@
   "Medicus Mundi Switzerland": {
     "url": "https://www.medicusmundi.ch/en/exchange-and-networking/events",
     "note": "Basel; global health network, its symposium and its members' events"
+  },
+  "Swiss Symposium in Point-of-Care Diagnostics": {
+    "url": "https://www.pocdx.ch/",
+    "note": "Winterthur; the homepage announces each edition"
   }
 }
