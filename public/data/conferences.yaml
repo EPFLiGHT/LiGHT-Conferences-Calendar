@@ -187,6 +187,16 @@
   sub: ML
   type: conference
 
+- title: ICML
+  year: 2027
+  id: icml27
+  full_name: Forty-fourth International Conference on Machine Learning
+  link: https://icml.cc
+  timezone: UTC-12
+  place: South America
+  sub: ML
+  type: conference
+
 - title: CVPR
   year: 2026
   id: cvpr26
