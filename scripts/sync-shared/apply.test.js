@@ -50,6 +50,15 @@ describe('applyEdition', () => {
     expect(entries[0].deadline).toBe('2026-01-01 23:59');
   });
 
+  it('leaves out a missing edition the source dates before today', () => {
+    const past = { today: utc('2026-06-01T00:00:00Z'), factsFor: () => facts({ startIso: '2026-03-01', endIso: '2026-03-03' }) };
+    expect(apply([], past)).toEqual({ updates: [], drafts: [], flags: [], drafted: null });
+
+    const entries = [entry({ year: 2025, id: 'conf25' })];
+    expect(apply(entries, past).drafts).toEqual([]);
+    expect(entries).toHaveLength(1);
+  });
+
   it('writes only deadlines for a venue with several entries per year', () => {
     const entries = [entry()];
     apply(entries, { multiEntry: true, factsFor: () => facts({ location: 'Lima, Peru' }) });

@@ -1,4 +1,4 @@
-// One reported edition updates its entries that have not ended, or is drafted from the latest earlier one.
+// One reported edition updates its entries that have not ended, or, unless it has ended, is drafted from the latest earlier one.
 // multiEntry venues (one entry per location) only get deadline updates; new editions are flagged, not drafted.
 import { parseEntryDateTime } from '../../src/utils/conferenceSchema.js';
 import { updateEntry, draftEntry } from './merge.js';
@@ -50,7 +50,8 @@ export function bigMoveFlags(changes) {
  * @param {number} args.year Edition year.
  * @param {(timezone: string) => object} args.factsFor The merge facts, read in
  *   the timezone of the entry they land in (a source may state times without a zone).
- * @param {DateTime} [args.today] Editions that ended before it are left alone.
+ * @param {DateTime} [args.today] Editions that ended before it are left alone,
+ *   and a missing one the source dates before it is not drafted or flagged.
  * @param {boolean} [args.multiEntry] The venue keeps several entries per year.
  * @param {(facts: object, target: object) => string[]} [args.screen] Runs on the
  *   facts before they are written and may null some out; returns flags. target
@@ -77,6 +78,7 @@ export function applyEdition({ entries, title, year, factsFor, today = null, mul
   const previous = previousEdition(entries, title, year);
   const timezone = previous?.timezone ?? 'utc';
   const facts = factsFor(timezone);
+  if (today && editionEnded({ start: facts.startIso, end: facts.endIso }, today)) return out;
   if (multiEntry) {
     const stated = [['location', facts.location], ['start', facts.startIso]]
       .filter(([, value]) => value)
