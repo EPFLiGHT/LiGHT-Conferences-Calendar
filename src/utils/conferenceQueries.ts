@@ -1,7 +1,7 @@
 /** Pure conference queries shared by the web app and the Slack bot. */
 
 import { DateTime } from 'luxon';
-import { getNextDeadline } from './parser';
+import { getDeadlineInfo, getNextDeadline } from './parser';
 import type { Conference, DeadlineInfo } from '@/types/conference';
 
 /** Calendar days from `today` until `start`, compared as wall-clock dates. */
@@ -89,12 +89,12 @@ export function getUpcomingEvents(conferences: Conference[], limit?: number): Ev
 }
 
 /**
- * Calculate days until deadline
- * Returns positive number for future deadlines, negative for past
+ * Whole days until the deadline, rounded down like the site countdown: 0 in its last
+ * 24 hours, negative once past.
  */
 export function getDaysUntilDeadline(deadline: DeadlineInfo): number {
   const diff = deadline.localDatetime.diff(DateTime.now(), ['days']);
-  return Math.ceil(diff.days);
+  return Math.floor(diff.days);
 }
 
 /**
@@ -109,41 +109,24 @@ export function getEventStartsOnDays(conferences: Conference[], reminderDays: nu
 }
 
 /**
- * Get conferences expiring within N days
- */
-function getDeadlinesWithinDays(
-  conferences: Conference[],
-  days: number
-): Array<{ conference: Conference; deadline: DeadlineInfo; daysLeft: number }> {
-  const now = DateTime.now();
-
-  return conferences
-    .map(conf => {
-      const deadline = getNextDeadline(conf);
-      if (!deadline || deadline.localDatetime <= now) return null;
-
-      const daysLeft = getDaysUntilDeadline(deadline);
-      if (daysLeft > days) return null;
-
-      return { conference: conf, deadline, daysLeft };
-    })
-    .filter((item): item is { conference: Conference; deadline: DeadlineInfo; daysLeft: number } => item !== null)
-    .sort((a, b) => a.daysLeft - b.daysLeft);
-}
-
-/**
  * Deadlines that land exactly on one of the given reminder-day offsets
- * (e.g. 30, 7, 3 days out). Shared by the user-DM and channel crons so both
- * fire on the same cadence and never re-post the same item on consecutive days.
+ * (e.g. 30, 7, 3 days out). Every upcoming deadline counts, so an open abstract
+ * deadline does not hide its paper deadline. Shared by the user-DM and channel crons
+ * so both fire on the same cadence and never re-post the same item on consecutive days.
  */
 export function filterDeadlinesByReminders(
   conferences: Conference[],
   reminderDays: number[]
 ): Array<{ conference: Conference; deadline: DeadlineInfo; daysLeft: number }> {
-  const maxReminderDays = Math.max(...reminderDays);
-  return getDeadlinesWithinDays(conferences, maxReminderDays).filter(item =>
-    reminderDays.includes(item.daysLeft)
-  );
+  const now = DateTime.now();
+  return conferences
+    .flatMap(conference =>
+      getDeadlineInfo(conference)
+        .filter(deadline => deadline.localDatetime > now)
+        .map(deadline => ({ conference, deadline, daysLeft: getDaysUntilDeadline(deadline) }))
+    )
+    .filter(item => reminderDays.includes(item.daysLeft))
+    .sort((a, b) => a.daysLeft - b.daysLeft);
 }
 
 export type SortBy = 'deadline' | 'start';

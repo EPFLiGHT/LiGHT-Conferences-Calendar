@@ -4,8 +4,10 @@ import {
   getUpcomingEvents,
   getEventStartsOnDays,
   filterDeadlinesByReminders,
+  getDaysUntilDeadline,
   sortConferences,
 } from '@/utils/conferenceQueries';
+import { getNextDeadline } from '@/utils/parser';
 import type { Conference } from '@/types/conference';
 
 function conf(id: string, start?: string): Conference {
@@ -20,9 +22,9 @@ function conf(id: string, start?: string): Conference {
   } as Conference;
 }
 
-// A conference whose paper deadline is `days` out from now (UTC, minute-truncated).
+// A conference whose paper deadline is `days` and a half out from now (UTC).
 function confDeadlineInDays(id: string, days: number): Conference {
-  const deadline = DateTime.now().setZone('utc').plus({ days }).toFormat('yyyy-MM-dd HH:mm');
+  const deadline = DateTime.now().setZone('utc').plus({ days, hours: 12 }).toFormat('yyyy-MM-dd HH:mm');
   return {
     id,
     title: id,
@@ -119,6 +121,50 @@ describe('filterDeadlinesByReminders', () => {
       [30, 7, 3]
     );
     expect(result).toEqual([]);
+  });
+});
+
+describe('deadline day counts', () => {
+  let prevZone: typeof Settings.defaultZone;
+
+  beforeEach(() => {
+    prevZone = Settings.defaultZone;
+    Settings.defaultZone = 'utc';
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    Settings.defaultZone = prevZone;
+  });
+
+  // Oct 25 23:59 AoE is Oct 26 11:59 UTC.
+  const aoeOct25 = { ...confDeadlineInDays('aoe', 0), timezone: 'UTC-12', deadline: '2026-10-25 23:59' } as Conference;
+  const daysLeftAt = (now: string) => {
+    vi.useFakeTimers({ now: new Date(now) });
+    return getDaysUntilDeadline(getNextDeadline(aoeOct25)!);
+  };
+
+  it('counts whole days left, as the site countdown does', () => {
+    expect(daysLeftAt('2026-10-23T09:00:00Z')).toBe(3);
+    expect(daysLeftAt('2026-10-24T09:00:00Z')).toBe(2);
+  });
+
+  it('is due today in the last 24 hours', () => {
+    expect(daysLeftAt('2026-10-26T09:00:00Z')).toBe(0);
+  });
+
+  it('sends the 3-day reminder with 3 full days left', () => {
+    vi.useFakeTimers({ now: new Date('2026-10-23T09:00:00Z') });
+    expect(filterDeadlinesByReminders([aoeOct25], [30, 7, 3])).toHaveLength(1);
+    vi.setSystemTime(new Date('2026-10-24T09:00:00Z'));
+    expect(filterDeadlinesByReminders([aoeOct25], [30, 7, 3])).toEqual([]);
+  });
+
+  it('reminds of a paper deadline while its abstract deadline is still open', () => {
+    vi.useFakeTimers({ now: new Date('2026-10-19T09:00:00Z') });
+    const withAbstract = { ...aoeOct25, abstract_deadline: '2026-10-18 23:59' } as Conference;
+    const result = filterDeadlinesByReminders([withAbstract], [30, 7, 3]);
+    expect(result.map((r) => [r.deadline.kind, r.daysLeft])).toEqual([['paper', 7]]);
   });
 });
 
