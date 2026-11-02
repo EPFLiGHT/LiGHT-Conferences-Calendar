@@ -7,7 +7,8 @@ import { DateTime } from 'luxon';
 import { parseEntries, serializeEntries } from './yamlio.js';
 import { renderReport, emptyOutcome, addOutcome } from './report.js';
 
-const DATA_PATH = fileURLToPath(new URL('../../public/data/conferences.yaml', import.meta.url));
+const DATA_PATHS = ['conferences', 'summits'].map((name) =>
+  fileURLToPath(new URL(`../../public/data/${name}.yaml`, import.meta.url)));
 
 const serializeConfig = (config) => `${JSON.stringify(config, null, 2)}\n`;
 
@@ -39,12 +40,14 @@ export function parseArgs(argv) {
  * @param {string} opts.title Report heading.
  * @param {string} opts.configPath The sync's venues.json.
  * @param {(title: string, cfg: object, ctx: {entries: Array<object>, today: DateTime}) =>
- *   Promise<object>} opts.perVenue Syncs one venue into ctx.entries (mutated) and
+ *   Promise<object>} opts.perVenue Syncs one venue into ctx.entries, the entries of
+ *   the first data file holding its title (mutated), and
  *   returns its outcome ({updates, drafts, flags, skipped}, each optional). It may
  *   edit cfg; venues.json is then rewritten.
  * @param {() => string} [opts.extraReport] Markdown appended to the report.
  * @param {string[]} [opts.argv] Defaults to the process arguments.
- * @param {string} [opts.dataPath] Defaults to public/data/conferences.yaml.
+ * @param {string[]} [opts.dataPaths] Defaults to conferences.yaml and summits.yaml;
+ *   a venue in neither syncs against the first.
  * @param {DateTime} [opts.today]
  * @param {object} [opts.env] Where SYNC_REPORT_PATH is read from.
  * @param {(text: string) => void} [opts.log]
@@ -56,7 +59,7 @@ export async function runSync({
   perVenue,
   extraReport = () => '',
   argv = process.argv.slice(2),
-  dataPath = DATA_PATH,
+  dataPaths = DATA_PATHS,
   today = DateTime.utc(),
   env = process.env,
   log = console.log,
@@ -67,18 +70,24 @@ export async function runSync({
     throw new Error(`venue "${venue}" is not in ${path.basename(configPath)}`);
   }
   const configBefore = serializeConfig(config);
-  const raw = fs.readFileSync(dataPath, 'utf8');
-  const entries = parseEntries(raw);
+  // A hand-formatted file is rewritten only when its entries change.
+  const files = dataPaths.map((dataPath) => {
+    const entries = parseEntries(fs.readFileSync(dataPath, 'utf8'));
+    return { dataPath, entries, before: serializeEntries(entries) };
+  });
 
   const run = emptyOutcome();
   for (const [venueTitle, cfg] of Object.entries(config)) {
     if (venue && venueTitle !== venue) continue;
+    const { entries } = files.find((f) => f.entries.some((e) => e.title === venueTitle)) ?? files[0];
     addOutcome(run, await perVenue(venueTitle, cfg, { entries, today }));
   }
 
   if (!dryRun) {
-    const after = serializeEntries(entries);
-    if (after !== raw) fs.writeFileSync(dataPath, after);
+    for (const { dataPath, entries, before } of files) {
+      const after = serializeEntries(entries);
+      if (after !== before) fs.writeFileSync(dataPath, after);
+    }
     const configAfter = serializeConfig(config);
     if (configAfter !== configBefore) fs.writeFileSync(configPath, configAfter);
   }

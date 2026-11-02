@@ -49,7 +49,7 @@ describe('runSync', () => {
   const run = (over = {}) => runSync({
     title: 'Test sync report',
     configPath,
-    dataPath,
+    dataPaths: [dataPath],
     today: TODAY,
     argv: [],
     env: { SYNC_REPORT_PATH: reportPath },
@@ -125,6 +125,31 @@ describe('runSync', () => {
     const before = fs.statSync(dataPath).mtimeMs;
     await run();
     expect(fs.statSync(dataPath).mtimeMs).toBe(before);
+  });
+
+  it('hands a venue the data file that holds it and writes back only that file', async () => {
+    const summitsPath = path.join(dir, 'summits.yaml');
+    const summitsText = '- title: Summit\n  year: 2026\n  id: summit26\n  timezone: "UTC"\n  type: "summit"\n';
+    fs.writeFileSync(summitsPath, summitsText);
+    fs.writeFileSync(configPath, '{"Summit":{"url":"https://summit.example/"},"Conf":{"url":"https://conf.example/"}}');
+    const seen = [];
+    await run({
+      dataPaths: [dataPath, summitsPath],
+      perVenue: async (title, cfg, ctx) => {
+        seen.push([title, ctx.entries.map((e) => e.id)]);
+        return title === 'Summit' ? setDeadline(title, cfg, ctx) : {};
+      },
+    });
+    expect(seen).toEqual([['Summit', ['summit26']], ['Conf', ['conf26', 'other26']]]);
+    expect(fs.readFileSync(summitsPath, 'utf8')).toContain('deadline: 2026-09-01 23:59');
+    expect(fs.readFileSync(dataPath, 'utf8')).toBe(serializeEntries(ENTRIES));
+  });
+
+  it('leaves a hand-formatted data file alone when its entries did not change', async () => {
+    const handwritten = '- title: Conf\n  year: 2026\n  id: conf26\n  timezone: "UTC"\n  type: "conference"\n';
+    fs.writeFileSync(dataPath, handwritten);
+    await run();
+    expect(fs.readFileSync(dataPath, 'utf8')).toBe(handwritten);
   });
 
   it('appends the extra report sections', async () => {

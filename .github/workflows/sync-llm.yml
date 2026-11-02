@@ -17,6 +17,7 @@ jobs:
       branch: auto/sync-llm
       add-paths: |
         public/data/conferences.yaml
+        public/data/summits.yaml
         scripts/sync-llm/venues.json
       title: "chore(data): sync health deadlines from venue websites"
     secrets:
