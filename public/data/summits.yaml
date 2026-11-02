@@ -3,12 +3,12 @@
   id: himss27
   full_name: HIMSS Global Health Conference & Exhibition
   link: https://www.himssconference.com/
-  deadline: "2026-06-30 23:59"
+  deadline: 2026-06-30 23:59
   timezone: America/Chicago
-  place: "Chicago, Illinois, USA"
-  date: "April 5-8, 2027"
-  start: "2027-04-05"
-  end: "2027-04-08"
+  place: Chicago, Illinois, USA
+  date: April 5-8, 2027
+  start: '2027-04-05'
+  end: '2027-04-08'
   sub: Health AI
   type: summit
   note: Call for posters closes Oct 11, 2026, 5 PM EST.
@@ -20,10 +20,10 @@
   full_name: HLTH USA
   link: https://hlth.com/events/usa/
   timezone: America/Los_Angeles
-  place: "Las Vegas, Nevada, USA"
-  date: "November 15-18, 2026"
-  start: "2026-11-15"
-  end: "2026-11-18"
+  place: Las Vegas, Nevada, USA
+  date: November 15-18, 2026
+  start: '2026-11-15'
+  end: '2026-11-18'
   sub: Health AI
   type: summit
 
@@ -34,10 +34,10 @@
   full_name: 5th Africa HealthTech Summit
   link: https://healthtechsummit.africa/
   timezone: Africa/Kigali
-  place: "Kigali, Rwanda"
-  date: "September 30 - October 2, 2026"
-  start: "2026-09-30"
-  end: "2026-10-02"
+  place: Kigali, Rwanda
+  date: September 30 - October 2, 2026
+  start: '2026-09-30'
+  end: '2026-10-02'
   sub: Global Health
   type: summit
 
@@ -48,10 +48,10 @@
   full_name: Seventy-ninth World Health Assembly (WHA79)
   link: https://www.who.int/about/governance/world-health-assembly/seventy-ninth
   timezone: Europe/Zurich
-  place: "Geneva, Switzerland"
-  date: "May 18-23, 2026"
-  start: "2026-05-18"
-  end: "2026-05-23"
+  place: Geneva, Switzerland
+  date: May 18-23, 2026
+  start: '2026-05-18'
+  end: '2026-05-23'
   sub: Global Health
   type: summit
 
@@ -62,10 +62,10 @@
   full_name: Eightieth World Health Assembly (WHA80)
   link: https://www.who.int/about/governance/world-health-assembly
   timezone: Europe/Zurich
-  place: "Geneva, Switzerland"
-  date: "May 23-30, 2027"
-  start: "2027-05-23"
-  end: "2027-05-30"
+  place: Geneva, Switzerland
+  date: May 23-30, 2027
+  start: '2027-05-23'
+  end: '2027-05-30'
   sub: Global Health
   type: summit
   note: Closes no later than May 30, 2027.
@@ -78,9 +78,9 @@
   link: https://aiforgood.itu.int/
   timezone: America/New_York
   place: Geneva, Switzerland
-  date: "July 7-10, 2026"
-  start: "2026-07-07"
-  end: "2026-07-10"
+  date: July 7-10, 2026
+  start: '2026-07-07'
+  end: '2026-07-10'
   sub: AI
   type: summit
 
@@ -92,9 +92,9 @@
   link: https://aiforgood.itu.int/summit27/
   timezone: America/New_York
   place: Geneva, Switzerland
-  date: "June 21-24, 2027"
-  start: "2027-06-21"
-  end: "2027-06-24"
+  date: June 21-24, 2027
+  start: '2027-06-21'
+  end: '2027-06-24'
   sub: AI
   type: summit
 
@@ -106,8 +106,8 @@
   timezone: UTC
   place: Zurich, Switzerland
   date: September 10-12, 2025
-  start: "2025-09-10"
-  end: "2025-09-12"
+  start: '2025-09-10'
+  end: '2025-09-12'
   sub: AI
   type: summit
 
@@ -120,8 +120,8 @@
   timezone: Africa/Kigali
   place: Kigali, Rwanda
   date: April 3-4, 2025
-  start: "2025-04-03"
-  end: "2025-04-04"
+  start: '2025-04-03'
+  end: '2025-04-04'
   sub: AI
   type: summit
 
@@ -133,8 +133,8 @@
   timezone: UTC
   place: Nairobi, Kenya & Worldwide Online
   date: December 3-5, 2025
-  start: "2025-12-03"
-  end: "2025-12-05"
+  start: '2025-12-03'
+  end: '2025-12-05'
   sub: Global Health
   type: summit
 
@@ -147,8 +147,8 @@
   timezone: UTC
   place: Berlin, Germany
   date: October 12-14, 2025
-  start: "2025-10-12"
-  end: "2025-10-14"
+  start: '2025-10-12'
+  end: '2025-10-14'
   sub: Global Health
   type: summit
 
@@ -160,8 +160,8 @@
   timezone: Europe/Paris
   place: Swiss TPH, Kreuzstrasse 2, 4123 Allschwill, Switzerland
   date: March 21-22, 2023
-  start: "2023-03-21"
-  end: "2023-03-22"
+  start: '2023-03-21'
+  end: '2023-03-22'
   sub: Global Health
   type: summit
 
@@ -174,11 +174,10 @@
   timezone: UTC
   place: Metropole Palace Hotel Belgrade, Serbia
   date: April 23-25, 2026
-  start: "2026-04-23"
-  end: "2026-04-25"
+  start: '2026-04-23'
+  end: '2026-04-25'
   sub: Global Health
   type: summit
-
 
 - title: WMA General Assembly
   year: 2026
@@ -189,11 +188,10 @@
   timezone: UTC
   place: Postillion Hotel & Convention Centre WTC Rotterdam, The Netherlands
   date: October 7-10, 2026
-  start: "2026-10-07"
-  end: "2026-10-10"
+  start: '2026-10-07'
+  end: '2026-10-10'
   sub: Global Health
   type: summit
-
 
 - title: WMA Council Session
   year: 2027
@@ -204,11 +202,10 @@
   timezone: UTC
   place: Rio de Janeiro, Brazil
   date: April 15-17, 2027
-  start: "2027-04-15"
-  end: "2027-04-17"
+  start: '2027-04-15'
+  end: '2027-04-17'
   sub: Global Health
   type: summit
-
 
 - title: WMA General Assembly
   year: 2027
@@ -219,11 +216,10 @@
   timezone: UTC
   place: Bangkok, Thailand
   date: October 20-23, 2027
-  start: "2027-10-20"
-  end: "2027-10-23"
+  start: '2027-10-20'
+  end: '2027-10-23'
   sub: Global Health
   type: summit
-
 
 - title: WEF
   year: 2026
@@ -234,8 +230,8 @@
   timezone: UTC
   place: Davos-Klosters, Switzerland
   date: January 19-23, 2026
-  start: "2026-01-19"
-  end: "2026-01-23"
+  start: '2026-01-19'
+  end: '2026-01-23'
   sub: Global Health
   type: summit
 
@@ -248,8 +244,8 @@
   timezone: UTC
   place: Davos-Klosters, Switzerland
   date: January 18-22, 2027
-  start: "2027-01-18"
-  end: "2027-01-22"
+  start: '2027-01-18'
+  end: '2027-01-22'
   sub: Global Health
   type: summit
 
@@ -261,8 +257,8 @@
   timezone: UTC
   place: Kigali, Rwanda
   date: June 15-20, 2025
-  start: "2025-06-15"
-  end: "2025-06-20"
+  start: '2025-06-15'
+  end: '2025-06-20'
   sub: Global Health
   type: summit
 
@@ -271,12 +267,12 @@
   id: edctpforum27
   full_name: European & Developing Countries Clinical Trials Partnership Forum
   link: https://edctpforum.eu/
-  abstract_deadline: "2026-09-02 17:00"
+  abstract_deadline: 2026-09-02 17:00
   timezone: Europe/Brussels
   place: Madrid, Spain
   date: April 5-9, 2027
-  start: "2027-04-05"
-  end: "2027-04-09"
+  start: '2027-04-05'
+  end: '2027-04-09'
   sub: Global Health
   type: summit
 
@@ -289,8 +285,8 @@
   timezone: UTC
   place: Geneva, Switzerland
   date: May 19-27, 2025
-  start: "2025-05-19"
-  end: "2025-05-27"
+  start: '2025-05-19'
+  end: '2025-05-27'
   sub: Global Health
   type: summit
 
@@ -303,8 +299,8 @@
   timezone: UTC
   place: New York, USA
   date: September 09-23, 2025
-  start: "2025-09-09"
-  end: "2025-09-23"
+  start: '2025-09-09'
+  end: '2025-09-23'
   sub: Global Health
   type: summit
 
@@ -317,23 +313,23 @@
   timezone: UTC
   place: New York, USA
   date: September 22-28, 2026
-  start: "2026-09-22"
-  end: "2026-09-28"
+  start: '2026-09-22'
+  end: '2026-09-28'
   sub: Global Health
   type: summit
-  note: "High-level week of the 81st session; session opens September 8, 2026."
+  note: High-level week of the 81st session; session opens September 8, 2026.
 
 - title: THS
   year: 2026
   id: ths26
   full_name: Tanzania health summit
   link: https://ths.or.tz/
-  deadline: "2026-06-15 23:59"
+  deadline: 2026-06-15 23:59
   timezone: UTC
   place: Dar es Salaam, Tanzania
   date: October 5-7, 2026
-  start: "2026-10-05"
-  end: "2026-10-07"
+  start: '2026-10-05'
+  end: '2026-10-07'
   sub: Global Health
   type: summit
 
@@ -341,14 +337,14 @@
   year: 2026
   id: amld26
   full_name: AMLD Intelligence Summit
-  link: "https://2026.appliedmldays.org/"
-  deadline: "2025-12-08 23:59"
+  link: https://2026.appliedmldays.org/
+  deadline: 2025-12-08 23:59
   timezone: UTC
-  place: "SwissTech Convention Center, EPFL, Lausanne, Switzerland"
-  date: "Feb 10-12, 2026"
-  start: "2026-02-10"
-  end: "2026-02-12"
-  paperslink: "https://2026.appliedmldays.org/media-90-posters"
+  place: SwissTech Convention Center, EPFL, Lausanne, Switzerland
+  date: Feb 10-12, 2026
+  start: '2026-02-10'
+  end: '2026-02-12'
+  paperslink: https://2026.appliedmldays.org/media-90-posters
   sub: ML
   type: summit
 
@@ -356,14 +352,14 @@
   year: 2027
   id: amld27
   full_name: AMLD Intelligence Summit
-  link: "https://www.appliedmldays.org/amld/2027/overview"
-  deadline: "2026-09-29 23:59"
+  link: https://www.appliedmldays.org/amld/2027/overview
+  deadline: 2026-09-29 23:59
   timezone: Europe/Zurich
-  place: "Lausanne, Switzerland"
-  date: "Mar 9-11, 2027"
-  start: "2027-03-09"
-  end: "2027-03-11"
-  paperslink: "https://www.appliedmldays.org/collaborate/call-for-posters"
+  place: Lausanne, Switzerland
+  date: Mar 9-11, 2027
+  start: '2027-03-09'
+  end: '2027-03-11'
+  paperslink: https://www.appliedmldays.org/collaborate/call-for-posters
   sub: ML
   type: summit
   note: Poster deadline; track proposals close Dec 1, 2026.
@@ -375,10 +371,10 @@
   full_name: 5th Africa Health ExCon
   link: https://www.africahealthexcon.com/
   timezone: Africa/Cairo
-  place: "Egypt International Exhibition Center (EIEC), Cairo, Egypt"
-  date: "June 15-18, 2026"
-  start: "2026-06-15"
-  end: "2026-06-18"
+  place: Egypt International Exhibition Center (EIEC), Cairo, Egypt
+  date: June 15-18, 2026
+  start: '2026-06-15'
+  end: '2026-06-18'
   sub: Global Health
   type: summit
 
@@ -387,12 +383,12 @@
   id: adhs26
   full_name: 6th Africa Digital Health Summit
   link: https://africadigitalhealthsummit.org/
-  abstract_deadline: "2026-02-27 23:59"
+  abstract_deadline: 2026-02-27 23:59
   timezone: Africa/Lagos
-  place: "Abuja Continental Hotel, Abuja, Nigeria"
-  date: "June 25-26, 2026"
-  start: "2026-06-25"
-  end: "2026-06-26"
+  place: Abuja Continental Hotel, Abuja, Nigeria
+  date: June 25-26, 2026
+  start: '2026-06-25'
+  end: '2026-06-26'
   sub: Global Health
   type: summit
 
@@ -401,12 +397,12 @@
   id: aaiac26
   full_name: 2nd International Conference on the Advancements of Artificial Intelligence in the African Context
   link: https://afriailab.udom.ac.tz/conference
-  deadline: "2026-03-15 23:59"
+  deadline: 2026-03-15 23:59
   timezone: Africa/Dar_es_Salaam
-  place: "Dar es Salaam, Tanzania"
-  date: "July 22-23, 2026"
-  start: "2026-07-22"
-  end: "2026-07-23"
+  place: Dar es Salaam, Tanzania
+  date: July 22-23, 2026
+  start: '2026-07-22'
+  end: '2026-07-23'
   sub: AI
   type: summit
 
@@ -417,10 +413,10 @@
   full_name: Transforming African MedTech Conference
   link: https://www.africanmedtech.com/
   timezone: Africa/Nairobi
-  place: "Kenya School of Government, Nairobi, Kenya"
-  date: "August 25-27, 2026"
-  start: "2026-08-25"
-  end: "2026-08-27"
+  place: Kenya School of Government, Nairobi, Kenya
+  date: August 25-27, 2026
+  start: '2026-08-25'
+  end: '2026-08-27'
   sub: Global Health
   type: summit
   note: In-person 2026 edition cancelled; replaced by a virtual session series.
@@ -430,12 +426,12 @@
   id: wcph26
   full_name: 18th World Congress on Public Health
   link: https://www.wcph.org/
-  deadline: "2026-01-31 23:59"
+  deadline: 2026-01-31 23:59
   timezone: Africa/Johannesburg
-  place: "Cape Town International Convention Centre, Cape Town, South Africa"
-  date: "September 6-9, 2026"
-  start: "2026-09-06"
-  end: "2026-09-09"
+  place: Cape Town International Convention Centre, Cape Town, South Africa
+  date: September 6-9, 2026
+  start: '2026-09-06'
+  end: '2026-09-09'
   sub: Global Health
   type: summit
 
@@ -446,10 +442,10 @@
   full_name: World Health Expo Nairobi (formerly Medic East Africa)
   link: https://www.worldhealthexpo.com/events/healthcare/nairobi/
   timezone: Africa/Nairobi
-  place: "Kenyatta International Convention Centre (KICC), Nairobi, Kenya"
-  date: "September 16-18, 2026"
-  start: "2026-09-16"
-  end: "2026-09-18"
+  place: Kenyatta International Convention Centre (KICC), Nairobi, Kenya
+  date: September 16-18, 2026
+  start: '2026-09-16'
+  end: '2026-09-18'
   sub: Global Health
   type: summit
 
@@ -460,10 +456,10 @@
   full_name: World Health Expo Nairobi (formerly Medic East Africa)
   link: https://www.worldhealthexpo.com/events/healthcare/nairobi/
   timezone: Africa/Nairobi
-  place: "Nairobi, Kenya"
-  date: "September 15-17, 2027"
-  start: "2027-09-15"
-  end: "2027-09-17"
+  place: Nairobi, Kenya
+  date: September 15-17, 2027
+  start: '2027-09-15'
+  end: '2027-09-17'
   sub: Global Health
   type: summit
 
@@ -474,10 +470,10 @@
   full_name: World Health Expo Johannesburg (formerly Africa Health)
   link: https://www.worldhealthexpo.com/events/healthcare/johannesburg/
   timezone: Africa/Johannesburg
-  place: "Gallagher Convention Centre, Johannesburg, South Africa"
-  date: "October 6-8, 2026"
-  start: "2026-10-06"
-  end: "2026-10-08"
+  place: Gallagher Convention Centre, Johannesburg, South Africa
+  date: October 6-8, 2026
+  start: '2026-10-06'
+  end: '2026-10-08'
   sub: Global Health
   type: summit
 
@@ -488,10 +484,10 @@
   full_name: AI Expo Africa (9th Edition)
   link: https://aiexpoafrica.com/
   timezone: Africa/Johannesburg
-  place: "Sandton Convention Centre, Johannesburg, South Africa"
-  date: "October 28-29, 2026"
-  start: "2026-10-28"
-  end: "2026-10-29"
+  place: Sandton Convention Centre, Johannesburg, South Africa
+  date: October 28-29, 2026
+  start: '2026-10-28'
+  end: '2026-10-29'
   sub: AI
   type: summit
 
@@ -502,10 +498,10 @@
   full_name: The AI Summit Cape Town @ Africa Tech Festival
   link: https://africatechfestival.com/ai-summit/
   timezone: Africa/Johannesburg
-  place: "Cape Town International Convention Centre (CTICC), Cape Town, South Africa"
-  date: "November 17-19, 2026"
-  start: "2026-11-17"
-  end: "2026-11-19"
+  place: Cape Town International Convention Centre (CTICC), Cape Town, South Africa
+  date: November 17-19, 2026
+  start: '2026-11-17'
+  end: '2026-11-19'
   sub: AI
   type: summit
 
@@ -516,10 +512,10 @@
   full_name: Futurize HealthTech Summit & Demo Day
   link: https://www.menterprise.africa/futurize-summit
   timezone: Africa/Nairobi
-  place: "Nairobi, Kenya"
-  date: "December 2026 (TBC)"
-  start: "2026-12-01"
-  end: "2026-12-01"
+  place: Nairobi, Kenya
+  date: December 2026 (TBC)
+  start: '2026-12-01'
+  end: '2026-12-01'
   sub: Global Health
   type: summit
 
@@ -530,10 +526,10 @@
   full_name: 5th Tanzania Digital Health & Innovation Forum
   link: https://muhas-dhi.ac.tz/
   timezone: Africa/Dar_es_Salaam
-  place: "Dar es Salaam, Tanzania"
-  date: "November 12-13, 2026"
-  start: "2026-11-12"
-  end: "2026-11-13"
+  place: Dar es Salaam, Tanzania
+  date: November 12-13, 2026
+  start: '2026-11-12'
+  end: '2026-11-13'
   sub: Global Health
   type: summit
 
@@ -543,13 +539,13 @@
   full_name: Second International Primary Health Care Conference
   link: https://dailynews.co.tz/tanzania-to-host-second-international-primary-health-care-conference-in-arusha/
   timezone: Africa/Dar_es_Salaam
-  place: "Arusha, Tanzania"
-  date: "September 9-11, 2026"
-  start: "2026-09-09"
-  end: "2026-09-11"
+  place: Arusha, Tanzania
+  date: September 9-11, 2026
+  start: '2026-09-09'
+  end: '2026-09-11'
   sub: Global Health
   type: summit
-  note: "Hosted by TAMISEMI with the Ministry of Health; no official conference website published."
+  note: Hosted by TAMISEMI with the Ministry of Health; no official conference website published.
 
 - title: WHO Regional Committee for Africa
   year: 2026
@@ -558,13 +554,13 @@
   full_name: Seventy-sixth session of the WHO Regional Committee for Africa (RC76)
   link: https://www.afro.who.int/about-us/governance/sessions/seventy-sixth-session-who-regional-committee-africa
   timezone: Africa/Addis_Ababa
-  place: "Addis Ababa, Ethiopia"
-  date: "August 25-28, 2026"
-  start: "2026-08-25"
-  end: "2026-08-28"
+  place: Addis Ababa, Ethiopia
+  date: August 25-28, 2026
+  start: '2026-08-25'
+  end: '2026-08-28'
   sub: Global Health
   type: summit
-  note: "Ministerial dialogue preceded the session on August 24; RC77 host and dates not yet announced."
+  note: Ministerial dialogue preceded the session on August 24; RC77 host and dates not yet announced.
 
 - title: DIHAD
   year: 2027
@@ -573,13 +569,13 @@
   full_name: Dubai International Humanitarian Aid & Development Conference & Exhibition
   link: https://dihad.org/event/
   timezone: Asia/Dubai
-  place: "Dubai, United Arab Emirates"
-  date: "May 4-6, 2027"
-  start: "2027-05-04"
-  end: "2027-05-06"
+  place: Dubai, United Arab Emirates
+  date: May 4-6, 2027
+  start: '2027-05-04'
+  end: '2027-05-06'
   sub: Global Health
   type: summit
-  note: "Dates per dihad.org/event; the site homepage still lists the past August 2026 edition."
+  note: Dates per dihad.org/event; the site homepage still lists the past August 2026 edition.
 
 - title: Digital Health Show
   year: 2027
@@ -588,10 +584,10 @@
   full_name: Digital Health Show (10-Year Anniversary Edition)
   link: https://digitalhealthshow.com/
   timezone: Africa/Johannesburg
-  place: "Johannesburg, South Africa"
-  date: "March 17-18, 2027"
-  start: "2027-03-17"
-  end: "2027-03-18"
+  place: Johannesburg, South Africa
+  date: March 17-18, 2027
+  start: '2027-03-17'
+  end: '2027-03-18'
   sub: Health AI
   type: summit
 
@@ -602,10 +598,10 @@
   full_name: Geneva Science Diplomacy Anticipation Summit
   link: https://www.gesda.global/geneva-science-diplomacy-anticipation-summit/
   timezone: Europe/Zurich
-  place: "Geneva, Switzerland"
-  date: "October 14-15, 2026"
-  start: "2026-10-14"
-  end: "2026-10-15"
+  place: Geneva, Switzerland
+  date: October 14-15, 2026
+  start: '2026-10-14'
+  end: '2026-10-15'
   sub: Global Health
   type: summit
 
@@ -616,13 +612,13 @@
   full_name: AidEx Geneva
   link: https://www.aid-expo.com/
   timezone: Europe/Zurich
-  place: "Geneva, Switzerland"
-  date: "October 21-22, 2026"
-  start: "2026-10-21"
-  end: "2026-10-22"
+  place: Geneva, Switzerland
+  date: October 21-22, 2026
+  start: '2026-10-21'
+  end: '2026-10-22'
   sub: Global Health
   type: summit
-  note: "Free to attend; co-located with Development2030."
+  note: Free to attend; co-located with Development2030.
 
 - title: AidEx Nairobi
   year: 2027
@@ -631,10 +627,10 @@
   full_name: AidEx Nairobi
   link: https://www.aidexafrica.com/
   timezone: Africa/Nairobi
-  place: "Nairobi, Kenya"
-  date: "June 2-3, 2027"
-  start: "2027-06-02"
-  end: "2027-06-03"
+  place: Nairobi, Kenya
+  date: June 2-3, 2027
+  start: '2027-06-02'
+  end: '2027-06-03'
   sub: Global Health
   type: summit
 
@@ -763,7 +759,7 @@
   end: '2026-11-04'
   sub: Global Health
   type: summit
-  note: "Primary Health Care for the Next 50 Years; also online."
+  note: Primary Health Care for the Next 50 Years; also online.
 
 - title: Swiss Symposium in PoC Diagnostics
   year: 2026
