@@ -778,3 +778,31 @@
   end: '2026-10-30'
   sub: Global Health
   type: summit
+
+- title: BMJ Future Health Europe
+  year: 2026
+  id: bmjfhe26
+  deadline_status: attendance
+  full_name: BMJ Future Health Europe
+  link: https://futurehealth.bmj.com/bmj-future-health-europe
+  timezone: Europe/London
+  place: London, UK
+  date: Oct 29-30, 2026
+  start: '2026-10-29'
+  end: '2026-10-30'
+  sub: Health AI
+  type: summit
+
+- title: MozFest
+  year: 2026
+  id: mozfest26
+  deadline_status: attendance
+  full_name: Mozilla Festival
+  link: https://www.mozillafoundation.org/en/festival/
+  timezone: Europe/Madrid
+  place: Barcelona, Spain
+  date: Oct 28-30, 2026
+  start: '2026-10-28'
+  end: '2026-10-30'
+  sub: AI
+  type: summit
