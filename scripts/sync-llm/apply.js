@@ -1,10 +1,10 @@
 /**
- * Turns validated editions into edits on conferences.yaml through the shared
+ * Turns validated editions into edits on the data file through the shared
  * scripts/sync-shared/apply.js, adding what only a web page needs: deadlines
  * are checked against the conference start one more time, a draft gets a link
- * for its own year, and every deadline that lands gets an evidence row, so a
- * reviewer can check the value against the sentence it came from without
- * opening the venue site.
+ * for its own year, and every deadline, start or end that lands gets an
+ * evidence row, so a reviewer can check the value against the sentence it came
+ * from without opening the venue site.
  */
 import { DateTime } from 'luxon';
 import { applyEdition, previousEdition } from '../sync-shared/apply.js';
@@ -12,6 +12,7 @@ import { namesYear, rollUrl } from '../sync-shared/dates.js';
 import { editionToFacts } from './facts.js';
 
 const DEADLINE_KINDS = { abstract_deadline: 'abstract', deadline: 'paper' };
+const DATE_FIELDS = ['start', 'end'];
 
 /**
  * A submission deadline cannot fall after its own conference has begun. Venues
@@ -118,15 +119,18 @@ export function applyEditions({ entries, title, editions, multiEntry = false, so
 
     const written = applied.updates.map(({ id, field }) => ({ id, field }));
     if (applied.drafted) {
-      for (const field of Object.keys(DEADLINE_KINDS)) {
+      for (const field of [...Object.keys(DEADLINE_KINDS), ...DATE_FIELDS]) {
         if (applied.drafted[field] !== undefined) written.push({ id: applied.drafted.id, field });
       }
     }
     for (const { id, field } of written) {
       const kind = DEADLINE_KINDS[field];
-      if (!kind) continue;
-      const quote = edition.deadlines.find((d) => d.kind === kind)?.evidence ?? '';
-      out.evidence.push({ id, field, quote, url: sourceUrl });
+      if (kind) {
+        const quote = edition.deadlines.find((d) => d.kind === kind)?.evidence ?? '';
+        out.evidence.push({ id, field, quote, url: sourceUrl });
+      } else if (DATE_FIELDS.includes(field) && edition.dates_evidence) {
+        out.evidence.push({ id, field, quote: edition.dates_evidence, url: sourceUrl });
+      }
     }
   }
   return out;

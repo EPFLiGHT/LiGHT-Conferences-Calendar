@@ -172,6 +172,35 @@ describe('applyEditions', () => {
     expect(entries[0].deadline).toBe('2026-01-01 23:59');
   });
 
+  it('records the dates quote behind the start and end of a draft', () => {
+    const entries = [entry({ deadline: undefined, deadline_status: 'attendance' })];
+    const dated = baseEdition({
+      year: 2027, start_date: '2027-10-27', end_date: '2027-10-29', dates_evidence: 'October 27-29, 2027', deadlines: [],
+    });
+    const { drafts, evidence } = applyEditions({
+      entries, title: 'HealthConf', editions: [dated], sourceUrl: 'https://hc.example/',
+    });
+    expect(drafts).toHaveLength(1);
+    expect(evidence).toEqual([
+      { id: 'hc27', field: 'start', quote: 'October 27-29, 2027', url: 'https://hc.example/' },
+      { id: 'hc27', field: 'end', quote: 'October 27-29, 2027', url: 'https://hc.example/' },
+    ]);
+  });
+
+  it('records the dates quote behind a start and end it moves', () => {
+    const entries = [entry({ start: '2026-10-01', end: '2026-10-03', date: 'Oct 1-3, 2026' })];
+    const moved = baseEdition({
+      year: 2026, start_date: '2026-10-08', end_date: '2026-10-10', dates_evidence: 'October 8-10, 2026', deadlines: [],
+    });
+    const { evidence } = applyEditions({
+      entries, title: 'HealthConf', editions: [moved], sourceUrl: 'https://hc.example/',
+    });
+    expect(evidence.map((e) => [e.field, e.quote])).toEqual([
+      ['start', 'October 8-10, 2026'],
+      ['end', 'October 8-10, 2026'],
+    ]);
+  });
+
   it('drafts with the link resolved for that year', () => {
     const entries = [entry({ link: 'https://hc.example/2026/' })];
     const { flags } = applyEditions({
