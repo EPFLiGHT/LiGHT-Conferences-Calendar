@@ -39,5 +39,31 @@
   "Union NAR": {
     "url": "https://bclung.ca/lung-health/tuberculosis/annual-tb-conference-the-union-nar/",
     "home": "https://bclung.ca/nar"
+  },
+  "BMJ Future Health Europe": {
+    "url": "https://futurehealth.bmj.com/bmj-future-health-europe",
+    "attendance": true
+  },
+  "MozFest": {
+    "url": "https://www.mozillafoundation.org/en/festival/",
+    "attendance": true,
+    "note": "Cloudflare bot check usually answers 403; the next dates may need a manual update"
+  },
+  "IC Forum": {
+    "url": "https://www.deza.eda.admin.ch/en/5th-edition-ic-forum",
+    "attendance": true,
+    "note": "SDC has no permanent IC Forum page; this news page names the 2027 dates, so point it at the next announcement after that edition"
+  },
+  "Geneva AI Summit": {
+    "url": "https://genevaaisummit.swiss/",
+    "attendance": true
+  },
+  "MMS Symposium": {
+    "url": "https://www.medicusmundi.ch/en/symposium-2026",
+    "attendance": true
+  },
+  "Swiss Symposium in PoC Diagnostics": {
+    "url": "https://www.pocdx.ch/",
+    "attendance": true
   }
 }
