@@ -5,15 +5,17 @@
  * dates page, first as it would be for the next edition's year (tier 0), let
  * the agent follow links from the venue homepage (tier 1), then let it search
  * the web as well (tier 2). Whatever survives validation is merged into
- * conferences.yaml (see scripts/sync-shared/run.js for the flags, the
- * write-back and the report). The report adds the page quote behind every
- * change and the tokens each venue cost.
+ * conferences.yaml or summits.yaml, whichever holds the venue (see
+ * scripts/sync-shared/run.js for the flags, the write-back and the report).
+ * The report adds the page quote behind every change and the tokens each venue
+ * cost.
  *
  * venues.json format, one entry per synced venue:
- *   { "<title as it appears in conferences.yaml>": {
+ *   { "<title as it appears in the data file>": {
  *       "url": "<page listing the deadlines, read at tier 0>",
  *       "home": "<where the agent starts; defaults to the entry's link>",
  *       "multiEntry": true,  // optional, as in scripts/sync-openreview/venues.json
+ *       "attendance": true,  // optional: no call for submissions, so dated editions count; tier 0 only
  *       "note": "<free-form comment for humans; the sync ignores it>"
  *   } }
  * When the deadlines turn up elsewhere, the sync rewrites url (and moves a
@@ -59,8 +61,8 @@ export async function syncVenue(ctx, title, cfg) {
       { pageText, today },
     );
     flags.push(...gateFlags.map((f) => `${title}: ${f}`));
-    const hasDeadlines = valid.some((e) => e.deadlines.length > 0);
-    return hasDeadlines ? valid : null;
+    const usable = valid.some((e) => e.deadlines.length > 0 || (cfg.attendance && e.start_date));
+    return usable ? valid : null;
   };
 
   // Tier 0 on one page: the surviving editions, else why there are none
@@ -69,9 +71,12 @@ export async function syncVenue(ctx, title, cfg) {
     const page = await fetcher.fetchPage(url);
     if (!page.ok) return { reason: `configured URL failed (${page.error})` };
     if (page.tooShort) return { reason: `page appears to be JS-rendered (only ${page.text.length} chars)` };
-    const result = await extractFromPage(llm, { venueTitle: title, pageText: page.text, url, today });
+    const result = await extractFromPage(llm, {
+      venueTitle: title, pageText: page.text, url, today, attendance: Boolean(cfg.attendance),
+    });
     if (!result) return { reason: 'tier 0 extraction produced no usable output' };
-    if (!result.page_has_dates) return { reason: 'configured page has no deadline information' };
+    // Between announcements an attendance event has nothing to flag.
+    if (!result.page_has_dates) return { reason: cfg.attendance ? null : 'configured page has no deadline information' };
     const editions = validate(result.editions, page.finalUrl);
     return editions ? { editions, sourceUrl: page.finalUrl } : { reason: null };
   };
@@ -86,6 +91,11 @@ export async function syncVenue(ctx, title, cfg) {
   }
   const configured = await tryPage(cfg.url);
   if (configured.editions) return found(0, configured);
+  // Attendance events post their next dates on their own page, so they skip the agent.
+  if (cfg.attendance) {
+    if (configured.reason) flags.push(`${title}: ${configured.reason}`);
+    return { outcome: 'not_found', tier: 0, reason: configured.reason ?? 'no upcoming dates on the page', flags };
+  }
   if (configured.reason) flags.push(`${title}: ${configured.reason}; agent fallback`);
 
   // Tiers 1 and 2: bounded agent, search unlocked only at tier 2.
@@ -155,6 +165,7 @@ async function main() {
     }
 
     if (out.outcome !== 'submitted') {
+      if (cfg.attendance) return { flags: out.flags };
       return {
         flags: [...out.flags, `${title}: no deadlines found (${out.reason}); check the venue site and venues.json`],
       };

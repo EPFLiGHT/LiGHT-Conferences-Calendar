@@ -42,6 +42,18 @@ describe('extractFromPage', () => {
     expect(system).toMatch(/untrusted/i);
   });
 
+  it('asks for editions by their dates alone for an attendance-only venue', async () => {
+    const systemFor = async (attendance) => {
+      const llm = fakeLlm(jsonReply(RESULT));
+      await extractFromPage(llm, {
+        venueTitle: 'Fixture Fest', pageText: 'x', url: 'https://fixture.example/', today: TODAY, attendance,
+      });
+      return llm.requests[0].input.find((m) => m.role === 'system').content;
+    };
+    expect(await systemFor(true)).toMatch(/even with no submission deadline/i);
+    expect(await systemFor(false)).not.toMatch(/even with no submission deadline/i);
+  });
+
   it('returns null instead of throwing when the response came back incomplete', async () => {
     const llm = fakeLlm({ status: 'incomplete', output_text: '{"page_has_dates": tru' });
     const out = await extractFromPage(llm, {

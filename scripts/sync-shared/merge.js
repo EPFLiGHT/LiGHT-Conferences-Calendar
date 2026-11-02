@@ -146,7 +146,8 @@ const DRAFT_DROPPED_FIELDS = ['note', 'paperslink', 'deadline_status', 'sync_pin
  * Draft a new edition by cloning the previous one and overwriting it with
  * facts. Curated fields (sub, type, timezone) carry over from the clone;
  * edition-specific fields (note, paperslink, deadline_status) are dropped, and
- * so are place, start, end and date unless the source states them. The link
+ * so are place, start, end and date unless the source states them. An
+ * attendance-only venue stays so until the source reports a deadline. The link
  * comes from the source; a cloned one naming the previous year is flagged. The
  * full_name comes from the source when it passes the gate, else from the clone.
  * @param {object} prevEntry The venue's latest existing entry (not mutated).
@@ -158,7 +159,10 @@ const DRAFT_DROPPED_FIELDS = ['note', 'paperslink', 'deadline_status', 'sync_pin
 export function draftEntry(prevEntry, facts, year) {
   const entry = { ...prevEntry };
   const flags = [];
-  for (const field of DRAFT_DROPPED_FIELDS) delete entry[field];
+  const attendance = prevEntry.deadline_status === 'attendance' && !facts.deadline && !facts.abstractDeadline;
+  for (const field of DRAFT_DROPPED_FIELDS) {
+    if (!(attendance && field === 'deadline_status')) delete entry[field];
+  }
   entry.year = year;
   entry.id = nextId(prevEntry.id, year);
 
@@ -192,7 +196,7 @@ export function draftEntry(prevEntry, facts, year) {
     entry.deadline = toZoneString(facts.deadline, entry.timezone);
   } else {
     delete entry.deadline;
-    flags.push('no submission deadline from the source yet');
+    if (!attendance) flags.push('no submission deadline from the source yet');
   }
 
   let startIso = facts.startIso;

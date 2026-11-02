@@ -7,7 +7,8 @@ const readJson = (rel) => JSON.parse(fs.readFileSync(new URL(rel, import.meta.ur
 const llmVenues = readJson('./venues.json');
 const openreviewVenues = readJson('../sync-openreview/venues.json');
 const titles = new Set(
-  loadEntries(fileURLToPath(new URL('../../public/data/conferences.yaml', import.meta.url))).map((e) => e.title),
+  ['conferences', 'summits'].flatMap((name) =>
+    loadEntries(fileURLToPath(new URL(`../../public/data/${name}.yaml`, import.meta.url))).map((e) => e.title)),
 );
 
 const unknownKeys = (cfg, known) => Object.keys(cfg).filter((k) => !known.includes(k));
@@ -17,14 +18,14 @@ describe('venues.json', () => {
     expect(Object.keys(llmVenues).filter((t) => t in openreviewVenues)).toEqual([]);
   });
 
-  it('names only venues conferences.yaml has', () => {
+  it('names only venues the synced data files have', () => {
     const missing = [...Object.keys(llmVenues), ...Object.keys(openreviewVenues)].filter((t) => !titles.has(t));
     expect(missing).toEqual([]);
   });
 
   it.each(Object.entries(llmVenues))('configures %s for the LLM sync with a url and known keys', (_, cfg) => {
     expect(typeof cfg.url).toBe('string');
-    expect(unknownKeys(cfg, ['url', 'home', 'multiEntry', 'note'])).toEqual([]);
+    expect(unknownKeys(cfg, ['url', 'home', 'multiEntry', 'attendance', 'note'])).toEqual([]);
   });
 
   it.each(Object.entries(openreviewVenues))('configures %s for the OpenReview sync with a prefix and known keys', (_, cfg) => {

@@ -345,6 +345,20 @@ describe('draftEntry', () => {
     expect(flags.length).toBeGreaterThan(0);
   });
 
+  it('keeps an attendance-only venue attendance-only while the source reports no deadline', () => {
+    const prev = { ...sydneyEntry(), deadline_status: 'attendance', abstract_deadline: undefined, deadline: undefined };
+    const facts = { ...neuripsFacts(), startIso: '2027-12-05', endIso: '2027-12-11', abstractDeadline: null, deadline: null };
+    const { entry, flags } = draftEntry(prev, facts, 2027);
+    expect(entry.deadline_status).toBe('attendance');
+    expect(flags).toEqual([]);
+  });
+
+  it('drops attendance once the source reports a deadline', () => {
+    const prev = { ...sydneyEntry(), deadline_status: 'attendance' };
+    const { entry } = draftEntry(prev, { ...neuripsFacts(), startIso: '2027-12-05', endIso: '2027-12-11' }, 2027);
+    expect(entry.deadline_status).toBeUndefined();
+  });
+
   it('leaves start/end/date unset and flags when the source start year is not the draft year', () => {
     const prev = sydneyEntry();
     const facts = { ...neuripsFacts(), startIso: '2025-01-20' };

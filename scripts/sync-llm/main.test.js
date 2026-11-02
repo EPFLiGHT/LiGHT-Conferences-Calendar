@@ -139,3 +139,42 @@ describe('syncVenue tiering', () => {
     expect(out.reason).toBe('still nothing');
   });
 });
+
+describe('syncVenue for attendance-only venues', () => {
+  const PAGE = 'Join us at FestConf Barcelona, Spain October 28-30, 2026.';
+  const DATES_ONLY = {
+    page_has_dates: true,
+    editions: [edition({
+      location: 'Barcelona, Spain', start_date: '2026-10-28', end_date: '2026-10-30',
+      dates_evidence: 'Barcelona, Spain October 28-30, 2026', deadlines: [],
+    })],
+  };
+  const cfg = { url: 'https://fest.example/', attendance: true };
+
+  it('counts an edition the page dates, with no deadline', async () => {
+    const out = await syncVenue(
+      ctx({ fetcher: fakeFetcher({ 'https://fest.example/': PAGE }), llm: fakeLlm(jsonReply(DATES_ONLY)) }),
+      'HealthConf',
+      cfg,
+    );
+    expect(out.outcome).toBe('submitted');
+    expect(out.tier).toBe(0);
+    expect(out.editions[0].start_date).toBe('2026-10-28');
+  });
+
+  it('stops at the configured page instead of paying for the agent', async () => {
+    const llm = fakeLlm(jsonReply({ page_has_dates: false, editions: [] }));
+    const out = await syncVenue(ctx({ fetcher: fakeFetcher({ 'https://fest.example/': PAGE }), llm }), 'HealthConf', cfg);
+    expect(llm.requests).toHaveLength(1);
+    expect(out.outcome).toBe('not_found');
+    expect(out.tier).toBe(0);
+    expect(out.flags).toEqual([]);
+  });
+
+  it('flags a configured page that fails to load', async () => {
+    const llm = fakeLlm();
+    const out = await syncVenue(ctx({ fetcher: fakeFetcher(), llm }), 'HealthConf', cfg);
+    expect(llm.requests).toHaveLength(0);
+    expect(out.flags).toEqual(['HealthConf: configured URL failed (http 404)']);
+  });
+});
