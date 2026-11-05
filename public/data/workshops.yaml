@@ -162,3 +162,20 @@
   end: "2026-11-11"
   sub: Global Health
   type: workshop
+
+- title: PAIRS
+  year: 2027
+  id: pairs27
+  full_name: "Participatory AI Research & Practice Symposium"
+  link: "https://pairs.site/2027/"
+  deadline: "2026-12-15 23:59"
+  timezone: "Europe/Zurich"
+  place: "Geneva, Switzerland"
+  date: "June 19, 2027"
+  start: "2027-06-19"
+  end: "2027-06-19"
+  sub:
+    - AI
+    - Global Affairs
+  note: "Extended abstracts; fringe event of the Geneva AI Summit 2027."
+  type: workshop
