@@ -67,9 +67,13 @@ flowchart TB
 ```
 
 The merge step is deliberately narrow. It writes only what a source states for the factual fields
-(`deadline`, `abstract_deadline`, `start`, `end`, `date`, and `place` when an entry has none) and never
-touches curated ones like `sub`, `note` or `link`. A field an entry pins with `sync_pin` is left alone, and
-a disagreement (including a source naming another city) is reported in the PR body rather than overwritten. `full_name` is only filled in when an entry has none or a new edition is
+(deadline dates, `start`, `end`, `date`, and `place` when an entry has none) and never touches curated ones
+like `sub`, `note` or `link`. A source reports typed deadlines; it never writes a `label` or an `other`
+item, and never removes or retypes one. Each reported deadline updates the entry's item of the same type,
+else its one abstract-family item (`paper_abstract`, `abstract`, `poster`), and is added only when no item
+of the same group falls on the same day. A field an entry pins with `sync_pin`, or a deadline pinned with
+`pin: true`, is left alone, and a disagreement (including a source naming another city) is reported in the
+PR body rather than overwritten. `full_name` is only filled in when an entry has none or a new edition is
 drafted, with any trailing year or acronym stripped; an existing one is never rewritten, and a source
 that names the conference differently is reported instead.
 
@@ -110,8 +114,13 @@ A fourth file, `speakers.yaml`, powers the Speakers page. It has its own format 
   id: shortname25               # lowercase title + 2-digit year
   full_name: Full Conference Name
   link: https://conference-website.com
-  deadline: 2025-05-21 20:00    # YYYY-MM-DD HH:MM
-  abstract_deadline: 2025-05-14 20:00  # optional
+  deadlines:                    # optional, in due order
+    - type: paper_abstract
+      due: 2025-05-14 20:00     # YYYY-MM-DD HH:MM, in the entry's timezone
+    - type: paper
+      due: 2025-05-21 20:00
+      label: Full paper (main track)  # optional; overrides the type's label
+      pin: true                 # optional; the syncs never change this date
   timezone: America/Los_Angeles # IANA timezone
   place: City, Country
   date: May 21-25, 2025
@@ -126,6 +135,25 @@ A fourth file, `speakers.yaml`, powers the Speakers page. It has its own format 
 Only `title`, `year`, `id`, `type` and `timezone` are required. Missing fields show as "TBA". See the
 [list of IANA timezones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
+Each deadline has a `type` saying what is due:
+
+| type | label | meaning |
+| --- | --- | --- |
+| `paper_abstract` | Paper abstract | an abstract registered ahead of a full paper (OpenReview's "Abstract Registration") |
+| `paper` | Full paper | a full paper or manuscript |
+| `abstract` | Abstract | the abstract is the submission, for oral or poster presentation |
+| `poster` | Poster abstract | a call for posters only |
+| `late_breaking` | Late-breaking abstract | a late-breaking abstract |
+| `proposal` | Session proposal | a workshop, panel, symposium or session proposal |
+| `other` | its `label` (required) | anything else a reader must submit |
+| `early_registration` | Early-bird registration | the last day of the reduced rate |
+| `registration` | Registration closes | the last day to register at all |
+| `presenter_registration` | Presenter registration | the day presenting authors must register by |
+| `grant` | Scholarship or travel grant | a scholarship, travel grant or fee waiver application |
+
+Two items of one event cannot share both `type` and `label`. A page saying "before Oct 15" means a
+23:59 deadline on Oct 14: write the last valid day.
+
 ### Automated updates from OpenReview
 
 Venues hosted on OpenReview (NeurIPS, ICML, ICLR, COLM, AAAI, CVPR, WACV, ECCV, LoG, UAI, MIDL, MLHC, CHIL)
@@ -138,14 +166,17 @@ hand-maintained in the YAML. To sync another OpenReview venue, add one line to
 ### Automated updates from venue websites
 
 Most health conferences are not on OpenReview, so a second monthly Action (`pnpm sync:llm`) fetches each
-venue's important-dates page and asks an OpenAI model to pull out the deadlines. Every deadline has to
-come with the exact sentence it was found in; the quote is checked against the page and shown in the PR body.
+venue's important-dates page and asks an OpenAI model to pull out the deadlines, registration and
+scholarship dates included. Every deadline has to come with the exact sentence it was found in; the quote is
+checked against the page, must name what is due, and is shown in the PR body. A venue whose registration,
+fees or scholarship dates live on other pages lists them under `pages` in `scripts/sync-llm/venues.json`;
+those are read every run and never rewritten.
 When a venue moves its dates page (they love doing this every year), a fallback agent finds the new one and
 fixes `scripts/sync-llm/venues.json` in the same PR.
 
 To run it locally, put `OPENAI_API_KEY=...` in `.env.local`. If a synced value keeps coming out wrong, pin
-it with `sync_pin: [place]` (or `deadline`, `start`, `end`, `date`, `abstract_deadline`) and both syncs will
-leave that field alone.
+it with `sync_pin: [place]` (or `start`, `end`, `date`) and both syncs will leave that field alone. A
+deadline is pinned on its own item with `pin: true`.
 
 ### Discovering Swiss events
 
