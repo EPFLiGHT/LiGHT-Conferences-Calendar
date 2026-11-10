@@ -22,6 +22,9 @@
   deadlines:
     - type: abstract
       due: 2027-04-30 23:59
+    - type: grant
+      label: Travel grant
+      due: 2027-04-30 23:59
   timezone: UTC-12
   place: Hamburg, Germany
   date: Jun 20-23, 2027
@@ -1250,8 +1253,15 @@
   full_name: 18th Consortium of Universities for Global Health Annual Conference
   link: https://cughlima2027.org/
   deadlines:
-    - type: paper
+    - type: proposal
+      label: Panel proposal
+      due: 2026-08-31 23:00
+    - type: abstract
       due: 2026-08-31 23:59
+    - type: early_registration
+      due: 2026-11-30 23:59
+    - type: presenter_registration
+      due: 2026-11-30 23:59
   timezone: EST
   place: Lima, Peru
   date: Feb 25-28, 2027
@@ -1336,6 +1346,11 @@
   id: inmedhhc27
   full_name: Institute for International Medicine Annual Humanitarian Health Conference
   link: https://www.inmed.us/hhc/
+  deadlines:
+    - type: early_registration
+      due: 2026-11-15 23:59
+    - type: poster
+      due: 2027-03-31 23:59
   timezone: UTC
   place: Raytown, Missouri, USA
   date: Apr 15-16, 2027
@@ -1587,9 +1602,13 @@
 - title: MIDL
   year: 2027
   id: midl27
-  deadline_status: tba
   full_name: Medical Imaging with Deep Learning
   link: https://2027.midl.io/
+  deadlines:
+    - type: paper_abstract
+      due: 2026-11-30 23:59
+    - type: paper
+      due: 2026-12-04 23:59
   timezone: UTC-12
   place: Porto, Portugal
   date: Jul 14-16, 2027
@@ -1626,6 +1645,15 @@
       due: 2027-01-31 23:59
     - type: paper
       due: 2027-02-07 23:59
+    - type: grant
+      label: Student travel grant
+      due: 2027-04-30 23:59
+    - type: early_registration
+      due: 2027-05-10 23:59
+    - type: presenter_registration
+      due: 2027-05-10 23:59
+    - type: registration
+      due: 2027-07-01 23:59
   timezone: UTC-12
   place: Amsterdam, The Netherlands
   date: Jul 6-7, 2027
@@ -1657,8 +1685,14 @@
   full_name: 49th Annual International Conference of the IEEE Engineering in Medicine and Biology Society
   link: https://embc.embs.org/2027/
   deadlines:
+    - type: proposal
+      label: Workshop and mini-symposium proposals
+      due: 2027-01-24 23:59
     - type: paper
       due: 2027-01-24 23:59
+    - type: poster
+      label: 1-page poster paper
+      due: 2027-04-23 23:59
   timezone: UTC-12
   place: Singapore
   date: Jul 11-15, 2027
@@ -1691,9 +1725,17 @@
   full_name: Pacific Symposium on Biocomputing
   link: https://psb.stanford.edu/
   deadlines:
+    - type: proposal
+      label: Session and workshop proposals
+      due: 2026-02-17 23:59
     - type: paper
       due: 2026-08-03 23:59
-    - type: paper_abstract
+    - type: grant
+      label: Travel award
+      due: 2026-10-15 23:59
+    - type: early_registration
+      due: 2026-10-31 23:59
+    - type: poster
       due: 2026-12-01 23:59
   timezone: America/Los_Angeles
   place: Big Island, Hawaii, USA
@@ -1729,6 +1771,9 @@
   deadlines:
     - type: abstract
       due: 2026-07-07 11:59
+    - type: early_registration
+      label: Standard-rate registration
+      due: 2026-11-20 23:59
   timezone: America/New_York
   place: Bangkok, Thailand
   date: December 2-4, 2026
@@ -1757,8 +1802,22 @@
   full_name: Geneva Health Forum
   link: https://genevahealthforum.com/
   deadlines:
-    - type: abstract
+    - type: other
+      label: Science Speed Talks video
+      due: 2026-09-14 23:59
+    - type: poster
       due: 2026-09-15 23:59
+    - type: presenter_registration
+      label: Speed talk finalist registration
+      due: 2026-09-30 23:59
+    - type: early_registration
+      due: 2026-10-14 23:59
+    - type: presenter_registration
+      label: Poster presenter registration
+      due: 2026-10-30 23:59
+    - type: registration
+      label: Online registration
+      due: 2026-11-09 23:59
   timezone: UTC-12
   place: Geneva, Switzerland
   date: November 10-12, 2026
@@ -1777,6 +1836,16 @@
   deadlines:
     - type: abstract
       due: 2026-04-13 23:59
+    - type: proposal
+      label: Symposia, courses and workshops
+      due: 2026-04-13 23:59
+    - type: late_breaking
+      due: 2026-07-22 23:59
+    - type: grant
+      label: Scholarships and sponsored registrations
+      due: 2026-07-23 23:59
+    - type: early_registration
+      due: 2026-07-31 23:59
   timezone: UTC-12
   place: Rio de Janeiro, Brazil
   date: November 17-20, 2026
@@ -1794,6 +1863,14 @@
   deadlines:
     - type: abstract
       due: 2026-10-10 23:59
+    - type: grant
+      label: Travel grant
+      due: 2026-10-10 23:59
+    - type: other
+      label: Challenging case
+      due: 2026-10-10 23:59
+    - type: early_registration
+      due: 2026-12-15 23:59
   timezone: UTC-12
   place: Vancouver, Canada
   date: February 24-27, 2027
@@ -1836,6 +1913,9 @@
   id: swissroboticsday26
   deadline_status: attendance
   link: https://swissroboticsday.ch/
+  deadlines:
+    - type: early_registration
+      due: 2026-06-29 23:59
   timezone: Europe/Zurich
   place: Zurich, Switzerland
   date: Nov 13, 2026

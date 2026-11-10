@@ -4,8 +4,10 @@
   full_name: HIMSS Global Health Conference & Exhibition
   link: https://www.himssconference.com/
   deadlines:
-    - type: paper
+    - type: proposal
       due: 2026-06-30 23:59
+    - type: early_registration
+      due: 2026-12-20 23:59
   timezone: America/Chicago
   place: Chicago, Illinois, USA
   date: April 5-8, 2027
@@ -272,6 +274,11 @@
   deadlines:
     - type: abstract
       due: 2026-09-02 17:00
+    - type: proposal
+      label: Symposium and workshop proposals
+      due: 2026-09-02 17:00
+    - type: registration
+      due: 2027-02-28 23:59
   timezone: Europe/Brussels
   place: Madrid, Spain
   date: April 5-9, 2027
@@ -541,6 +548,9 @@
   deadline_status: attendance
   full_name: 5th Tanzania Digital Health & Innovation Forum
   link: https://muhas-dhi.ac.tz/
+  deadlines:
+    - type: early_registration
+      due: 2026-10-13 23:59
   timezone: Africa/Dar_es_Salaam
   place: Dar es Salaam, Tanzania
   date: November 12-13, 2026
@@ -668,8 +678,11 @@
 - title: St. Gallen Symposium
   year: 2027
   id: stgallensymposium27
-  deadline_status: attendance
   link: https://symposium.org/sgs/theme-programme-56
+  deadlines:
+    - type: other
+      label: Global Ideas Competition
+      due: 2027-02-02 12:59
   timezone: Europe/Zurich
   place: St. Gallen, Switzerland
   date: Apr 28-29, 2027
@@ -725,6 +738,9 @@
   id: baselpeaceforum27
   deadline_status: attendance
   link: https://basel-peace.org/bpf-2027
+  deadlines:
+    - type: registration
+      due: 2026-12-18 23:59
   timezone: Europe/Zurich
   place: Basel, Switzerland
   date: Jan 21, 2027
@@ -738,6 +754,11 @@
   id: caritasforum27
   deadline_status: attendance
   link: https://www.caritas.ch/de/caritas-forum-2027
+  deadlines:
+    - type: early_registration
+      due: 2026-12-24 23:59
+    - type: registration
+      due: 2027-01-20 23:59
   timezone: Europe/Zurich
   place: Bern, Switzerland
   date: Jan 29, 2027
@@ -824,6 +845,12 @@
   id: mcpdevsummitnairobi26
   deadline_status: attendance
   link: https://events.linuxfoundation.org/mcp-dev-summit-nairobi/
+  deadlines:
+    - type: grant
+      label: Travel fund
+      due: 2026-10-11 23:59
+    - type: early_registration
+      due: 2026-11-18 23:59
   timezone: Africa/Nairobi
   place: Nairobi, Kenya
   date: Nov 19-20, 2026

@@ -183,7 +183,8 @@
   full_name: "Participatory AI Research & Practice Symposium"
   link: "https://pairs.site/2027/"
   deadlines:
-    - type: paper
+    - type: abstract
+      label: Extended abstract
       due: "2026-12-15 23:59"
   timezone: "Europe/Zurich"
   place: "Geneva, Switzerland"
