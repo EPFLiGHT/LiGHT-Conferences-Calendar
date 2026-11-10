@@ -5,26 +5,50 @@ import type { DateTime } from 'luxon';
 import type { Conference, DeadlineInfo } from '@/types/conference';
 import type { BlockKitMessage } from '@/types/slack';
 import { getDaysUntilDeadline } from '@/utils/conferenceQueries';
-import { getNextDeadline, getNoDeadlineLabel } from '@/utils/parser';
+import { getCardDeadlines, getNoDeadlineLabel } from '@/utils/parser';
+import { DEADLINE_GROUP_EMOJIS } from '@/constants/deadlineTypes';
 import { SUBJECT_LABELS, SUBJECT_EMOJIS } from '@/constants/subjects';
 import { URGENCY_EMOJIS, URGENCY_CONFIG } from '../../config/constants';
 import { appUrl } from '../appUrl';
 import { context, divider, plural, section } from './blocks';
 
 export type DeadlineItem = { conference: Conference; deadline: DeadlineInfo; daysLeft: number };
+/** One event's deadlines in one card. */
+export type DeadlineCardItem = {
+  conference: Conference;
+  deadlines: Array<{ deadline: DeadlineInfo; daysLeft: number }>;
+};
 export type EventStartItem = { conference: Conference; start: DateTime; daysLeft: number };
 
-export type ConferenceCardItem = ({ kind: 'deadline' } & DeadlineItem) | ({ kind: 'event' } & EventStartItem);
+export type ConferenceCardItem = ({ kind: 'deadline' } & DeadlineCardItem) | ({ kind: 'event' } & EventStartItem);
+
+/** One card per conference, in first-appearance order, each with its deadlines in due order. */
+export function groupDeadlineItems(items: DeadlineItem[]): DeadlineCardItem[] {
+  const cards = new Map<string, DeadlineCardItem>();
+  for (const { conference, deadline, daysLeft } of items) {
+    const card = cards.get(conference.id) ?? { conference, deadlines: [] };
+    card.deadlines.push({ deadline, daysLeft });
+    cards.set(conference.id, card);
+  }
+  for (const card of cards.values()) {
+    card.deadlines.sort((x, y) => x.deadline.datetime.toMillis() - y.deadline.datetime.toMillis());
+  }
+  return [...cards.values()];
+}
 
 export function buildConferenceCard(item: ConferenceCardItem): KnownBlock[] {
   const { conference } = item;
-  const lines = [`${urgencyEmoji(item.daysLeft)} *${conference.title} ${conference.year}*  ${subjectTags(conference.sub)}`];
+  const daysLeft = item.kind === 'deadline' ? Math.min(...item.deadlines.map((d) => d.daysLeft)) : item.daysLeft;
+  const lines = [`${urgencyEmoji(daysLeft)} *${conference.title} ${conference.year}*  ${subjectTags(conference.sub)}`];
 
   if (item.kind === 'deadline') {
     // The conference's own zone, as its website states it; local would be the server's (UTC).
-    const { datetime } = item.deadline;
-    lines.push(`📝 ${item.deadline.label}: *${datetime.toFormat('MMM d, yyyy')}* (${datetime.zoneName})`);
-    lines.push(`⏰ ${formatDeadlineUrgency(item.daysLeft)}`);
+    for (const { deadline, daysLeft: left } of item.deadlines) {
+      const { datetime } = deadline;
+      lines.push(
+        `${DEADLINE_GROUP_EMOJIS[deadline.group]} ${deadline.label}: *${datetime.toFormat('MMM d, yyyy')}* (${datetime.zoneName}) · ⏰ ${formatDeadlineUrgency(left)}`
+      );
+    }
   } else {
     if (conference.place) lines.push(`📍 ${conference.place}`);
     lines.push(`📆 Starts *${item.start.toFormat('MMM d, yyyy')}* · ${formatEventCountdown(item.daysLeft)}`);
@@ -38,7 +62,7 @@ export function cardList(items: ConferenceCardItem[]): KnownBlock[] {
   return items.flatMap((item, i) => [...(i === 0 ? [] : [divider]), ...buildConferenceCard(item)]);
 }
 
-/** /conf-info reply: the card plus full name, place and note. */
+/** /conf-info reply: the card (every upcoming deadline, else the latest passed one) plus full name, place and note. */
 export function buildConferenceDetails(conference: Conference): BlockKitMessage {
   const details = context(
     [conference.full_name, conference.place && `📍 ${conference.place}`, conference.note && `ℹ️ ${conference.note}`]
@@ -46,15 +70,16 @@ export function buildConferenceDetails(conference: Conference): BlockKitMessage 
       .join('  ·  ')
   );
   const name = `${conference.title} ${conference.year}`;
-  const deadline = getNextDeadline(conference);
+  const { shown } = getCardDeadlines(conference, Infinity);
 
-  if (!deadline) {
+  if (shown.length === 0) {
     const noDeadline = getNoDeadlineLabel(conference);
     return { blocks: [section(`📅 *${name}*\n_${noDeadline}_`), details], text: `${name} - ${noDeadline}` };
   }
 
-  const card = buildConferenceCard({ kind: 'deadline', conference, deadline, daysLeft: getDaysUntilDeadline(deadline) });
-  return { blocks: [...card, details], text: `${name} - ${deadline.label}` };
+  const deadlines = shown.map((deadline) => ({ deadline, daysLeft: getDaysUntilDeadline(deadline) }));
+  const card = buildConferenceCard({ kind: 'deadline', conference, deadlines });
+  return { blocks: [...card, details], text: `${name} - ${shown.map((d) => d.label).join(', ')}` };
 }
 
 function cardButtons(conference: Conference): Button[] {

@@ -1,29 +1,31 @@
 /**
  * Merge rules shared by every sync: decides what a source may write into a
- * conference entry. Only "factual" fields are ever touched (deadline,
- * abstract_deadline, start, end, date, and place and full_name when the entry
- * has none); curated fields (sub, type, note, link, paperslink, id, timezone,
- * deadline_status) are protected by construction because they are never passed
- * to the setter. A value the source does not state is left
- * alone, never derived from the old one.
+ * conference entry. Only "factual" fields are ever touched (deadline dates,
+ * start, end, date, and place and full_name when the entry has none); curated
+ * fields (sub, type, note, link, paperslink, id, timezone, deadline_status,
+ * deadline labels and types) are protected by construction because they are
+ * never passed to the setter. A value the source does not state is left
+ * alone, never derived from the old one. Deadlines merge through
+ * deadlines.js.
  * An entry can also pin individual factual fields via `sync_pin` (a list of
- * field names) when a curated value should win over the source, e.g. a venue
- * whose announced deadline differs from the portal cutoff; pinned fields are
- * never written, and any divergence is flagged in the report instead.
+ * field names), and a deadline via `pin: true` on its item, when a curated
+ * value should win over the source; pinned values are never written, and any
+ * divergence is flagged in the report instead.
  *
  * full_name passes through the gate in names.js and is only filled when
  * missing or drafted; a curated one is kept, and flagged when the source's
  * core name differs.
  *
  * Sources hand in a `facts` object: {fullName, location, startIso, endIso,
- * link, abstractDeadline, deadline}, with the deadlines as Luxon UTC instants;
- * endIso and link are optional.
+ * link, deadlines}, with deadlines a list of {type, due} (due a Luxon UTC
+ * instant, at most one per type); endIso and link are optional.
  * Building it from a source's payload is the source's own job (see
  * scripts/sync-openreview/facts.js and scripts/sync-llm/facts.js).
  */
-import { parseEntryDateTime } from '../../src/utils/conferenceSchema.js';
-import { toZoneString, formatDateRange, nextId, namesYear } from './dates.js';
+import { formatDateRange, nextId, namesYear } from './dates.js';
 import { cleanFullName, sameConferenceName } from './names.js';
+import { draftDeadlines, mergeDeadlines, setDeadlinesKey } from './deadlines.js';
+import { DEADLINE_TYPES } from '../../src/constants/deadlineTypes.data.js';
 
 /**
  * The curated place and the source's name one city when a curated segment
@@ -74,14 +76,9 @@ export function updateEntry(entry, facts, opts = {}) {
     return true;
   };
 
-  const setDeadline = (field, dt) => {
-    if (!dt) return;
-    const old = entry[field] && parseEntryDateTime(entry[field], entry.timezone);
-    if (today && old?.isValid && old < today && dt < today) return;
-    set(field, toZoneString(dt, entry.timezone));
-  };
-  setDeadline('deadline', facts.deadline);
-  setDeadline('abstract_deadline', facts.abstractDeadline);
+  const merged = mergeDeadlines(entry, facts.deadlines ?? [], { today });
+  changes.push(...merged.changes);
+  flags.push(...merged.flags);
 
   if (!deadlinesOnly) {
     const fullName = cleanFullName(facts.fullName, entry);
@@ -146,8 +143,10 @@ const DRAFT_DROPPED_FIELDS = ['note', 'paperslink', 'deadline_status', 'sync_pin
  * Draft a new edition by cloning the previous one and overwriting it with
  * facts. Curated fields (sub, type, timezone) carry over from the clone;
  * edition-specific fields (note, paperslink, deadline_status) are dropped, and
- * so are place, start, end and date unless the source states them. An
- * attendance-only venue stays so until the source reports a deadline. The link
+ * so are place, start, end and date unless the source states them. Deadlines
+ * come only from the source, so labels are not carried over. An
+ * attendance-only venue stays so until the source reports a submission
+ * deadline. The link
  * comes from the source; a cloned one naming the previous year is flagged. The
  * full_name comes from the source when it passes the gate, else from the clone.
  * @param {object} prevEntry The venue's latest existing entry (not mutated).
@@ -159,7 +158,9 @@ const DRAFT_DROPPED_FIELDS = ['note', 'paperslink', 'deadline_status', 'sync_pin
 export function draftEntry(prevEntry, facts, year) {
   const entry = { ...prevEntry };
   const flags = [];
-  const attendance = prevEntry.deadline_status === 'attendance' && !facts.deadline && !facts.abstractDeadline;
+  const reported = facts.deadlines ?? [];
+  const hasSubmission = reported.some((d) => DEADLINE_TYPES[d.type]?.group === 'submission');
+  const attendance = prevEntry.deadline_status === 'attendance' && !hasSubmission;
   for (const field of DRAFT_DROPPED_FIELDS) {
     if (!(attendance && field === 'deadline_status')) delete entry[field];
   }
@@ -185,18 +186,17 @@ export function draftEntry(prevEntry, facts, year) {
     flags.push('no place from the source yet');
   }
 
-  // Assigning to an existing key keeps its position in the dumped YAML;
-  // only delete when the fact is absent.
-  if (facts.abstractDeadline) {
-    entry.abstract_deadline = toZoneString(facts.abstractDeadline, entry.timezone);
+  const items = draftDeadlines(reported, entry.timezone);
+  if (items.length > 0) {
+    setDeadlinesKey(entry, items);
   } else {
-    delete entry.abstract_deadline;
+    delete entry.deadlines;
   }
-  if (facts.deadline) {
-    entry.deadline = toZoneString(facts.deadline, entry.timezone);
-  } else {
-    delete entry.deadline;
-    if (!attendance) flags.push('no submission deadline from the source yet');
+  if (!hasSubmission && !attendance) flags.push('no submission deadline from the source yet');
+  if (prevEntry.deadlines?.some((d) => d.label)) {
+    flags.push(
+      `deadline labels from ${prevEntry.id} not carried over; check the new deadlines' types and add labels where the page is more precise`,
+    );
   }
 
   let startIso = facts.startIso;

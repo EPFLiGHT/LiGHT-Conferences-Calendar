@@ -19,8 +19,9 @@ full_name:
 link:
 sub: ML | CV | NLP | DM | HCI | SEC | SE | AI | Global Health | Health AI
 
-deadline: YYYY-MM-DD HH:MM
-abstract_deadline: YYYY-MM-DD HH:MM
+deadlines:
+  - type: abstract | paper | poster | early_registration | registration | grant | ...
+    due: YYYY-MM-DD HH:MM
 
 place:
 date:

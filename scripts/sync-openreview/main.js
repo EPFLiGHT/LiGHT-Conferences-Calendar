@@ -49,16 +49,17 @@ export async function syncEdition({ api, entries, title, venue, year, today }) {
 
   const facts = buildFacts(content);
   const existing = entries.filter((e) => e.title === title && e.year === year);
-  const needsDeadline = existing.length === 0 || existing.some((e) => !editionEnded(e, today) && !e.deadline);
-  if (!facts.deadline && !facts.abstractDeadline && needsDeadline) {
-    // This due date is ICLR's abstract deadline but LoG's paper deadline, so it fills neither field.
+  const needsDeadline = existing.length === 0
+    || existing.some((e) => !editionEnded(e, today) && !e.deadlines?.some((d) => d.type === 'paper'));
+  if (facts.deadlines.length === 0 && needsDeadline) {
+    // This due date is ICLR's abstract deadline but LoG's paper deadline, so it fills neither type.
     const duedate = facts.submissionId
       ? await api.getSubmissionDuedate(facts.submissionId).catch(() => null)
       : null;
     out.flags.push(
       duedate
-        ? `${title} ${year}: OpenReview states no deadlines; its submission form closes ${DateTime.fromMillis(duedate, { zone: 'utc' }).toFormat('yyyy-MM-dd HH:mm')} UTC, which is the abstract deadline at some venues and the paper deadline at others; deadline fields left untouched`
-        : `${title} ${year}: OpenReview states no deadlines yet; deadline fields left untouched`,
+        ? `${title} ${year}: OpenReview states no deadlines; its submission form closes ${DateTime.fromMillis(duedate, { zone: 'utc' }).toFormat('yyyy-MM-dd HH:mm')} UTC, which is the abstract deadline at some venues and the paper deadline at others; deadlines left untouched`
+        : `${title} ${year}: OpenReview states no deadlines yet; deadlines left untouched`,
     );
   }
 

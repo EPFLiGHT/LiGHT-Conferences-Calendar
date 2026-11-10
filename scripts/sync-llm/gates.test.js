@@ -32,7 +32,7 @@ describe('validateEditions', () => {
     expect(editions[0].deadlines).toHaveLength(1);
   });
 
-  it('drops a date whose evidence names no submission (travel grant, registration)', () => {
+  it('drops a date whose evidence names nothing of its type (a bursary reported as a paper)', () => {
     const page = 'Important dates. 30 April 26: Gertrud Meissner application deadline.';
     const e = edition();
     e.deadlines[0].date = '2026-04-30';
@@ -40,14 +40,14 @@ describe('validateEditions', () => {
     const { editions, flags } = validateEditions(
       { page_has_dates: true, editions: [e] }, { pageText: page, today: TODAY });
     expect(editions[0].deadlines).toHaveLength(0);
-    expect(flags[0]).toMatch(/names no submission/);
+    expect(flags[0]).toMatch(/evidence names no full paper/);
   });
 
   it('keeps a submission deadline that shares its line with a grant deadline', () => {
     const page = 'Dates. 10 May 26: Abstract deadline and travel grant applications EXTENDED DATE.';
     const e = edition();
     e.deadlines[0] = {
-      kind: 'abstract', date: '2026-05-10', time: null, timezone_text: null,
+      type: 'abstract', date: '2026-05-10', time: null, timezone_text: null,
       evidence: '10 May 26: Abstract deadline and travel grant applications EXTENDED DATE',
     };
     const { editions, flags } = validateEditions(
@@ -60,7 +60,7 @@ describe('validateEditions', () => {
     const page = 'The call for abstracts will be open from July 1 to September 1, 2026.';
     const e = edition();
     e.deadlines[0] = {
-      kind: 'abstract', date: '2026-09-01', time: null, timezone_text: null,
+      type: 'abstract', date: '2026-09-01', time: null, timezone_text: null,
       evidence: 'The call for abstracts will be open from July 1 to September 1, 2026.',
     };
     const { editions } = validateEditions(
@@ -72,12 +72,12 @@ describe('validateEditions', () => {
     const page = 'Abstract Submission Deadline April 2026. Full paper submission deadline: Closed.';
     const vague = edition();
     vague.deadlines[0] = {
-      kind: 'abstract', date: '2026-04-01', time: null, timezone_text: null,
+      type: 'abstract', date: '2026-04-01', time: null, timezone_text: null,
       evidence: 'Abstract Submission Deadline April 2026',
     };
     const closed = edition();
     closed.deadlines[0] = {
-      kind: 'paper', date: '2026-04-15', time: null, timezone_text: null,
+      type: 'paper', date: '2026-04-15', time: null, timezone_text: null,
       evidence: 'Full paper submission deadline: Closed.',
     };
     const { editions, flags } = validateEditions(
@@ -91,7 +91,7 @@ describe('validateEditions', () => {
     const page = '10 May 26: Abstract deadline.';
     const e = edition();
     e.deadlines[0] = {
-      kind: 'abstract', date: '2026-05-10', time: null, timezone_text: null,
+      type: 'abstract', date: '2026-05-10', time: null, timezone_text: null,
       evidence: '10 May 26: Abstract deadline',
     };
     const { editions } = validateEditions(
@@ -103,7 +103,7 @@ describe('validateEditions', () => {
     const page = 'Paper Abstract Registration (Intention to Submit) Thursday, February 12, 2026';
     const e = edition();
     e.deadlines[0] = {
-      kind: 'abstract', date: '2026-02-12', time: null, timezone_text: null,
+      type: 'abstract', date: '2026-02-12', time: null, timezone_text: null,
       evidence: 'Paper Abstract Registration (Intention to Submit) Thursday, February 12, 2026',
     };
     const { editions } = validateEditions(
@@ -115,69 +115,70 @@ describe('validateEditions', () => {
     const page = 'October 1, 2026 Camera-ready accepted paper deadline. September 8, 2026 Notification of paper acceptance.';
     const e = edition({ year: 2026 });
     e.deadlines[0] = {
-      kind: 'paper', date: '2026-10-01', time: null, timezone_text: null,
+      type: 'paper', date: '2026-10-01', time: null, timezone_text: null,
       evidence: 'October 1, 2026 Camera-ready accepted paper deadline',
     };
     const { editions, flags } = validateEditions(
       { page_has_dates: true, editions: [e] }, { pageText: page, today: TODAY });
     expect(editions[0].deadlines).toHaveLength(0);
-    expect(flags[0]).toMatch(/names no submission/);
+    expect(flags[0]).toMatch(/names a later stage/);
   });
 
-  it('corrects the kind when the evidence contradicts the model', () => {
+  it('corrects the type when the evidence contradicts the model', () => {
     const page = '10 May 26: Abstract deadline and travel grant applications.';
     const e = edition();
     e.deadlines[0] = {
-      kind: 'paper', date: '2026-05-10', time: null, timezone_text: null,
+      type: 'paper', date: '2026-05-10', time: null, timezone_text: null,
       evidence: '10 May 26: Abstract deadline and travel grant applications',
     };
     const { editions, flags } = validateEditions(
       { page_has_dates: true, editions: [e] }, { pageText: page, today: TODAY });
-    expect(editions[0].deadlines[0].kind).toBe('abstract');
+    expect(editions[0].deadlines[0].type).toBe('abstract');
     expect(flags[0]).toMatch(/reported as paper.*reads as abstract/);
   });
 
-  it('keeps the model kinds when the evidence override would collide', () => {
+  it('reads "Paper registration" as the paper abstract beside a full paper', () => {
     const page = 'Paper registration: February 1, 2026. Full paper submission: March 1, 2026.';
     const e = edition();
     e.deadlines = [
-      { kind: 'abstract', date: '2026-02-01', time: null, timezone_text: null,
+      { type: 'abstract', date: '2026-02-01', time: null, timezone_text: null,
         evidence: 'Paper registration: February 1, 2026' },
-      { kind: 'paper', date: '2026-03-01', time: null, timezone_text: null,
+      { type: 'paper', date: '2026-03-01', time: null, timezone_text: null,
         evidence: 'Full paper submission: March 1, 2026' },
     ];
     const { editions, flags } = validateEditions(
       { page_has_dates: true, editions: [e] }, { pageText: page, today: TODAY });
-    expect(editions[0].deadlines.map((d) => d.kind)).toEqual(['abstract', 'paper']);
+    expect(editions[0].deadlines.map((d) => d.type)).toEqual(['paper_abstract', 'paper']);
     const facts = editionToFacts(editions[0], 'UTC');
-    expect(facts.abstractDeadline.toISODate()).toBe('2026-02-01');
-    expect(facts.deadline.toISODate()).toBe('2026-03-01');
-    expect(flags.some((f) => /kept its labels, check which row is which/.test(f))).toBe(true);
+    expect(facts.deadlines.map((d) => [d.type, d.due.toISODate()])).toEqual([
+      ['paper_abstract', '2026-02-01'], ['paper', '2026-03-01'],
+    ]);
+    expect(flags).toContain('2026 abstract deadline 2026-02-01: reported as abstract, but its evidence reads as paper_abstract; recorded as paper_abstract');
   });
 
-  it('never blesses the model labels silently when the evidence disagrees with both', () => {
+  it('never blesses the model labels silently when the evidence disagrees with both, then reads the abstract beside the paper as a paper abstract', () => {
     const page = 'Full paper submission 10 January 2026. Paper submission 20 January 2026.';
     const e = edition();
     e.deadlines = [
-      { kind: 'abstract', date: '2026-01-10', time: null, timezone_text: null,
+      { type: 'abstract', date: '2026-01-10', time: null, timezone_text: null,
         evidence: 'Full paper submission 10 January 2026' },
-      { kind: 'paper', date: '2026-01-20', time: null, timezone_text: null,
+      { type: 'paper', date: '2026-01-20', time: null, timezone_text: null,
         evidence: 'Paper submission 20 January 2026' },
     ];
     const { editions, flags } = validateEditions(
       { page_has_dates: true, editions: [e] },
       { pageText: page, today: DateTime.fromISO('2025-12-01T00:00:00Z', { zone: 'utc' }) });
-    expect(editions[0].deadlines.map((d) => d.kind)).toEqual(['abstract', 'paper']);
-    expect(flags.some((f) => /evidence for every deadline reads as "paper"/.test(f))).toBe(true);
+    expect(editions[0].deadlines.map((d) => d.type)).toEqual(['paper_abstract', 'paper']);
+    expect(flags).toContain('2026: the evidence reads as "paper" for the abstract and paper deadlines; kept the model\'s types, check which row is which');
   });
 
-  it('drops a second deadline of the same kind rather than letting it be lost silently', () => {
+  it('drops a second deadline of the same type rather than letting it be lost silently', () => {
     const page = 'Paper deadline: September 15, 2026. Paper deadline: September 20, 2026.';
     const e = edition();
     e.deadlines = [
-      { kind: 'paper', date: '2026-09-15', time: null, timezone_text: null,
+      { type: 'paper', date: '2026-09-15', time: null, timezone_text: null,
         evidence: 'Paper deadline: September 15, 2026' },
-      { kind: 'paper', date: '2026-09-20', time: null, timezone_text: null,
+      { type: 'paper', date: '2026-09-20', time: null, timezone_text: null,
         evidence: 'Paper deadline: September 20, 2026' },
     ];
     const { editions, flags } = validateEditions(
@@ -195,7 +196,7 @@ describe('validateEditions', () => {
     ['2026-09-05', 'A separate 5 2026 paper track is planned'],
   ])('does not let an English word stand in for the month of %s', (date, evidence) => {
     const e = edition({ start_date: null });
-    e.deadlines[0] = { kind: 'paper', date, time: null, timezone_text: null, evidence };
+    e.deadlines[0] = { type: 'paper', date, time: null, timezone_text: null, evidence };
     const { editions, flags } = validateEditions(
       { page_has_dates: true, editions: [e] }, { pageText: evidence, today: TODAY });
     expect(editions[0].deadlines).toHaveLength(0);
@@ -206,7 +207,7 @@ describe('validateEditions', () => {
     const page = 'Paper deadline March 15 Room 26';
     const e = edition();
     e.deadlines[0] = {
-      kind: 'paper', date: '2026-03-15', time: null, timezone_text: null,
+      type: 'paper', date: '2026-03-15', time: null, timezone_text: null,
       evidence: 'Paper deadline March 15 Room 26',
     };
     const { editions, flags } = validateEditions(
@@ -219,7 +220,7 @@ describe('validateEditions', () => {
     const page = 'Papers due in November 2026 (see item 1).';
     const e = edition();
     e.deadlines[0] = {
-      kind: 'paper', date: '2026-11-01', time: null, timezone_text: null,
+      type: 'paper', date: '2026-11-01', time: null, timezone_text: null,
       evidence: 'Papers due in November 2026 (see item 1)',
     };
     const { editions, flags } = validateEditions(
@@ -247,13 +248,13 @@ describe('validateEditions', () => {
     expect(flags.some((f) => /not a real YYYY-MM-DD date/.test(f))).toBe(true);
   });
 
-  it('keeps the model kind when the evidence names both', () => {
+  it('keeps the model type when the evidence names both', () => {
     const page = 'Abstract and paper submission deadline: September 15, 2026.';
     const e = edition();
     e.deadlines[0].evidence = 'Abstract and paper submission deadline: September 15, 2026';
     const { editions } = validateEditions(
       { page_has_dates: true, editions: [e] }, { pageText: page, today: TODAY });
-    expect(editions[0].deadlines[0].kind).toBe('paper');
+    expect(editions[0].deadlines[0].type).toBe('paper');
   });
 
   it('drops implausible deadline dates even when the page states them', () => {
@@ -302,6 +303,94 @@ describe('validateEditions', () => {
   });
 });
 
+describe('validateEditions deadline types', () => {
+  const typesKept = (deadlines, page = deadlines.map((d) => d.evidence).join('\n')) =>
+    validateEditions({ editions: [edition({ deadlines })] }, { pageText: page, today: TODAY }).editions[0].deadlines.map((d) => d.type);
+
+  it('keeps registration, presenter and grant deadlines whose quotes say so', () => {
+    expect(typesKept([
+      deadline({ type: 'early_registration', date: '2026-10-14', evidence: 'Early bird registration deadline: 14 October 2026' }),
+      deadline({ type: 'presenter_registration', date: '2026-10-30', evidence: 'Registration deadline for poster presenters: 30 October 2026' }),
+      deadline({ type: 'grant', date: '2026-08-01', evidence: 'Scholarship applications close 1 August 2026' }),
+    ])).toEqual(['early_registration', 'presenter_registration', 'grant']);
+  });
+
+  it('drops a grant whose quote names no grant', () => {
+    const { editions, flags } = validateEditions(
+      { editions: [edition({ deadlines: [deadline({ type: 'grant', date: '2026-08-01', evidence: 'Important: 1 August 2026' })] })] },
+      { pageText: 'Important: 1 August 2026', today: TODAY });
+    expect(editions[0].deadlines).toEqual([]);
+    expect(flags).toEqual(['2026 grant deadline 2026-08-01: evidence names no scholarship or travel grant; dropped ("Important: 1 August 2026")']);
+  });
+
+  it('reads "Abstract registration" as a paper abstract and a workshop proposal as a proposal', () => {
+    expect(typesKept([deadline({ type: 'registration', date: '2026-09-01', evidence: 'Abstract registration: 1 September 2026' })])).toEqual(['paper_abstract']);
+    expect(typesKept([deadline({ type: 'paper', date: '2026-09-10', evidence: 'Workshop proposals due 10 September 2026' })])).toEqual(['proposal']);
+  });
+
+  it('turns an abstract beside a full paper into a paper abstract', () => {
+    expect(typesKept([
+      deadline({ type: 'abstract', date: '2026-09-01', evidence: 'Abstract deadline: 1 September 2026' }),
+      deadline({ type: 'paper', date: '2026-09-08', evidence: 'Full paper deadline: 8 September 2026' }),
+    ])).toEqual(['paper_abstract', 'paper']);
+  });
+
+  it('keeps a poster deadline whose quote only says submission', () => {
+    expect(typesKept([deadline({ type: 'poster', date: '2026-09-15', evidence: 'Submission deadline: 15 September 2026' })])).toEqual(['poster']);
+  });
+
+  it('reads "Late-breaker" and satellite sessions, as the Union World Conference writes them', () => {
+    expect(typesKept([
+      deadline({ type: 'late_breaking', date: '2026-07-22', evidence: '22-July-26 Late-breaker abstract submissions close' }),
+      deadline({ type: 'proposal', date: '2026-08-03', evidence: '3-Aug-26 Satellite (Round 2) submissions close' }),
+    ])).toEqual(['late_breaking', 'proposal']);
+  });
+
+  it('accepts a year-less quote when the page gives that day with its year, as AIME does', () => {
+    const page = 'Type | Early Bird (until October 10) | Late/ On-Site | At least one author must register by October 10th, 2026. Submit grants by SEPTEMBER 30th.';
+    const { editions, flags } = validateEditions({ editions: [edition({ deadlines: [
+      deadline({ type: 'early_registration', date: '2026-10-10', evidence: 'Type | Early Bird (until October 10) | Late/ On-Site |' }),
+      deadline({ type: 'grant', date: '2026-09-30', evidence: 'Submit grants by SEPTEMBER 30th.' }),
+    ] })] }, { pageText: page, today: TODAY });
+    expect(editions[0].deadlines.map((d) => d.type)).toEqual(['early_registration']);
+    expect(flags).toEqual(['2026 grant deadline 2026-09-30: the page does not state this date; dropped ("Submit grants by SEPTEMBER 30th.")']);
+  });
+
+  it('drops a year-less quote when the page gives that day only with another year', () => {
+    const page = 'Early Bird (until October 10). Authors must register by October 10th, 2025.';
+    expect(typesKept([deadline({ type: 'early_registration', date: '2026-10-10', evidence: 'Early Bird (until October 10)' })], page)).toEqual([]);
+  });
+
+  it('never turns a grant into a proposal', () => {
+    expect(typesKept([deadline({ type: 'grant', date: '2026-08-01', evidence: 'Travel grant proposals due 1 August 2026' })])).toEqual(['grant']);
+  });
+
+  it('keeps an abstract due after the paper as an abstract, not the paper\'s abstract', () => {
+    expect(typesKept([
+      deadline({ type: 'paper', date: '2026-08-03', evidence: 'Full paper deadline: 3 August 2026' }),
+      deadline({ type: 'abstract', date: '2026-12-01', evidence: 'Abstract deadline: 1 December 2026' }),
+    ])).toEqual(['paper', 'abstract']);
+  });
+
+  it('keeps registration closing during the event, but not a paper due then', () => {
+    const page = 'Conference: November 10-12, 2026. Registration closes 12 November 2026. Paper deadline: 11 November 2026.';
+    const e = edition({ start_date: '2026-11-10', end_date: '2026-11-12', dates_evidence: 'Conference: November 10-12, 2026', deadlines: [
+      deadline({ type: 'registration', date: '2026-11-12', evidence: 'Registration closes 12 November 2026' }),
+      deadline({ type: 'paper', date: '2026-11-11', evidence: 'Paper deadline: 11 November 2026' }),
+    ] });
+    const { editions, flags } = validateEditions({ editions: [e] }, { pageText: page, today: TODAY });
+    expect(editions[0].deadlines.map((x) => x.type)).toEqual(['registration']);
+    expect(flags).toEqual(['2026 paper deadline 2026-11-11: after the conference start 2026-11-10; dropped']);
+  });
+
+  it('keeps a late-breaking abstract and drops a registration whose quote names none', () => {
+    expect(typesKept([
+      deadline({ type: 'late_breaking', date: '2026-09-20', evidence: 'Late-breaking abstracts: 20 September 2026' }),
+      deadline({ type: 'registration', date: '2026-09-25', evidence: 'Hotel booking closes 25 September 2026' }),
+    ])).toEqual(['late_breaking']);
+  });
+});
+
 describe('validateEditions date-evidence hardening', () => {
   it('rejects a date assembled from adjacent digit runs and a stray year', () => {
     // '151' must not vouch for day 15 month 1, however submission-flavored
@@ -309,7 +398,7 @@ describe('validateEditions date-evidence hardening', () => {
     const evidence = 'Submit papers, Hall 151, program 2026';
     const result = validateEditions(
       { editions: [{ year: 2026, start_date: null, deadlines: [
-        { kind: 'paper', date: '2026-01-15', time: null, timezone_text: null, evidence }] }] },
+        { type: 'paper', date: '2026-01-15', time: null, timezone_text: null, evidence }] }] },
       { pageText: evidence, today: TODAY },
     );
     expect(result.editions[0].deadlines).toHaveLength(0);
@@ -320,7 +409,7 @@ describe('validateEditions date-evidence hardening', () => {
     const evidence = 'Submit papers by 15/09/2026';
     const result = validateEditions(
       { editions: [{ year: 2026, start_date: null, deadlines: [
-        { kind: 'paper', date: '2026-09-15', time: null, timezone_text: null, evidence }] }] },
+        { type: 'paper', date: '2026-09-15', time: null, timezone_text: null, evidence }] }] },
       { pageText: evidence, today: TODAY },
     );
     expect(result.editions[0].deadlines).toHaveLength(1);
@@ -346,7 +435,7 @@ const EMBC_PAGE = [
 
 const embcEdition = (deadlines) => edition({
   year: 2027,
-  deadlines: deadlines.map(([kind, date, evidence]) => deadline({ kind, date, evidence })),
+  deadlines: deadlines.map(([type, date, evidence]) => deadline({ type, date, evidence })),
 });
 
 describe('validateEditions table cells', () => {
@@ -366,12 +455,12 @@ describe('validateEditions table cells', () => {
     expect(flags).toEqual([]);
   });
 
-  it('drops workshop and tutorial proposals, which are not paper or abstract deadlines', () => {
+  it('keeps a workshop proposal as a proposal now that proposals are tracked', () => {
     const { editions, flags } = validateEditions(
       { editions: [embcEdition([['abstract', '2027-01-24', 'Proposals (Workshops/Mini Symposium) | 24 January 2027 Submission Deadline']])] },
       { pageText: EMBC_PAGE, today: TODAY });
-    expect(editions[0].deadlines).toHaveLength(0);
-    expect(flags[0]).toMatch(/names no submission/);
+    expect(editions[0].deadlines.map((d) => d.type)).toEqual(['proposal']);
+    expect(flags[0]).toMatch(/reported as abstract, but its evidence reads as proposal/);
   });
 });
 

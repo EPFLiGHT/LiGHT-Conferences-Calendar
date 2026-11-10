@@ -27,7 +27,7 @@ describe('interactions', () => {
     vi.spyOn(console, 'log').mockImplementation(() => {});
     viewsPublish.mockReset().mockResolvedValue({ ok: true });
     await storeTeamToken('T1', 'xoxb-t1');
-    await fakeKv.set(kvKeys.cache.conferences, [conference({ deadline: '2099-01-15 23:59' })]);
+    await fakeKv.set(kvKeys.cache.conferences, [conference({ deadlines: [{ type: 'paper', due: '2099-01-15 23:59' }] })]);
   });
 
   afterEach(() => {

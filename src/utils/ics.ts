@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon';
 import type { Conference } from '@/types/conference';
+import { DEADLINE_GROUP_LABELS } from '@/constants/deadlineTypes';
 import { getDeadlineInfo } from './parser';
 
 interface ICSEvent {
@@ -70,12 +71,6 @@ export function downloadICS(content: string, filename: string): void {
   URL.revokeObjectURL(link.href);
 }
 
-// Imported calendars key events by UID and show these titles, so neither may change.
-const DEADLINE_EVENTS = {
-  abstract: { uid: 'abstract', title: 'Abstract Deadline', description: 'Abstract submission deadline' },
-  paper: { uid: 'deadline', title: 'Paper Deadline', description: 'Paper submission deadline' },
-} as const;
-
 export function conferenceToICSEvents(conference: Conference): ICSEvent[] {
   const events: ICSEvent[] = [];
 
@@ -96,15 +91,15 @@ export function conferenceToICSEvents(conference: Conference): ICSEvent[] {
     }
   }
 
+  // Imported calendars key events by UID, so a deadline's key must not change; titles may.
   for (const deadline of getDeadlineInfo(conference)) {
-    const { uid, title, description } = DEADLINE_EVENTS[deadline.kind];
     events.push({
-      uid: `${uid}-${conference.id}@conference-deadlines`,
-      title: `${title}: ${conference.title} ${conference.year}`,
+      uid: `${deadline.key}-${conference.id}@conference-deadlines`,
+      title: `${deadline.label}: ${conference.title} ${conference.year}`,
       start: deadline.datetime,
       end: deadline.datetime.plus({ hours: 1 }),
       isAllDay: false,
-      description: `${description} for ${conference.full_name}`,
+      description: `${DEADLINE_GROUP_LABELS[deadline.group]} deadline for ${conference.full_name}: ${deadline.label}`,
       url: conference.link,
     });
   }

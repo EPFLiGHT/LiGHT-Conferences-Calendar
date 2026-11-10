@@ -6,9 +6,18 @@ import {
   cardList,
   formatDeadlineUrgency,
   formatEventCountdown,
+  groupDeadlineItems,
   type ConferenceCardItem,
 } from './cards';
-import { conference, deadlineItem, sectionText } from '@/slack-bot/testing/fixtures';
+import { URGENCY_EMOJIS } from '../../config/constants';
+import type { DeadlineType } from '@/constants/deadlineTypes';
+import {
+  conference,
+  deadlineCard,
+  deadlineInfo as info,
+  sectionText,
+  typedDeadlineItem as item,
+} from '@/slack-bot/testing/fixtures';
 
 function buttons(blocks: any[]): any[] {
   return blocks.find((b) => b.type === 'actions')?.elements ?? [];
@@ -18,13 +27,18 @@ describe('buildConferenceCard: deadline', () => {
   const item: ConferenceCardItem = {
     kind: 'deadline',
     conference: conference(),
-    deadline: {
-      kind: 'paper',
-      label: 'Paper deadline',
-      datetime: DateTime.fromISO('2026-03-01T23:59:00', { zone: 'UTC-12' }),
-      localDatetime: DateTime.fromISO('2026-03-02T11:59:00', { zone: 'UTC' }),
-    },
-    daysLeft: 1,
+    deadlines: [{
+      deadline: {
+        key: 'deadline',
+        type: 'paper',
+        group: 'submission',
+        label: 'Full paper',
+        shortLabel: 'Paper',
+        datetime: DateTime.fromISO('2026-03-01T23:59:00', { zone: 'UTC-12' }),
+        localDatetime: DateTime.fromISO('2026-03-02T11:59:00', { zone: 'UTC' }),
+      },
+      daysLeft: 1,
+    }],
   };
 
   beforeEach(() => {
@@ -65,6 +79,45 @@ describe('buildConferenceCard: deadline', () => {
   });
 });
 
+describe('deadline cards with several deadlines', () => {
+  const ghf = conference({ id: 'ghf26', title: 'GHF', timezone: 'UTC-12' });
+  const a = conference({ id: 'a26', title: 'A' });
+  const b = conference({ id: 'b26', title: 'B' });
+  const ghfWith = (...deadlines: Array<[DeadlineType, string]>) =>
+    conference({ id: 'ghf26', title: 'GHF', timezone: 'UTC-12', deadlines: deadlines.map(([type, due]) => ({ type, due })) });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('lists each deadline on its own line with its group emoji', () => {
+    const text = sectionText(buildConferenceCard({ kind: 'deadline', conference: ghf, deadlines: [
+      { deadline: info('poster', '2026-09-15 23:59'), daysLeft: 3 },
+      { deadline: info('early_registration', '2026-10-14 23:59'), daysLeft: 32 },
+    ] }));
+    expect(text).toContain('📝 Poster abstract: *Sep 15, 2026* (UTC-12) · ⏰ 3 days left');
+    expect(text).toContain('🎫 Early-bird registration: *Oct 14, 2026* (UTC-12) · ⏰ 1 month left');
+    expect(text.startsWith(URGENCY_EMOJIS.critical)).toBe(true);
+  });
+
+  it('groups deadlines by event in first-appearance order', () => {
+    const grouped = groupDeadlineItems([item(a, 'poster', 3), item(b, 'paper', 7), item(a, 'grant', 30)]);
+    expect(grouped.map((g) => [g.conference.id, g.deadlines.map((d) => d.deadline.type)])).toEqual([
+      ['a26', ['poster', 'grant']], ['b26', ['paper']],
+    ]);
+  });
+
+  it('/conf-info lists every upcoming deadline, else the latest passed one', () => {
+    vi.useFakeTimers({ now: new Date('2026-10-01T00:00:00Z') });
+    const upcoming = JSON.stringify(buildConferenceDetails(ghfWith(['poster', '2026-09-15 23:59'], ['early_registration', '2026-10-14 23:59'], ['presenter_registration', '2026-10-30 23:59'])).blocks);
+    expect(upcoming).toContain('Early-bird registration');
+    expect(upcoming).toContain('Presenter registration');
+    expect(upcoming).not.toContain('Poster abstract');
+    vi.setSystemTime(new Date('2026-12-01T00:00:00Z'));
+    expect(JSON.stringify(buildConferenceDetails(ghfWith(['poster', '2026-09-15 23:59'])).blocks)).toContain('Expired');
+  });
+});
+
 describe('buildConferenceCard: event', () => {
   it('renders place, date-only start, countdown, and unknown-subject fallback', () => {
     const t = sectionText(
@@ -84,7 +137,7 @@ describe('buildConferenceCard: event', () => {
 
 describe('cardList', () => {
   it('separates cards with dividers', () => {
-    const items = ['a', 'b', 'c'].map((id) => ({ kind: 'deadline' as const, ...deadlineItem(id, 3) }));
+    const items = ['a', 'b', 'c'].map((id) => deadlineCard(id, 3));
     const types = cardList(items).map((b) => b.type);
     expect(types).toEqual(['section', 'actions', 'divider', 'section', 'actions', 'divider', 'section', 'actions']);
   });
@@ -100,7 +153,7 @@ describe('buildConferenceDetails', () => {
   });
 
   it('shows the card plus full name, place and note', () => {
-    const msg = buildConferenceDetails(conference({ deadline: '2026-03-01 12:00', note: 'Hybrid' }));
+    const msg = buildConferenceDetails(conference({ deadlines: [{ type: 'paper', due: '2026-03-01 12:00' }], note: 'Hybrid' }));
     const all = JSON.stringify(msg.blocks);
     expect(all).toContain('Mar 1, 2026');
     expect(all).toContain('Privacy Enhancing Technologies Symposium');

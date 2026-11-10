@@ -14,7 +14,10 @@
   },
   "AIME": {
     "url": "https://aime27.aimedicine.info/call-for-papers/",
-    "home": "https://aime27.aimedicine.info/"
+    "home": "https://aime27.aimedicine.info/",
+    "pages": [
+      "https://aime27.aimedicine.info/registration/"
+    ]
   },
   "IEEE EMBC": {
     "url": "https://embc.embs.org/2027/important-dates",

@@ -16,7 +16,9 @@
   id: safeml25
   full_name: "International Workshop on Secure, Accountable, and Verifiable Machine Learning"
   link: "https://conf.researchr.org/home/icst-2025/safe-ml-2025"
-  deadline: "2025-01-17 23:59"
+  deadlines:
+    - type: paper
+      due: "2025-01-17 23:59"
   timezone: "UTC-12"
   place: "Naples, Italy"
   date: "April 1, 2025"
@@ -31,7 +33,9 @@
   id: lastx26
   full_name: "Workshop on LLM Assisted Security and Trust Exploration"
   link: "https://www.ndss-symposium.org/ndss2026/co-located-events/last-x/"
-  deadline: "2025-12-10 23:59"
+  deadlines:
+    - type: paper
+      due: "2025-12-10 23:59"
   timezone: "UTC-8"
   place: "San Diego, California, USA"
   date: "February 27, 2026"
@@ -46,7 +50,9 @@
   id: sci25
   full_name: "6th ACNS Workshop on Secure Cryptographic Implementation"
   link: "https://acns-sci.github.io/"
-  deadline: "2025-03-22 23:59"
+  deadlines:
+    - type: paper
+      due: "2025-03-22 23:59"
   timezone: "UTC-12"
   place: "Munich, Germany"
   date: "June 25, 2025"
@@ -60,7 +66,9 @@
   id: artman25
   full_name: "Workshop on Recent Advances in Resilient and Trustworthy MAchine learning-driveN system"
   link: "https://artman-workshop.gitlab.io/"
-  deadline: "2025-07-03 23:59"
+  deadlines:
+    - type: paper
+      due: "2025-07-03 23:59"
   timezone: "UTC-12"
   place: "Taipei, Taiwan"
   date: "October 13, 2025"
@@ -87,7 +95,9 @@
   id: dpm25
   full_name: "20th Data Privacy Management International Workshop"
   link: "https://deic.uab.cat/dpm/dpm2025/"
-  deadline: "2025-06-30 23:59"
+  deadlines:
+    - type: paper
+      due: "2025-06-30 23:59"
   timezone: "UTC-12"
   place: "Toulouse, France"
   date: "September 25, 2025"
@@ -101,7 +111,9 @@
   id: haips25
   full_name: "1st Workshop on Human-Centered AI Privacy and Security"
   link: "https://haips.com/"
-  deadline: "2025-06-20 23:59"
+  deadlines:
+    - type: paper
+      due: "2025-06-20 23:59"
   timezone: "UTC"
   place: "Taipei, Taiwan"
   date: "October 17, 2025"
@@ -115,7 +127,9 @@
   id: menaml26
   full_name: "The Middle East and North Africa Machine Learning (MenaML) Winter School"
   link: "https://www.mena.ml/"
-  deadline: "2025-09-18 23:59"
+  deadlines:
+    - type: paper
+      due: "2025-09-18 23:59"
   timezone: "UTC"
   place: "KAUST, Saudi Arabia"
   date: "January 24-29, 2026"
@@ -168,7 +182,10 @@
   id: pairs27
   full_name: "Participatory AI Research & Practice Symposium"
   link: "https://pairs.site/2027/"
-  deadline: "2026-12-15 23:59"
+  deadlines:
+    - type: abstract
+      label: Extended abstract
+      due: "2026-12-15 23:59"
   timezone: "Europe/Zurich"
   place: "Geneva, Switzerland"
   date: "June 19, 2027"

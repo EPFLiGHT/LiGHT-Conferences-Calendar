@@ -2,6 +2,7 @@
  * Renders a sync run's outcome as markdown. The output is printed to the
  * console and becomes the body of the automated pull request.
  */
+import { changeFieldName } from './deadlines.js';
 
 const OUTCOME_KEYS = ['updates', 'drafts', 'flags', 'skipped'];
 
@@ -26,7 +27,8 @@ export function addOutcome(into, from) {
  * @param {object} run The accumulated run outcome.
  * @param {string} run.title Report heading; each sync passes its own.
  * @param {Array<{id: string, field: string, old: string|null, new: string}>} [run.updates]
- *   Field-level changes applied to existing entries.
+ *   Field-level changes applied to existing entries; a deadline row also
+ *   carries its item's type and label, which the Field column shows.
  * @param {Array<{id: string, title: string, year: number}>} [run.drafts]
  *   Newly drafted editions.
  * @param {string[]} [run.flags] Items needing human attention (pinned or
@@ -42,7 +44,7 @@ export function renderReport({ title, updates = [], drafts = [], flags = [], ski
   if (updates.length > 0) {
     lines.push('### Updated entries', '', '| Entry | Field | Old | New |', '|---|---|---|---|');
     for (const c of updates) {
-      lines.push(`| ${c.id} | ${c.field} | ${c.old ?? ''} | ${c.new} |`);
+      lines.push(`| ${c.id} | ${changeFieldName(c)} | ${c.old ?? ''} | ${c.new} |`);
     }
     lines.push('');
   }

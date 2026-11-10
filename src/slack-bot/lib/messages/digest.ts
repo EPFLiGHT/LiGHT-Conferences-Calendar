@@ -3,10 +3,11 @@
 import type { KnownBlock } from '@slack/web-api';
 import type { BlockKitMessage } from '@/types/slack';
 import { NOTIFICATION_CONFIG } from '../../config/constants';
-import { cardList, type ConferenceCardItem, type DeadlineItem, type EventStartItem } from './cards';
+import { cardList, groupDeadlineItems, type ConferenceCardItem, type DeadlineItem, type EventStartItem } from './cards';
 import { context, divider, header, plural, section } from './blocks';
 
 export interface DigestStyle {
+  /** Notification text, and the header when nothing is coming up. */
   title: string;
   footer: string;
 }
@@ -42,23 +43,30 @@ export function buildDigest(params: DigestParams): BlockKitMessage {
 
 function renderDigest(params: DigestParams, maxItems: number): BlockKitMessage {
   const { title, footer, deadlines, eventStarts, date } = params;
+  const dateLine = context(formatDigestDate(date));
 
-  const digestSection = (heading: string, items: ConferenceCardItem[]): KnownBlock[] => [
-    section(heading),
+  // Each section opens with its own header; the date sits under the first one.
+  const digestSection = (heading: string, items: ConferenceCardItem[], first: boolean): KnownBlock[] => [
+    header(heading),
+    ...(first ? [dateLine, divider] : []),
     ...cardList(items.slice(0, maxItems)),
     ...(items.length > maxItems
       ? [context(`_+ ${items.length - maxItems} more. Type \`/conf-upcoming\` to see them all_`)]
       : []),
   ];
 
-  const parts: KnownBlock[][] = [];
+  const sections: Array<[string, ConferenceCardItem[]]> = [];
   if (deadlines.length > 0) {
-    parts.push(digestSection('*⏳ Deadlines approaching*', deadlines.map((d) => ({ kind: 'deadline' as const, ...d }))));
+    // Cards (one per event) are capped; the summary below still counts deadlines.
+    sections.push(['⏳ Deadlines approaching', groupDeadlineItems(deadlines).map((card) => ({ kind: 'deadline' as const, ...card }))]);
   }
   if (eventStarts.length > 0) {
-    parts.push(digestSection('*🎟️ Starting soon*', eventStarts.map((e) => ({ kind: 'event' as const, ...e }))));
+    sections.push(['🎟️ Starting soon', eventStarts.map((e) => ({ kind: 'event' as const, ...e }))]);
   }
-  if (parts.length === 0) parts.push([section('✨ Nothing coming up right now. Check back later!')]);
+  const body: KnownBlock[] =
+    sections.length > 0
+      ? sections.flatMap(([heading, items], i) => [...(i === 0 ? [] : [divider]), ...digestSection(heading, items, i === 0)])
+      : [header(title), dateLine, divider, section('✨ Nothing coming up right now. Check back later!')];
 
   const summary = [
     deadlines.length > 0 && plural(deadlines.length, 'deadline'),
@@ -66,14 +74,7 @@ function renderDigest(params: DigestParams, maxItems: number): BlockKitMessage {
   ].filter(Boolean);
 
   return {
-    blocks: [
-      header(title),
-      context(formatDigestDate(date)),
-      divider,
-      ...parts.flatMap((blocks, i) => (i === 0 ? blocks : [divider, ...blocks])),
-      divider,
-      context(footer),
-    ],
+    blocks: [...body, divider, context(footer)],
     text: summary.length > 0 ? `${title}: ${summary.join(' • ')}` : title,
   };
 }

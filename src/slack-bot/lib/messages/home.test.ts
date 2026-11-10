@@ -40,7 +40,7 @@ describe('buildHomeView', () => {
       buildHomeView({ prefs: prefs(false), deadlines: [deadlineItem('pets', 3)], eventStarts: [eventItem('chil', 9)] })
         .blocks
     );
-    expect(text).toContain('🔴 *<https://petsymposium.org|PETS 2026>*  Paper deadline · Mar 1 · 3 days left');
+    expect(text).toContain('🔴 *<https://petsymposium.org|PETS 2026>*  Full paper · Mar 1 · 3 days left');
     expect(text).toContain('• *<https://petsymposium.org|CHIL 2026>*  Verona, Italy · Jun 22 · in 1 week');
   });
 

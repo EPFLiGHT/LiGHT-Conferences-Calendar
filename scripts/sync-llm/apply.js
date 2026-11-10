@@ -9,9 +9,10 @@
 import { DateTime } from 'luxon';
 import { applyEdition, previousEdition } from '../sync-shared/apply.js';
 import { namesYear, rollUrl } from '../sync-shared/dates.js';
+import { changeFieldName, deadlineName } from '../sync-shared/deadlines.js';
+import { DEADLINE_TYPES } from '../../src/constants/deadlineTypes.data.js';
 import { editionToFacts } from './facts.js';
 
-const DEADLINE_KINDS = { abstract_deadline: 'abstract', deadline: 'paper' };
 const DATE_FIELDS = ['start', 'end'];
 
 /**
@@ -29,17 +30,18 @@ function dropDeadlinesAfterStart(facts, entry) {
   // In the entry's own zone: a deadline late on the start day is still valid.
   const start = DateTime.fromISO(entry.start, { zone: entry.timezone ?? 'utc' });
   if (!start.isValid) return [];
+  const end = entry.end ? DateTime.fromISO(entry.end, { zone: entry.timezone ?? 'utc' }) : null;
   const flags = [];
-  for (const [key, field] of [['deadline', 'deadline'], ['abstractDeadline', 'abstract_deadline']]) {
-    const dt = facts[key];
-    if (dt && dt > start.endOf('day')) {
-      const shown = dt.setZone(entry.timezone ?? 'utc').toISODate();
-      flags.push(
-        `${entry.id}: ${field} ${shown} is after the conference start ${entry.start}; it belongs to a later edition, dropped`,
-      );
-      facts[key] = null;
-    }
-  }
+  facts.deadlines = facts.deadlines.filter(({ type, due }) => {
+    // Registration may stay open until the event's last day.
+    const last = DEADLINE_TYPES[type]?.group === 'registration' && end?.isValid ? end : start;
+    if (due <= last.endOf('day')) return true;
+    const shown = due.setZone(entry.timezone ?? 'utc').toISODate();
+    flags.push(
+      `${entry.id}: ${type} deadline ${shown} is after the conference start ${entry.start}; it belongs to a later edition, dropped`,
+    );
+    return false;
+  });
   return flags;
 }
 
@@ -53,7 +55,7 @@ function dropDeadlinesAfterStart(facts, entry) {
  * @returns {string[]} One flag when deadlines were applied without that check.
  */
 function flagUncheckedAgainstStart(facts, id) {
-  if (!facts.deadline && !facts.abstractDeadline) return [];
+  if (facts.deadlines.length === 0) return [];
   return [
     `${id}: no conference start date on the page or in the YAML, so the deadlines could not be checked against it; verify they belong to this edition and not the next`,
   ];
@@ -117,20 +119,22 @@ export function applyEditions({ entries, title, editions, multiEntry = false, so
     out.drafts.push(...applied.drafts);
     out.flags.push(...applied.flags);
 
-    const written = applied.updates.map(({ id, field }) => ({ id, field }));
-    if (applied.drafted) {
-      for (const field of [...Object.keys(DEADLINE_KINDS), ...DATE_FIELDS]) {
-        if (applied.drafted[field] !== undefined) written.push({ id: applied.drafted.id, field });
-      }
+    // A deadline's quote is the source's own row for it, from the page it came from.
+    const deadlineRow = (id, field, reported) => {
+      const d = edition.deadlines.find((x) => x.type === reported);
+      out.evidence.push({ id, field, quote: d?.evidence ?? '', url: d?.source ?? sourceUrl });
+    };
+    const dateRow = (id, field) => {
+      if (edition.dates_evidence) out.evidence.push({ id, field, quote: edition.dates_evidence, url: sourceUrl });
+    };
+    for (const change of applied.updates) {
+      if (change.field === 'deadlines') deadlineRow(change.id, changeFieldName(change), change.reported);
+      else if (DATE_FIELDS.includes(change.field)) dateRow(change.id, change.field);
     }
-    for (const { id, field } of written) {
-      const kind = DEADLINE_KINDS[field];
-      if (kind) {
-        const quote = edition.deadlines.find((d) => d.kind === kind)?.evidence ?? '';
-        out.evidence.push({ id, field, quote, url: sourceUrl });
-      } else if (DATE_FIELDS.includes(field) && edition.dates_evidence) {
-        out.evidence.push({ id, field, quote: edition.dates_evidence, url: sourceUrl });
-      }
+    if (applied.drafted) {
+      const { id } = applied.drafted;
+      for (const item of applied.drafted.deadlines ?? []) deadlineRow(id, deadlineName(item), item.type);
+      for (const field of DATE_FIELDS) if (applied.drafted[field] !== undefined) dateRow(id, field);
     }
   }
   return out;

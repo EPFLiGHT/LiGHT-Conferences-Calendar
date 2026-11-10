@@ -18,8 +18,7 @@ const PLACEHOLDER_RE = /^(tbd|tba)$/i;
  *   endIso: null,
  *   link: string|null,
  *   submissionId: string|null,
- *   abstractDeadline: DateTime|null,
- *   deadline: DateTime|null,
+ *   deadlines: Array<{type: 'paper_abstract'|'paper', due: DateTime}>,
  * }} Missing, non-string, empty or placeholder ("TBD"/"TBA") values come back
  *   as null. OpenReview never states an end date, so endIso is always null;
  *   link is the edition's website.
@@ -29,7 +28,6 @@ export function buildFacts(content) {
     const v = content?.[key]?.value;
     return typeof v === 'string' ? v.trim() : '';
   };
-  const dates = parseVenueDateString(value('date'));
   const location = value('location');
   return {
     fullName: value('title') || null,
@@ -38,7 +36,6 @@ export function buildFacts(content) {
     endIso: null,
     link: value('website') || null,
     submissionId: value('submission_id') || null,
-    abstractDeadline: dates.abstractDeadline || null,
-    deadline: dates.deadline || null,
+    deadlines: parseVenueDateString(value('date')),
   };
 }

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { DateTime } from 'luxon';
 import { updateEntry, draftEntry } from './merge.js';
+import { changeFieldName } from './deadlines.js';
 import { SYNC_PINNABLE_FIELDS } from '../../src/utils/conferenceSchema.js';
 
 // The facts a source hands in, using the values scripts/sync-openreview
@@ -10,10 +11,18 @@ function neuripsFacts() {
     fullName: 'The Fortieth Annual Conference on Neural Information Processing Systems',
     location: 'Sydney, Australia',
     startIso: '2026-12-06',
-    abstractDeadline: DateTime.fromISO('2026-05-05T11:59:00Z', { zone: 'utc' }),
-    deadline: DateTime.fromISO('2026-05-07T11:59:00Z', { zone: 'utc' }),
+    deadlines: [
+      { type: 'paper_abstract', due: DateTime.fromISO('2026-05-05T11:59:00Z', { zone: 'utc' }) },
+      { type: 'paper', due: DateTime.fromISO('2026-05-07T11:59:00Z', { zone: 'utc' }) },
+    ],
   };
 }
+
+const due = (entry, type) => entry.deadlines?.find((d) => d.type === type)?.due;
+const withPaperPin = (paperDue) => ({
+  ...sydneyEntry(),
+  deadlines: [{ type: 'paper_abstract', due: '2026-05-04 23:59' }, { type: 'paper', due: paperDue, pin: true }],
+});
 
 function sydneyEntry() {
   return {
@@ -22,8 +31,7 @@ function sydneyEntry() {
     id: 'neuripssy26',
     full_name: '40th Annual Conference on Neural Information Processing Systems',
     link: 'https://neurips.cc/',
-    abstract_deadline: '2026-05-04 23:59',
-    deadline: '2026-05-06 23:59',
+    deadlines: [{ type: 'paper_abstract', due: '2026-05-04 23:59' }, { type: 'paper', due: '2026-05-06 23:59' }],
     timezone: 'Australia/Sydney',
     place: 'Sydney, Australia',
     date: 'Dec 6-12, 2026',
@@ -40,10 +48,9 @@ describe('updateEntry', () => {
   it('rewrites deadlines in the entry timezone and records changes', () => {
     const entry = sydneyEntry();
     const { changes } = updateEntry(entry, neuripsFacts(), { deadlinesOnly: true });
-    expect(entry.deadline).toBe('2026-05-07 21:59');
-    expect(entry.abstract_deadline).toBe('2026-05-05 21:59');
-    const fields = changes.map((c) => c.field).sort();
-    expect(fields).toEqual(['abstract_deadline', 'deadline']);
+    expect(due(entry, 'paper')).toBe('2026-05-07 21:59');
+    expect(due(entry, 'paper_abstract')).toBe('2026-05-05 21:59');
+    expect(changes.map(changeFieldName).sort()).toEqual(['paper', 'paper_abstract']);
     expect(changes[0].id).toBe('neuripssy26');
   });
 
@@ -57,7 +64,7 @@ describe('updateEntry', () => {
 
   it('a moved start with a stated end rewrites start, end and date', () => {
     const entry = sydneyEntry();
-    const facts = { ...neuripsFacts(), startIso: '2026-12-08', endIso: '2026-12-13', deadline: null, abstractDeadline: null, fullName: null, location: null };
+    const facts = { ...neuripsFacts(), startIso: '2026-12-08', endIso: '2026-12-13', deadlines: [], fullName: null, location: null };
     const { changes, flags } = updateEntry(entry, facts);
     expect(entry.start).toBe('2026-12-08');
     expect(entry.end).toBe('2026-12-13');
@@ -69,7 +76,7 @@ describe('updateEntry', () => {
   // OpenReview states a start but never an end.
   it('a moved start with no stated end leaves start, end and date alone and flags it', () => {
     const entry = sydneyEntry();
-    const facts = { ...neuripsFacts(), startIso: '2026-12-08', deadline: null, abstractDeadline: null, fullName: null, location: null };
+    const facts = { ...neuripsFacts(), startIso: '2026-12-08', deadlines: [], fullName: null, location: null };
     const { changes, flags } = updateEntry(entry, facts);
     expect(entry.start).toBe('2026-12-06');
     expect(entry.end).toBe('2026-12-12');
@@ -82,7 +89,7 @@ describe('updateEntry', () => {
 
   it('a stated end alone rewrites end and date', () => {
     const entry = sydneyEntry();
-    const facts = { ...neuripsFacts(), endIso: '2026-12-11', deadline: null, abstractDeadline: null, fullName: null, location: null };
+    const facts = { ...neuripsFacts(), endIso: '2026-12-11', deadlines: [], fullName: null, location: null };
     updateEntry(entry, facts);
     expect(entry.end).toBe('2026-12-11');
     expect(entry.date).toBe('Dec 6-11, 2026');
@@ -90,7 +97,7 @@ describe('updateEntry', () => {
 
   it('drops a source range that ends before it starts', () => {
     const entry = sydneyEntry();
-    const facts = { ...neuripsFacts(), startIso: '2026-12-08', endIso: '2026-12-01', deadline: null, abstractDeadline: null, fullName: null, location: null };
+    const facts = { ...neuripsFacts(), startIso: '2026-12-08', endIso: '2026-12-01', deadlines: [], fullName: null, location: null };
     const { changes, flags } = updateEntry(entry, facts);
     expect(changes).toEqual([]);
     expect(flags.some((f) => f.includes('ends before it starts'))).toBe(true);
@@ -98,7 +105,7 @@ describe('updateEntry', () => {
 
   it('leaves start/end/date untouched and flags when the source start year is not the edition year', () => {
     const entry = sydneyEntry();
-    const facts = { fullName: null, location: null, startIso: '2025-01-20', deadline: null, abstractDeadline: null };
+    const facts = { fullName: null, location: null, startIso: '2025-01-20', deadlines: [] };
     const { changes, flags } = updateEntry(entry, facts);
     expect(entry.start).toBe('2026-12-06');
     expect(entry.end).toBe('2026-12-12');
@@ -121,7 +128,7 @@ describe('updateEntry', () => {
     const entry = sydneyEntry();
     const today = DateTime.fromISO('2026-09-28T12:00:00Z', { zone: 'utc' });
     const { changes } = updateEntry(entry, neuripsFacts(), { deadlinesOnly: true, today });
-    expect(entry.deadline).toBe('2026-05-06 23:59');
+    expect(due(entry, 'paper')).toBe('2026-05-06 23:59');
     expect(changes).toEqual([]);
   });
 
@@ -129,8 +136,8 @@ describe('updateEntry', () => {
     const entry = sydneyEntry();
     const today = DateTime.fromISO('2026-05-07T00:00:00Z', { zone: 'utc' });
     const { changes } = updateEntry(entry, neuripsFacts(), { deadlinesOnly: true, today });
-    expect(entry.deadline).toBe('2026-05-07 21:59');
-    expect(changes.map((c) => c.field)).toContain('deadline');
+    expect(due(entry, 'paper')).toBe('2026-05-07 21:59');
+    expect(changes.map(changeFieldName)).toContain('paper');
   });
 
   it('never writes curated fields', () => {
@@ -141,23 +148,23 @@ describe('updateEntry', () => {
     expect(entry.note).toBe('Main site; satellite sites in Atlanta and Paris.');
   });
 
-  it('leaves a pinned field untouched and flags the divergence', () => {
-    const entry = { ...sydneyEntry(), sync_pin: ['deadline'] };
+  it('leaves a pinned deadline untouched and flags the divergence', () => {
+    const entry = withPaperPin('2026-05-06 23:59');
     const { changes, flags } = updateEntry(entry, neuripsFacts(), { deadlinesOnly: true });
-    expect(entry.deadline).toBe('2026-05-06 23:59');
-    expect(changes.map((c) => c.field)).not.toContain('deadline');
-    expect(flags.some((f) => f.includes('neuripssy26') && f.includes('deadline pinned') && f.includes('2026-05-07 21:59'))).toBe(true);
+    expect(due(entry, 'paper')).toBe('2026-05-06 23:59');
+    expect(changes.map(changeFieldName)).not.toContain('paper');
+    expect(flags).toContain('neuripssy26: paper pinned; source reports 2026-05-07 21:59');
   });
 
-  it('still updates unpinned fields when another field is pinned', () => {
-    const entry = { ...sydneyEntry(), sync_pin: ['deadline'] };
+  it('still updates unpinned deadlines when another one is pinned', () => {
+    const entry = withPaperPin('2026-05-06 23:59');
     updateEntry(entry, neuripsFacts(), { deadlinesOnly: true });
-    expect(entry.abstract_deadline).toBe('2026-05-05 21:59');
+    expect(due(entry, 'paper_abstract')).toBe('2026-05-05 21:59');
   });
 
   it('a pinned start leaves end and date alone', () => {
     const entry = { ...sydneyEntry(), sync_pin: ['start'] };
-    const facts = { ...neuripsFacts(), startIso: '2026-12-08', endIso: '2026-12-14', deadline: null, abstractDeadline: null, fullName: null, location: null };
+    const facts = { ...neuripsFacts(), startIso: '2026-12-08', endIso: '2026-12-14', deadlines: [], fullName: null, location: null };
     const { changes, flags } = updateEntry(entry, facts);
     expect(entry.start).toBe('2026-12-06');
     expect(entry.end).toBe('2026-12-12');
@@ -170,7 +177,7 @@ describe('updateEntry', () => {
   // range; a two-day move would hide the bug behind a still-plausible date.
   it('a pinned end freezes start and date too, never inverting the range', () => {
     const entry = { ...sydneyEntry(), sync_pin: ['end'] };
-    const facts = { ...neuripsFacts(), startIso: '2026-12-20', endIso: '2026-12-26', deadline: null, abstractDeadline: null, fullName: null, location: null };
+    const facts = { ...neuripsFacts(), startIso: '2026-12-20', endIso: '2026-12-26', deadlines: [], fullName: null, location: null };
     const { changes, flags } = updateEntry(entry, facts);
     expect(entry.start).toBe('2026-12-06');
     expect(entry.end).toBe('2026-12-12');
@@ -182,7 +189,7 @@ describe('updateEntry', () => {
 
   it('a pinned date freezes start and end too, so the shown date never goes stale', () => {
     const entry = { ...sydneyEntry(), sync_pin: ['date'] };
-    const facts = { ...neuripsFacts(), startIso: '2026-12-08', endIso: '2026-12-14', deadline: null, abstractDeadline: null, fullName: null, location: null };
+    const facts = { ...neuripsFacts(), startIso: '2026-12-08', endIso: '2026-12-14', deadlines: [], fullName: null, location: null };
     const { changes, flags } = updateEntry(entry, facts);
     expect(entry.start).toBe('2026-12-06');
     expect(entry.end).toBe('2026-12-12');
@@ -193,13 +200,13 @@ describe('updateEntry', () => {
 
   it('a pinned end still allows a start move when there is no end to shift', () => {
     const entry = { ...sydneyEntry(), end: undefined, date: undefined, sync_pin: ['end'] };
-    const facts = { ...neuripsFacts(), startIso: '2026-12-20', deadline: null, abstractDeadline: null, fullName: null, location: null };
+    const facts = { ...neuripsFacts(), startIso: '2026-12-20', deadlines: [], fullName: null, location: null };
     updateEntry(entry, facts);
     expect(entry.start).toBe('2026-12-20');
   });
 
   it('does not flag a pinned field when the source agrees with it', () => {
-    const entry = { ...sydneyEntry(), deadline: '2026-05-07 21:59', sync_pin: ['deadline'] };
+    const entry = withPaperPin('2026-05-07 21:59');
     const { flags } = updateEntry(entry, neuripsFacts(), { deadlinesOnly: true });
     expect(flags).toEqual([]);
   });
@@ -210,7 +217,7 @@ describe('updateEntry', () => {
 });
 
 describe('updateEntry place', () => {
-  const placeOnly = (location) => ({ fullName: null, location, startIso: null, deadline: null, abstractDeadline: null });
+  const placeOnly = (location) => ({ fullName: null, location, startIso: null, deadlines: [] });
 
   it('fills a missing place from the source', () => {
     const entry = { ...sydneyEntry(), place: undefined };
@@ -237,7 +244,7 @@ describe('updateEntry place', () => {
 });
 
 describe('updateEntry full_name', () => {
-  const nameOnly = (fullName) => ({ fullName, location: null, startIso: null, deadline: null, abstractDeadline: null });
+  const nameOnly = (fullName) => ({ fullName, location: null, startIso: null, deadlines: [] });
 
   it('fills a missing full_name from the source', () => {
     const entry = { ...sydneyEntry(), full_name: undefined };
@@ -280,9 +287,10 @@ describe('updateEntry full_name', () => {
 
 describe('draftEntry', () => {
   it('clones the previous edition, drops stale fields, fills facts', () => {
-    const prev = { ...sydneyEntry(), sync_pin: ['deadline'] };
+    const prev = { ...sydneyEntry(), sync_pin: ['place'] };
     const { entry, flags } = draftEntry(prev, { ...neuripsFacts(), startIso: '2027-12-05', endIso: '2027-12-11' }, 2027);
     expect(entry.sync_pin).toBeUndefined();
+    expect(entry.deadlines).toEqual([{ type: 'paper_abstract', due: '2026-05-05 21:59' }, { type: 'paper', due: '2026-05-07 21:59' }]);
     expect(entry.id).toBe('neuripssy27');
     expect(entry.year).toBe(2027);
     expect(entry.sub).toBe('ML');
@@ -334,11 +342,11 @@ describe('draftEntry', () => {
     const prev = sydneyEntry();
     const { entry, flags } = draftEntry(
       prev,
-      { fullName: null, location: null, startIso: null, abstractDeadline: null, deadline: null },
+      { fullName: null, location: null, startIso: null, deadlines: [] },
       2027,
     );
-    expect(entry.deadline).toBeUndefined();
-    expect(entry.abstract_deadline).toBeUndefined();
+    expect('deadlines' in entry).toBe(false);
+    expect(flags).toContain('no submission deadline from the source yet');
     expect(entry.start).toBeUndefined();
     expect(entry.end).toBeUndefined();
     expect(entry.date).toBeUndefined();
@@ -346,11 +354,35 @@ describe('draftEntry', () => {
   });
 
   it('keeps an attendance-only venue attendance-only while the source reports no deadline', () => {
-    const prev = { ...sydneyEntry(), deadline_status: 'attendance', abstract_deadline: undefined, deadline: undefined };
-    const facts = { ...neuripsFacts(), startIso: '2027-12-05', endIso: '2027-12-11', abstractDeadline: null, deadline: null };
+    const { deadlines: _, ...noDeadlines } = sydneyEntry();
+    const prev = { ...noDeadlines, deadline_status: 'attendance' };
+    const facts = { ...neuripsFacts(), startIso: '2027-12-05', endIso: '2027-12-11', deadlines: [] };
     const { entry, flags } = draftEntry(prev, facts, 2027);
     expect(entry.deadline_status).toBe('attendance');
     expect(flags).toEqual([]);
+  });
+
+  it('keeps an attendance-only venue attendance-only when the source reports only registration', () => {
+    const prev = { ...sydneyEntry(), deadline_status: 'attendance' };
+    const early = { type: 'early_registration', due: DateTime.fromISO('2027-10-01T00:00:00Z', { zone: 'utc' }) };
+    const facts = { ...neuripsFacts(), startIso: '2027-12-05', endIso: '2027-12-11', deadlines: [early] };
+    const { entry, flags } = draftEntry(prev, facts, 2027);
+    expect(entry.deadline_status).toBe('attendance');
+    expect(entry.deadlines).toEqual([{ type: 'early_registration', due: '2027-10-01 10:00' }]);
+    expect(flags).toEqual([]);
+  });
+
+  it('drafts only the source deadlines and flags the labels it did not carry over', () => {
+    const prev = {
+      ...sydneyEntry(),
+      deadlines: [{ type: 'other', label: 'Science Speed Talks video', due: '2026-09-15 23:59' }],
+    };
+    const poster = { type: 'poster', due: DateTime.fromISO('2027-09-15T13:59:00Z', { zone: 'utc' }) };
+    const { entry, flags } = draftEntry(prev, { ...neuripsFacts(), startIso: '2027-12-05', endIso: '2027-12-11', deadlines: [poster] }, 2027);
+    expect(entry.deadlines).toEqual([{ type: 'poster', due: '2027-09-15 23:59' }]);
+    expect(flags).toContain(
+      "deadline labels from neuripssy26 not carried over; check the new deadlines' types and add labels where the page is more precise",
+    );
   });
 
   it('drops attendance once the source reports a deadline', () => {

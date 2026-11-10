@@ -11,8 +11,7 @@ const entry = {
   id: 'colm26',
   full_name: 'Third Conference on Language Modeling',
   link: 'https://colmweb.org/',
-  abstract_deadline: '2026-03-27 11:59',
-  deadline: '2026-04-01 12:15',
+  deadlines: [{ type: 'paper_abstract', due: '2026-03-27 11:59' }, { type: 'paper', due: '2026-04-01 12:15:00' }],
   timezone: 'UTC-12',
   place: 'San Francisco, USA',
   date: 'Oct 6-9, 2026',
@@ -27,6 +26,7 @@ describe('serializeEntries', () => {
     const text = serializeEntries([entry]);
     const parsed = load(text); // DEFAULT schema, like src/utils/parser.ts
     expect(parsed[0].start).toBe('2026-10-06');
+    expect(parsed[0].deadlines[1].due).toBe('2026-04-01 12:15:00');
     expect(parsed[0].year).toBe(2026);
   });
 
@@ -46,8 +46,8 @@ describe('serializeEntries', () => {
 
 describe('parseEntries', () => {
   it('keeps unquoted dates as strings and years as numbers', () => {
-    const [parsed] = parseEntries('- id: colm26\n  year: 2026\n  start: 2026-10-06\n  deadline: 2026-04-01 12:15\n');
-    expect(parsed).toEqual({ id: 'colm26', year: 2026, start: '2026-10-06', deadline: '2026-04-01 12:15' });
+    const [parsed] = parseEntries('- id: colm26\n  year: 2026\n  start: 2026-10-06\n  deadlines:\n    - type: paper\n      due: 2026-04-01 12:15:00\n');
+    expect(parsed).toEqual({ id: 'colm26', year: 2026, start: '2026-10-06', deadlines: [{ type: 'paper', due: '2026-04-01 12:15:00' }] });
   });
 });
 

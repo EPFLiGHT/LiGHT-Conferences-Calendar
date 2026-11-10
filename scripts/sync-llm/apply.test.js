@@ -3,45 +3,55 @@ import { DateTime } from 'luxon';
 import { applyEditions, resolveDraftLinks } from './apply.js';
 import { edition as baseEdition, deadline, fakeFetcher } from './test-helpers.js';
 
+const paperDue = (e) => e.deadlines?.find((d) => d.type === 'paper')?.due;
+
 const edition = (year, date) =>
   baseEdition({ year, deadlines: [deadline({ date, evidence: `Deadline: ${date}` })] });
 
 const entry = (over = {}) => ({
   title: 'HealthConf', year: 2026, id: 'hc26', link: 'https://hc.example',
-  deadline: '2026-01-01 23:59', timezone: 'UTC-12', sub: 'Global Health', type: 'conference',
+  deadlines: [{ type: 'paper', due: '2026-01-01 23:59' }], timezone: 'UTC-12', sub: 'Global Health', type: 'conference',
   ...over,
 });
 
 describe('applyEditions', () => {
   it('drops a deadline that falls after the entry conference start', () => {
-    const entries = [entry({ start: '2026-07-26', deadline: undefined })];
+    const entries = [entry({ start: '2026-07-26', deadlines: undefined })];
     const { updates, flags, evidence } = applyEditions({
       entries, title: 'HealthConf', editions: [edition(2026, '2026-11-01')],
       sourceUrl: 'https://hc.example/dates',
     });
-    expect(entries[0].deadline).toBeUndefined();
+    expect(entries[0].deadlines).toBeUndefined();
     expect(updates).toHaveLength(0);
     expect(evidence).toHaveLength(0);
     expect(flags[0]).toMatch(/after the conference start 2026-07-26/);
   });
 
+  it('keeps registration closing during the event against the curated dates', () => {
+    const entries = [entry({ start: '2026-07-26', end: '2026-07-30', deadlines: undefined })];
+    const reg = baseEdition({ year: 2026, deadlines: [deadline({ type: 'registration', date: '2026-07-28', evidence: 'Registration closes 28 July 2026' })] });
+    const { flags } = applyEditions({ entries, title: 'HealthConf', editions: [reg], sourceUrl: 'https://hc.example/dates' });
+    expect(entries[0].deadlines).toEqual([{ type: 'registration', due: '2026-07-28 23:59' }]);
+    expect(flags).toEqual([]);
+  });
+
   it('keeps a deadline that fits the postponed start the page reports', () => {
     // The page's new start supersedes the curated one, so the deadline must
     // not be checked against the stale YAML start while the dates still move.
-    const entries = [entry({ start: '2026-06-22', deadline: undefined })];
+    const entries = [entry({ start: '2026-06-22', deadlines: undefined })];
     const postponed = { ...edition(2026, '2026-07-01'), start_date: '2026-09-10' };
     const { updates, flags } = applyEditions({
       entries, title: 'HealthConf', editions: [postponed],
       sourceUrl: 'https://hc.example/dates',
     });
-    expect(entries[0].deadline).toBe('2026-07-01 23:59');
+    expect(paperDue(entries[0])).toBe('2026-07-01 23:59');
     expect(entries[0].start).toBe('2026-09-10');
     expect(updates.length).toBeGreaterThan(0);
     expect(flags.some((f) => f.includes('belongs to a later edition'))).toBe(false);
   });
 
   it('keeps a deadline falling on the conference start day', () => {
-    const entries = [entry({ start: '2026-11-01', deadline: undefined })];
+    const entries = [entry({ start: '2026-11-01', deadlines: undefined })];
     const { updates } = applyEditions({
       entries, title: 'HealthConf', editions: [edition(2026, '2026-11-01')],
       sourceUrl: 'https://hc.example/dates',
@@ -50,7 +60,7 @@ describe('applyEditions', () => {
   });
 
   it('flags a deadline no start date could check, on an entry whose dates are still TBA', () => {
-    const entries = [entry({ deadline: undefined })];
+    const entries = [entry({ deadlines: undefined })];
     const { updates, flags } = applyEditions({
       entries, title: 'HealthConf', editions: [edition(2026, '2026-11-01')],
       sourceUrl: 'https://hc.example/dates',
@@ -80,7 +90,7 @@ describe('applyEditions', () => {
   });
 
   it('does not flag an unchecked start when no deadline was extracted', () => {
-    const entries = [entry({ deadline: undefined })];
+    const entries = [entry({ deadlines: undefined })];
     const noDeadlines = { ...edition(2026, '2026-11-01'), deadlines: [] };
     const { flags } = applyEditions({
       entries, title: 'HealthConf', editions: [noDeadlines],
@@ -95,21 +105,45 @@ describe('applyEditions', () => {
       entries, title: 'HealthConf', editions: [edition(2026, '2026-02-01')],
       sourceUrl: 'https://hc.example/dates',
     });
-    expect(entries[0].deadline).toBe('2026-02-01 23:59');
+    expect(paperDue(entries[0])).toBe('2026-02-01 23:59');
     expect(updates).toHaveLength(1);
     expect(drafts).toHaveLength(0);
     expect(evidence[0]).toEqual({
-      id: 'hc26', field: 'deadline', quote: 'Deadline: 2026-02-01', url: 'https://hc.example/dates',
+      id: 'hc26', field: 'paper', quote: 'Deadline: 2026-02-01', url: 'https://hc.example/dates',
     });
   });
 
-  it('respects sync_pin (flag instead of write)', () => {
-    const entries = [entry({ sync_pin: ['deadline'] })];
+  it('names the type and the page each deadline came from in evidence rows', () => {
+    const entries = [entry({ deadlines: [{ type: 'poster', due: '2026-09-01 23:59' }] })];
+    const quote = 'Poster submission deadline: September 15, 2026';
+    const posterEdition = baseEdition({
+      year: 2026,
+      deadlines: [deadline({ type: 'poster', date: '2026-09-15', evidence: quote, source: 'https://hc.example/call' })],
+    });
+    const out = applyEditions({
+      entries, title: 'HealthConf', editions: [posterEdition], sourceUrl: 'https://hc.example/dates',
+    });
+    expect(out.evidence).toEqual([{ id: 'hc26', field: 'poster', quote, url: 'https://hc.example/call' }]);
+  });
+
+  it('quotes the reported deadline when the source calls a hand-checked poster an abstract', () => {
+    const entries = [entry({ deadlines: [{ type: 'poster', due: '2026-09-01 23:59' }] })];
+    const quote = 'Abstract submission deadline: September 15, 2026';
+    const abstractEdition = baseEdition({ year: 2026, deadlines: [deadline({ type: 'abstract', date: '2026-09-15', evidence: quote })] });
+    const out = applyEditions({
+      entries, title: 'HealthConf', editions: [abstractEdition], sourceUrl: 'https://hc.example/dates',
+    });
+    expect(out.evidence).toEqual([{ id: 'hc26', field: 'poster', quote, url: 'https://hc.example/dates' }]);
+    expect(out.flags).toContain('hc26: source calls the poster deadline abstract; date updated, type kept');
+  });
+
+  it('respects a pinned deadline (flag instead of write)', () => {
+    const entries = [entry({ deadlines: [{ type: 'paper', due: '2026-01-01 23:59', pin: true }] })];
     const { updates, flags } = applyEditions({
       entries, title: 'HealthConf', editions: [edition(2026, '2026-02-01')],
       sourceUrl: 'https://hc.example/dates',
     });
-    expect(entries[0].deadline).toBe('2026-01-01 23:59');
+    expect(paperDue(entries[0])).toBe('2026-01-01 23:59');
     expect(updates).toHaveLength(0);
     expect(flags.some((f) => f.includes('pinned'))).toBe(true);
   });
@@ -123,9 +157,9 @@ describe('applyEditions', () => {
     expect(drafts).toEqual([{ id: 'hc27', title: 'HealthConf', year: 2027 }]);
     expect(entries).toHaveLength(2);
     expect(entries[1].id).toBe('hc27');
-    expect(entries[1].deadline).toBe('2027-02-01 23:59');
+    expect(paperDue(entries[1])).toBe('2027-02-01 23:59');
     expect(evidence).toEqual([
-      { id: 'hc27', field: 'deadline', quote: 'Deadline: 2027-02-01', url: 'https://hc.example/dates' },
+      { id: 'hc27', field: 'paper', quote: 'Deadline: 2027-02-01', url: 'https://hc.example/dates' },
     ]);
   });
 
@@ -158,8 +192,8 @@ describe('applyEditions', () => {
     expect(drafts).toHaveLength(1);
     const draftedEntry = entries[1];
     expect(draftedEntry.id).toBe('hc27');
-    expect(draftedEntry.deadline).toBeUndefined();
-    expect(evidence.some((e) => e.id === 'hc27' && e.field === 'deadline')).toBe(false);
+    expect(draftedEntry.deadlines).toBeUndefined();
+    expect(evidence.some((e) => e.id === 'hc27' && e.field === 'paper')).toBe(false);
   });
 
   it('leaves an edition that has already ended alone', () => {
@@ -169,11 +203,11 @@ describe('applyEditions', () => {
       sourceUrl: 'https://hc.example/dates', today: DateTime.fromISO('2026-09-28T00:00:00Z', { zone: 'utc' }),
     });
     expect(updates).toEqual([]);
-    expect(entries[0].deadline).toBe('2026-01-01 23:59');
+    expect(paperDue(entries[0])).toBe('2026-01-01 23:59');
   });
 
   it('records the dates quote behind the start and end of a draft', () => {
-    const entries = [entry({ deadline: undefined, deadline_status: 'attendance' })];
+    const entries = [entry({ deadlines: undefined, deadline_status: 'attendance' })];
     const dated = baseEdition({
       year: 2027, start_date: '2027-10-27', end_date: '2027-10-29', dates_evidence: 'October 27-29, 2027', deadlines: [],
     });

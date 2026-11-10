@@ -37,7 +37,7 @@ beforeEach(async () => {
   conversationsInfo.mockReset().mockResolvedValue({ channel: { name: 'general' } });
   postMessage.mockReset().mockResolvedValue({ ok: true });
   viewsPublish.mockReset().mockResolvedValue({ ok: true });
-  await fakeKv.set(kvKeys.cache.conferences, [conference({ deadline: '2099-01-15 23:59', start: '2099-03-01' })]);
+  await fakeKv.set(kvKeys.cache.conferences, [conference({ deadlines: [{ type: 'paper', due: '2099-01-15 23:59' }], start: '2099-03-01' })]);
   await storeTeamToken('T1', 'xoxb-t1');
   await storeTeamToken('T2', 'xoxb-t2');
   await subscribeChannel('C1', 'c1', 'T1');

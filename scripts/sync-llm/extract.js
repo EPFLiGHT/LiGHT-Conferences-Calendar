@@ -7,18 +7,24 @@
  * optional, only nullable, which is why so much of it is `['string', 'null']`.
  * The prompt rules live here too, since both tiers need them.
  */
+import { DEADLINE_TYPE_CODES } from '../../src/constants/deadlineTypes.data.js';
 
 const DEADLINE_ITEM = {
   type: 'object',
   additionalProperties: false,
   properties: {
-    kind: { type: 'string', enum: ['abstract', 'paper'] },
+    // `other` needs a curated label, so only a person adds one.
+    type: { type: 'string', enum: DEADLINE_TYPE_CODES.filter((t) => t !== 'other') },
     date: { type: 'string', description: 'YYYY-MM-DD as stated on the page' },
     time: { type: ['string', 'null'], description: 'HH:MM 24h if stated, else null' },
     timezone_text: { type: ['string', 'null'], description: 'timezone exactly as written, e.g. "AoE", "CET", else null' },
+    before: {
+      type: 'boolean',
+      description: 'true when the page gives the first day that is too late ("before 15 October"); copy that date into "date" as written',
+    },
     evidence: { type: 'string', description: 'verbatim sentence or table row from the page containing this deadline' },
   },
-  required: ['kind', 'date', 'time', 'timezone_text', 'evidence'],
+  required: ['type', 'date', 'time', 'timezone_text', 'before', 'evidence'],
 };
 
 const EDITION_ITEM = {
@@ -64,17 +70,24 @@ export const PAGE_RULES = `Rules:
   2027 conference is edition 2027 even though it closes submissions in December 2026.
 - A deadline always precedes its own conference. A date after the conference belongs to
   the next edition; report it under that edition or not at all.
-- Extract submission deadlines only: kind "abstract" for submitting an abstract, kind
-  "paper" for submitting a full paper or manuscript. Classify by the page's own label,
-  not by how many dates it lists: a lone abstract deadline is still kind "abstract".
-- When a label names both, classify by the thing actually being submitted, not by the
-  words around it: "Paper Abstract Registration" and "Abstract submission for full
-  papers" are both kind "abstract". Never give two deadlines of one edition the same kind.
-- Ignore every other date, including registration, early bird pricing, travel grants,
-  award or bursary applications, notification of acceptance, camera ready, and the
-  conference dates themselves. If the page has no submission deadline, say so.
-- Ignore proposals for workshops, tutorials, special sessions or symposia, and any
-  "final submission" that follows an acceptance notification (that is the camera ready).
+- Extract every deadline a reader must meet to take part, each with one "type":
+  "paper_abstract": an abstract registered ahead of a full paper ("Abstract Registration").
+  "paper": a full paper or manuscript.
+  "abstract": an abstract that is itself the submission, for oral or poster presentation.
+  "poster": a submission to a call for posters only.
+  "late_breaking": a late-breaking abstract.
+  "proposal": a proposal for a workshop, panel, symposium, tutorial or session.
+  "early_registration": the last day of early-bird or reduced-rate registration.
+  "registration": the last day to register at all. A date that only ends one fee tier while a later tier follows is not "registration"; give the first such date as "early_registration" and skip the others.
+  "presenter_registration": the day presenting authors or speakers must register by.
+  "grant": a scholarship, bursary, travel grant or fee waiver application.
+  Classify by the page's own label, not by how many dates it lists. "Paper Abstract
+  Registration" and "Abstract submission for full papers" are "paper_abstract". Never give
+  two deadlines of one edition the same type.
+- When the page says a thing is due "before" a date, copy that date and set "before" to true.
+- Ignore notification of acceptance, camera ready, the conference dates themselves, the day
+  a call or registration opens, and any "final submission" or poster file upload that
+  follows an acceptance notification.
 - A " | " ends a table cell. Some tables put the date first and its label after it in the
   same cell: in "24 January 2027 Submission Deadline | 16 April 2027 Accept/Reject
   Notification |" the submission deadline is 24 January and 16 April is the notification.
@@ -93,9 +106,8 @@ export const PAGE_RULES = `Rules:
 
 /** Overrides the deadline-only rules above for an event people attend rather than submit to. */
 const ATTENDANCE_RULE = `- This venue is an event people attend, without a call for submissions. Report every
-  edition whose start date the page states, even with no submission deadline, with an empty
-  deadlines list unless the page does give one. page_has_dates means the page states an
-  edition's dates.`;
+  edition whose start date the page states, with its registration and grant deadlines if the
+  page gives them. page_has_dates means the page states an edition's dates.`;
 
 /**
  * A model's sense of "now" is its training cutoff, so the date has to be said
@@ -122,7 +134,7 @@ export function dateContext(today) {
  *   agent tiers the same way it does for any other tier-0 failure.
  */
 export async function extractFromPage(llm, { venueTitle, pageText, url, today, attendance = false }) {
-  const task = attendance ? 'event dates' : 'research conference deadlines';
+  const task = attendance ? 'event dates' : 'conference deadlines';
   const rules = attendance ? `${PAGE_RULES}\n${ATTENDANCE_RULE}` : PAGE_RULES;
   const res = await llm.respond({
     input: [

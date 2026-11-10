@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { syncVenue } from './main.js';
+import { mergeVenue, readExtraPages, syncVenue } from './main.js';
 import { createBudget, createTokenBudget, createTierBudget } from './budget.js';
 import {
   TODAY, edition, deadline, fakeFetcher, fakeLlm, call, toolReply, jsonReply,
@@ -35,6 +35,29 @@ describe('syncVenue tiering', () => {
     expect(out.tier).toBe(0);
     expect(out.outcome).toBe('submitted');
     expect(out.editions[0].deadlines).toHaveLength(1);
+    expect(out.editions[0].deadlines[0].source).toBe('https://hc.example/dates');
+  });
+
+  it('escalates when the main page shows only an early-bird date', async () => {
+    const page = 'Early bird registration deadline: 14 October 2026';
+    const only = { page_has_dates: true, editions: [edition({ year: 2027, deadlines: [deadline({ type: 'early_registration', date: '2026-10-14', evidence: page })] })] };
+    const out = await syncVenue(
+      ctx({ fetcher: fakeFetcher({ 'https://hc.example/dates': page }), llm: fakeLlm(jsonReply(only), notFound(), notFound()) }),
+      'HealthConf',
+      { url: 'https://hc.example/dates' },
+    );
+    expect(out).toMatchObject({ outcome: 'not_found', tier: 2 });
+  });
+
+  it('counts a registration deadline as a find for an attendance venue', async () => {
+    const page = 'Early bird registration deadline: 14 October 2026';
+    const only = { page_has_dates: true, editions: [edition({ year: 2027, deadlines: [deadline({ type: 'early_registration', date: '2026-10-14', evidence: page })] })] };
+    const out = await syncVenue(
+      ctx({ fetcher: fakeFetcher({ 'https://hc.example/dates': page }), llm: fakeLlm(jsonReply(only)) }),
+      'HealthConf',
+      { url: 'https://hc.example/dates', attendance: true },
+    );
+    expect(out).toMatchObject({ outcome: 'submitted', tier: 0 });
   });
 
   it('reads the configured page moved to the next year first, where a site that moved on keeps its new dates', async () => {
@@ -176,5 +199,53 @@ describe('syncVenue for attendance-only venues', () => {
     const out = await syncVenue(ctx({ fetcher: fakeFetcher(), llm }), 'HealthConf', cfg);
     expect(llm.requests).toHaveLength(0);
     expect(out.flags).toEqual(['HealthConf: configured URL failed (http 404)']);
+  });
+});
+
+describe('extra pages', () => {
+  const fees = 'Early bird registration deadline: 14 October 2026';
+  const feesResult = { page_has_dates: true, editions: [edition({
+    year: 2027, location: 'Geneva', deadlines: [deadline({ type: 'early_registration', date: '2026-10-14', evidence: fees })],
+  })] };
+  const cfg = { url: 'https://hc.example/dates', pages: ['https://hc.example/fees'] };
+
+  it('reads every extra page at tier 0 and tags deadlines with their page', async () => {
+    const out = await readExtraPages(ctx({ fetcher: fakeFetcher({ 'https://hc.example/fees': fees }), llm: fakeLlm(jsonReply(feesResult)) }), 'HealthConf', cfg);
+    expect(out.editions[0].deadlines.map((x) => [x.type, x.source])).toEqual([['early_registration', 'https://hc.example/fees']]);
+    expect(out.editions[0]).not.toHaveProperty('location');
+    expect(out.flags).toEqual([]);
+  });
+
+  it('flags an extra page that fails and one skipped for budget', async () => {
+    const gone = { url: 'https://hc.example/dates', pages: ['https://hc.example/gone'] };
+    expect((await readExtraPages(ctx({ fetcher: fakeFetcher({}), llm: fakeLlm() }), 'HealthConf', gone)).flags)
+      .toEqual(['HealthConf: extra page https://hc.example/gone configured URL failed (http 404); fix it in venues.json by hand']);
+    expect((await readExtraPages(ctx({ fetcher: fakeFetcher({}), llm: fakeLlm(), budgetExceeded: () => true }), 'HealthConf', gone)).flags)
+      .toEqual(['HealthConf: run token budget exhausted; extra page https://hc.example/gone not read']);
+  });
+
+  it('flags an extra page whose model call throws instead of aborting the run', async () => {
+    const llm = { respond: async () => { throw new Error('upstream 503'); } };
+    const out = await readExtraPages(ctx({ fetcher: fakeFetcher({ 'https://hc.example/fees': fees }), llm }), 'HealthConf', cfg);
+    expect(out).toEqual({ editions: [], flags: ['HealthConf: extra page https://hc.example/fees not read (upstream 503)'] });
+  });
+
+  it('applies extra-page deadlines to a known edition when the main page found none, keeping the main flag', async () => {
+    const c = ctx({ fetcher: fakeFetcher({ 'https://hc.example/fees': fees }), llm: fakeLlm(jsonReply(feesResult)) });
+    const main = { outcome: 'not_found', tier: 2, reason: 'no result', flags: [] };
+    const out = await mergeVenue(c, 'HealthConf', cfg, main);
+    expect(c.entries[0].deadlines).toEqual([{ type: 'early_registration', due: '2026-10-14 23:59' }]);
+    expect(out.flags).toContain('HealthConf: no deadlines found (no result); check the venue site and venues.json');
+    expect(out.evidence).toEqual([{ id: 'hc27', field: 'early_registration', quote: fees, url: 'https://hc.example/fees' }]);
+  });
+
+  it('merges the main page result as before when no extra pages are configured', async () => {
+    const c = ctx({ fetcher: fakeFetcher({}), llm: fakeLlm() });
+    const main = { outcome: 'submitted', tier: 0, sourceUrl: 'https://hc.example/dates', flags: [], editions: [edition({
+      year: 2027, deadlines: [deadline({ date: '2027-05-06', evidence: 'Paper submission deadline: May 6, 2027', source: 'https://hc.example/dates' })],
+    })] };
+    const out = await mergeVenue(c, 'HealthConf', { url: 'https://hc.example/dates' }, main);
+    expect(c.entries[0].deadlines).toEqual([{ type: 'paper', due: '2027-05-06 23:59' }]);
+    expect(out.updates).toHaveLength(1);
   });
 });

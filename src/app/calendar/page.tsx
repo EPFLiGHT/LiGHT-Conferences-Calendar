@@ -42,8 +42,6 @@ const HEADER_TOOLBAR = {
   right: 'dayGridMonth,timeGridWeek,listMonth',
 };
 
-const SHORT_DEADLINE_LABEL = { abstract: 'Abstract', paper: 'Submission' } as const;
-
 const EVENT_TIME_FORMAT = {
   hour: '2-digit',
   minute: '2-digit',
@@ -78,8 +76,8 @@ function CalendarContent() {
         const color = getEventColor(conf.sub);
         const extendedProps = { conference: conf };
         const events: EventInput[] = getDeadlineInfo(conf).map((deadline) => ({
-          id: `${deadline.kind}-${conf.id}`,
-          title: `${SHORT_DEADLINE_LABEL[deadline.kind]}: ${conf.title} ${conf.year}`,
+          id: `${deadline.key}-${conf.id}`,
+          title: `${deadline.shortLabel}: ${conf.title} ${conf.year}`,
           start: deadline.datetime.toISO() ?? undefined,
           end: deadline.datetime.plus({ hours: 1 }).toISO() ?? undefined,
           allDay: false,

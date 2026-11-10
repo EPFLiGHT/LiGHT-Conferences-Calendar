@@ -5,7 +5,7 @@
  *
  * A deadline survives only if its quote appears on the page it cites (which
  * catches both invented dates and instructions smuggled into page text), the
- * quote names something being submitted, the quote shows the date rather than
+ * quote names what is due (words fitting its type), the quote shows the date rather than
  * merely implying it, the date's own table cell does not label it a later
  * stage, the date is plausibly near, and it falls before the conference
  * itself. Conference dates need a quote too, and the location and full name
@@ -14,15 +14,16 @@
  */
 import { DateTime } from 'luxon';
 import { isValidDate } from '../../src/utils/conferenceSchema.js';
+import { ABSTRACT_FAMILY, DEADLINE_TYPES } from '../../src/constants/deadlineTypes.data.js';
 import { resolveZone, parseDeadline } from './facts.js';
 
 export const normalize = (s) => s.toLowerCase().replace(/\s+/g, ' ').trim();
 // Ignores the stray spaces some sites print inside words ("AN NUAL CONGRESS").
 export const squash = (s) => s.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
 
-// Later stages and workshop or tutorial proposals, whose rows still say "paper" or
-// "submission". Not "registration": "Abstract Registration" is a real deadline.
-const NOT_A_DEADLINE_RE = /camera.?ready|notification|acceptance|\bproposals?\b/i;
+// Later stages, whose rows still say "paper" or "submission". Not "registration":
+// "Abstract Registration" is a real deadline.
+const NOT_A_DEADLINE_RE = /camera.?ready|notification|acceptance/i;
 
 // English, French, German and Italian names and abbreviations, all anchored on
 // word boundaries below. A bare `sep[a-z]*` would let "separate", "maybe" and
@@ -57,8 +58,10 @@ const notOtherMonth = (month) =>
  * and a stray "(see item 1)" must not vouch for a day-01 date. A numeric month
  * needs a real separator character next to the day: with none, "Hall 151"
  * would read as day 15 month 1 and a stray year elsewhere would vouch for it.
+ * With pageText, a year-less quote ("Early Bird (until May 10)") also passes
+ * when the page gives that day and month with the year beside it elsewhere.
  */
-function dateShownInEvidence(dateIso, evidence) {
+function dateShownInEvidence(dateIso, evidence, pageText = null) {
   const [year, month, day] = dateIso.split('-').map(Number);
   const names = MONTHS[month - 1];
   if (!names) return false;
@@ -78,7 +81,9 @@ function dateShownInEvidence(dateIso, evidence) {
   const adjacent = orders('(?!\\d)').some((re) => re.test(evidence));
   if (!adjacent) return false;
   const fullYearShown = new RegExp(`(?<!\\d)${year}(?!\\d)`).test(evidence);
-  return fullYearShown || orders(shortYear).some((re) => re.test(evidence));
+  if (fullYearShown || orders(shortYear).some((re) => re.test(evidence))) return true;
+  const yearBeside = `${sepReq}(?:${year}|${year % 100})(?!\\d)`;
+  return pageText != null && orders(yearBeside).some((re) => re.test(pageText));
 }
 
 // English, French, German and Italian weekdays, by their first three letters.
@@ -129,68 +134,96 @@ function ownCellLabel(pageText, evidence) {
   return end !== -1 && rest[end] === '|' ? rest.slice(0, end).trim() : null;
 }
 
-// What remains must name the thing being submitted. Requiring the word beats
-// blacklisting the rest: it keeps rows that pair a deadline with something
-// else, like "Abstract deadline and travel grant applications".
+// What remains must name what is due. Requiring the word beats blacklisting the
+// rest: it keeps rows that pair a deadline with something else, like "Abstract
+// deadline and travel grant applications".
 const ABSTRACT_RE = /\babstracts?\b/i;
 const PAPER_RE = /\b(papers?|manuscripts?)\b/i;
-const SUBMISSION_RE = /\b(abstracts?|papers?|manuscripts?|submissions?|submit|submitting)\b/i;
+const POSTER_RE = /\bposters?\b/i;
+const PROPOSAL_RE = /\bproposals?\b/i;
+const SUBMISSION_RE = /\b(abstracts?|papers?|manuscripts?|posters?|submissions?|submit|submitting)\b/i;
+const REGISTRATION_RE = /\bregist|\binscri|\banmeld|\btickets?\b|\bfees?\b/i;
+
+/** Every pattern must match for a quote to back its type. */
+const TYPE_WORDS = {
+  paper_abstract: [SUBMISSION_RE],
+  paper: [SUBMISSION_RE],
+  abstract: [SUBMISSION_RE],
+  poster: [SUBMISSION_RE],
+  late_breaking: [/late[\s-]?break(?:ing|ers?)/i],
+  proposal: [/\b(proposals?|workshops?|panels?|symposi(?:um|a)|tutorials?|sessions?|satellites?)\b/i],
+  early_registration: [/early[\s-]?bird|\bearly registration|\breduced (?:fee|rate|price)|tarif réduit|inscription anticipée|frühbucher/i],
+  registration: [REGISTRATION_RE],
+  presenter_registration: [REGISTRATION_RE, /\b(presenters?|presenting|authors?|speakers?|accepted)\b/i],
+  grant: [/scholarships?|bursar(?:y|ies)|\bgrants?\b|fellowships?|stipends?|travel (?:award|support|fund)|fee waivers?|\bbourses?\b/i],
+};
+
+const fitsType = (evidence, type) => Boolean(TYPE_WORDS[type]) && TYPE_WORDS[type].every((re) => re.test(evidence));
 
 /**
- * Trust the page over the model's own label: the quote is verbatim page text,
- * while `kind` is a judgment the model gets wrong on pages listing one kind.
- * Ambiguous quotes (both words, or neither) keep the model's choice.
+ * Trust the page over the model's own label where the quote is unambiguous: the
+ * quote is verbatim page text, while `type` is a judgment the model gets wrong on
+ * pages listing one kind of submission. Anything else keeps the model's choice.
  */
-function kindFromEvidence(evidence, modelKind) {
-  const isAbstract = ABSTRACT_RE.test(evidence);
-  const isPaper = PAPER_RE.test(evidence);
-  if (isAbstract && !isPaper) return 'abstract';
-  if (isPaper && !isAbstract) return 'paper';
-  return modelKind;
+function typeFromEvidence(evidence, modelType) {
+  if (/\b(abstract|paper) registration\b/i.test(evidence)) return 'paper_abstract';
+  const abstract = ABSTRACT_RE.test(evidence);
+  const paper = PAPER_RE.test(evidence);
+  if (ABSTRACT_FAMILY.includes(modelType) && paper && !abstract && !POSTER_RE.test(evidence)) return 'paper';
+  if (modelType === 'paper' && abstract && !paper) return 'abstract';
+  const submission = DEADLINE_TYPES[modelType]?.group === 'submission';
+  if (submission && modelType !== 'proposal' && PROPOSAL_RE.test(evidence) && !abstract && !paper) return 'proposal';
+  return modelType;
 }
 
-const isDistinct = (kinds) => new Set(kinds).size === kinds.length;
-
 /**
- * Settle each deadline's kind, keeping at most one of each.
+ * Settle each deadline's type, keeping at most one of each.
  *
- * The evidence override reads a single word, and a submission page is full of
- * rows that borrow the other kind's vocabulary ("Paper registration" is the
- * abstract deadline). When applying it would collapse rows the model had
- * already told apart, the model's labels win instead. Without that, the two
- * rows both become "paper", and editionToFacts keeps the first of each kind,
- * so the stored `deadline` would silently be the abstract's earlier date.
+ * The evidence override reads a few words, and a dates page is full of rows that
+ * borrow another type's vocabulary. Where applying it would merge rows the model
+ * had told apart, those rows keep the model's types instead; otherwise the first
+ * would win and the second be dropped as a duplicate, silently. Types whose quote
+ * lacks their words are dropped, and an abstract due no later than a full paper
+ * is the paper's abstract.
  * @param {Array<object>} deadlines Deadlines that passed every other gate.
  * @param {number} year Edition year, for flag text.
  * @param {string[]} flags Appended to in place.
- * @returns {Array<object>} At most one deadline per kind.
+ * @returns {Array<object>} At most one deadline per type.
  */
-function reconcileKinds(deadlines, year, flags) {
-  const proposed = deadlines.map((d) => kindFromEvidence(d.evidence, d.kind));
-  const useEvidence = isDistinct(proposed) || !isDistinct(deadlines.map((d) => d.kind));
+function reconcileTypes(deadlines, year, flags) {
+  const modelTypes = deadlines.map((d) => d.type);
+  const proposed = deadlines.map((d) => typeFromEvidence(d.evidence, d.type));
+  const keepModel = proposed.map((t, i) => proposed.some((u, j) => j !== i && u === t && modelTypes[j] !== modelTypes[i]));
 
-  // Suppressing the override means trusting labels the evidence disagrees with;
-  // that is the safer guess, not a verified one, so it cannot pass unremarked.
-  if (!useEvidence) {
+  // Trusting labels the evidence disagrees with is the safer guess, not a verified one.
+  for (const t of new Set(proposed.filter((_, i) => keepModel[i]))) {
+    const labelled = [...new Set(modelTypes.filter((_, i) => keepModel[i] && proposed[i] === t))];
     flags.push(
-      `${year}: the evidence for every deadline reads as "${proposed[0]}", but the model labelled them ${deadlines.map((d) => d.kind).join(' and ')}; kept its labels, check which row is which`,
+      `${year}: the evidence reads as "${t}" for the ${labelled.join(' and ')} deadlines; kept the model's types, check which row is which`,
     );
   }
 
   const kept = new Map();
   deadlines.forEach((d, i) => {
-    const kind = useEvidence ? proposed[i] : d.kind;
-    const label = `${year} ${d.kind} deadline ${d.date}`;
-    if (kind !== d.kind) {
-      flags.push(`${label}: reported as ${d.kind}, but its evidence reads as ${kind}; recorded as ${kind}`);
+    const type = keepModel[i] ? d.type : proposed[i];
+    const label = `${year} ${d.type} deadline ${d.date}`;
+    if (type !== d.type) {
+      flags.push(`${label}: reported as ${d.type}, but its evidence reads as ${type}; recorded as ${type}`);
     }
-    if (kept.has(kind)) {
-      flags.push(`${label}: a ${kind} deadline is already recorded for ${year}; dropped, check the page by hand`);
+    if (!fitsType(d.evidence, type)) {
+      const what = DEADLINE_TYPES[type]?.label?.toLowerCase() ?? type;
+      flags.push(`${year} ${type} deadline ${d.date}: evidence names no ${what}; dropped ("${d.evidence.slice(0, 80)}")`);
       return;
     }
-    kept.set(kind, { ...d, kind });
+    if (kept.has(type)) {
+      flags.push(`${label}: a ${type} deadline is already recorded for ${year}; dropped, check the page by hand`);
+      return;
+    }
+    kept.set(type, { ...d, type });
   });
-  return [...kept.values()];
+  const paperAbstract = kept.has('paper') && !kept.has('paper_abstract')
+    && kept.get('abstract')?.date <= kept.get('paper').date;
+  return [...kept.values()].map((d) => (paperAbstract && d.type === 'abstract' ? { ...d, type: 'paper_abstract' } : d));
 }
 
 /**
@@ -255,19 +288,20 @@ export function validateEditions({ editions = [] }, { pageText, today = DateTime
       fullName = null;
     }
     const start = startDate ? DateTime.fromISO(startDate, { zone: 'utc' }) : null;
+    const end = endDate ? DateTime.fromISO(endDate, { zone: 'utc' }) : null;
     const survivors = [];
     for (const d of edition.deadlines) {
-      const label = `${edition.year} ${d.kind} deadline ${d.date}`;
+      const label = `${edition.year} ${d.type} deadline ${d.date}`;
       const needle = normalize(d.evidence ?? '');
       if (!needle || !haystack.includes(needle)) {
         flags.push(`${label}: evidence not found on the page; dropped`);
         continue;
       }
-      if (NOT_A_DEADLINE_RE.test(d.evidence) || !SUBMISSION_RE.test(d.evidence)) {
-        flags.push(`${label}: evidence names no submission; dropped ("${d.evidence.slice(0, 80)}")`);
+      if (NOT_A_DEADLINE_RE.test(d.evidence)) {
+        flags.push(`${label}: evidence names a later stage, not a deadline; dropped ("${d.evidence.slice(0, 80)}")`);
         continue;
       }
-      if (!dateShownInEvidence(d.date, d.evidence)) {
+      if (!dateShownInEvidence(d.date, d.evidence, pageText)) {
         flags.push(`${label}: the page does not state this date; dropped ("${d.evidence.slice(0, 80)}")`);
         continue;
       }
@@ -281,7 +315,13 @@ export function validateEditions({ editions = [] }, { pageText, today = DateTime
         flags.push(`${label}: implausible or unparseable date; dropped`);
         continue;
       }
-      if (start?.isValid && dt > start.endOf('day')) {
+      // Registration may stay open until the last day; nothing else may be due after the start.
+      if (DEADLINE_TYPES[d.type]?.group === 'registration' && end?.isValid) {
+        if (dt > end.endOf('day')) {
+          flags.push(`${label}: after the conference end ${endDate}; dropped`);
+          continue;
+        }
+      } else if (start?.isValid && dt > start.endOf('day')) {
         flags.push(`${label}: after the conference start ${startDate}; dropped`);
         continue;
       }
@@ -296,7 +336,7 @@ export function validateEditions({ editions = [] }, { pageText, today = DateTime
       location,
       start_date: startDate,
       end_date: endDate,
-      deadlines: reconcileKinds(survivors, edition.year, flags),
+      deadlines: reconcileTypes(survivors, edition.year, flags),
     });
   }
   return { editions: out, flags };

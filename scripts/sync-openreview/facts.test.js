@@ -13,8 +13,9 @@ describe('buildFacts', () => {
     expect(facts.location).toBe('Sydney, Australia');
     expect(facts.startIso).toBe('2026-12-06');
     expect(facts.submissionId).toBe('NeurIPS.cc/2026/Conference/-/Submission');
-    expect(facts.deadline.toISO()).toBe('2026-05-07T11:59:00.000Z');
-    expect(facts.abstractDeadline.toISO()).toBe('2026-05-05T11:59:00.000Z');
+    expect(facts.deadlines.map((d) => [d.type, d.due.toISO()])).toEqual([
+      ['paper_abstract', '2026-05-05T11:59:00.000Z'], ['paper', '2026-05-07T11:59:00.000Z'],
+    ]);
     expect(facts.link).toBe('https://neurips.cc/');
     expect(facts.endIso).toBeNull();
   });
@@ -33,7 +34,7 @@ describe('buildFacts', () => {
       submission_id: { value: 99 },
     });
     expect(facts).toMatchObject({
-      fullName: null, location: null, startIso: null, submissionId: null, deadline: null,
+      fullName: null, location: null, startIso: null, submissionId: null, deadlines: [],
     });
   });
 });
