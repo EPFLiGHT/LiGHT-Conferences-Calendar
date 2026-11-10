@@ -802,3 +802,31 @@
   end: '2026-10-30'
   sub: AI
   type: summit
+
+- title: MCP Dev Summit Nairobi
+  year: 2026
+  id: mcpdevsummitnairobi26
+  deadline_status: attendance
+  link: https://events.linuxfoundation.org/mcp-dev-summit-nairobi/
+  timezone: Africa/Nairobi
+  place: Nairobi, Kenya
+  date: Nov 19-20, 2026
+  start: '2026-11-19'
+  end: '2026-11-20'
+  sub: AI
+  type: summit
+  note: Sold out; waitlist open.
+
+- title: AGNTCon + MCPCon Europe
+  year: 2027
+  id: agntconmcpconeu27
+  deadline_status: tba
+  link: https://events.linuxfoundation.org/agntcon-mcpcon-europe-2027/
+  timezone: Europe/London
+  place: London, UK
+  date: Sep 15-16, 2027
+  start: '2027-09-15'
+  end: '2027-09-16'
+  sub: AI
+  type: summit
+  note: Formerly MCP Dev Summit Europe.

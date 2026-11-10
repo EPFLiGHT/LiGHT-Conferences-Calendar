@@ -65,5 +65,13 @@
   "Swiss Symposium in PoC Diagnostics": {
     "url": "https://www.pocdx.ch/",
     "attendance": true
+  },
+  "MCP Dev Summit Nairobi": {
+    "url": "https://events.linuxfoundation.org/mcp-dev-summit-nairobi/",
+    "attendance": true
+  },
+  "AGNTCon + MCPCon Europe": {
+    "url": "https://events.linuxfoundation.org/agntcon-mcpcon-europe-2027/",
+    "attendance": true
   }
 }
