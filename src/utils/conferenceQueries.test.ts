@@ -33,7 +33,7 @@ function confDeadlineInDays(id: string, days: number): Conference {
     sub: ['ML'],
     type: 'conference',
     timezone: 'utc',
-    deadline,
+    deadlines: [{ type: 'paper', due: deadline }],
   } as Conference;
 }
 
@@ -138,7 +138,7 @@ describe('deadline day counts', () => {
   });
 
   // Oct 25 23:59 AoE is Oct 26 11:59 UTC.
-  const aoeOct25 = { ...confDeadlineInDays('aoe', 0), timezone: 'UTC-12', deadline: '2026-10-25 23:59' } as Conference;
+  const aoeOct25 = { ...confDeadlineInDays('aoe', 0), timezone: 'UTC-12', deadlines: [{ type: 'paper', due: '2026-10-25 23:59' }] } as Conference;
   const daysLeftAt = (now: string) => {
     vi.useFakeTimers({ now: new Date(now) });
     return getDaysUntilDeadline(getNextDeadline(aoeOct25)!);
@@ -162,9 +162,12 @@ describe('deadline day counts', () => {
 
   it('reminds of a paper deadline while its abstract deadline is still open', () => {
     vi.useFakeTimers({ now: new Date('2026-10-19T09:00:00Z') });
-    const withAbstract = { ...aoeOct25, abstract_deadline: '2026-10-18 23:59' } as Conference;
+    const withAbstract = {
+      ...aoeOct25,
+      deadlines: [{ type: 'paper_abstract', due: '2026-10-18 23:59' }, { type: 'paper', due: '2026-10-25 23:59' }],
+    } as Conference;
     const result = filterDeadlinesByReminders([withAbstract], [30, 7, 3]);
-    expect(result.map((r) => [r.deadline.kind, r.daysLeft])).toEqual([['paper', 7]]);
+    expect(result.map((r) => [r.deadline.type, r.daysLeft])).toEqual([['paper', 7]]);
   });
 });
 
@@ -188,15 +191,17 @@ describe('sortConferences', () => {
   const ids = (list: Conference[]) => list.map((c) => c.id);
 
   describe('by deadline', () => {
-    const upcomingLate = event('upcoming-late', { deadline: '2026-07-01 23:59' });
-    const upcomingSoon = event('upcoming-soon', { abstract_deadline: '2026-06-01 23:59', deadline: '2026-06-20 23:59' });
+    const upcomingLate = event('upcoming-late', { deadlines: [{ type: 'paper', due: '2026-07-01 23:59' }] });
+    const upcomingSoon = event('upcoming-soon', {
+      deadlines: [{ type: 'paper_abstract', due: '2026-06-01 23:59' }, { type: 'paper', due: '2026-06-20 23:59' }],
+    });
     const ongoing = event('ongoing', { start: '2026-06-10', end: '2026-06-20' });
     const startsAug = event('starts-aug', { start: '2026-08-01' });
     const startsSep = event('starts-sep', { start: '2026-09-01', end: '2026-09-03' });
     const tba2026 = event('tba-2026');
     const tba2027 = event('tba-2027', { year: 2027 });
-    const expiredOld = event('expired-old', { deadline: '2026-05-01 23:59' });
-    const expiredRecent = event('expired-recent', { deadline: '2026-06-01 23:59' });
+    const expiredOld = event('expired-old', { deadlines: [{ type: 'paper', due: '2026-05-01 23:59' }] });
+    const expiredRecent = event('expired-recent', { deadlines: [{ type: 'paper', due: '2026-06-01 23:59' }] });
     const pastMarch = event('past-march', { start: '2026-03-01', end: '2026-03-03' });
     const pastOctober = event('past-october', { year: 2025, start: '2025-10-01' });
     const past2025 = event('past-2025', { year: 2025 });
@@ -243,7 +248,7 @@ describe('sortConferences', () => {
   });
 
   it('returns a new array and leaves the input order alone', () => {
-    const list = [event('b', { deadline: '2026-07-01 23:59' }), event('a', { deadline: '2026-06-20 23:59' })];
+    const list = [event('b', { deadlines: [{ type: 'paper', due: '2026-07-01 23:59' }] }), event('a', { deadlines: [{ type: 'paper', due: '2026-06-20 23:59' }] })];
     const sorted = sortConferences(list, 'deadline');
     expect(sorted).not.toBe(list);
     expect(ids(list)).toEqual(['b', 'a']);

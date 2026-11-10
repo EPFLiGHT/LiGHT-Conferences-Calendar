@@ -3,7 +3,9 @@
   id: esmyco26
   full_name: The 46th Annual Congress of the European Society of Mycobacteriology
   link: https://www.esmycobacteriology.eu/event-home
-  abstract_deadline: 2026-05-10 23:59
+  deadlines:
+    - type: abstract
+      due: 2026-05-10 23:59
   timezone: UTC-12
   place: Verona, Italy
   date: June 22-25, 2026
@@ -17,7 +19,9 @@
   id: esmyco27
   full_name: The 47th Annual Congress of the European Society of Mycobacteriology
   link: https://www.esmycobacteriology.eu/event-home
-  abstract_deadline: 2027-04-30 23:59
+  deadlines:
+    - type: abstract
+      due: 2027-04-30 23:59
   timezone: UTC-12
   place: Hamburg, Germany
   date: Jun 20-23, 2027
@@ -31,7 +35,9 @@
   id: ndss26
   full_name: Network and Distributed System Security Symposium
   link: https://www.ndss-symposium.org/ndss2026/
-  deadline: 2025-08-06 23:59
+  deadlines:
+    - type: paper
+      due: 2025-08-06 23:59
   timezone: UTC-12
   place: San Diego, California, USA
   date: Feb 23-27, 2026
@@ -46,7 +52,9 @@
   id: ndss27
   full_name: Network and Distributed System Security Symposium
   link: https://www.ndss-symposium.org/ndss2027/
-  deadline: 2026-08-19 23:59
+  deadlines:
+    - type: paper
+      due: 2026-08-19 23:59
   timezone: UTC-12
   place: Seoul, South Korea
   date: Mar 22-26, 2027
@@ -62,8 +70,11 @@
   id: neuripssd25
   full_name: 39th Annual Conference on Neural Information Processing Systems
   link: https://neurips.cc/
-  abstract_deadline: 2025-05-11 23:59
-  deadline: 2025-05-15 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2025-05-11 23:59
+    - type: paper
+      due: 2025-05-15 23:59
   timezone: America/Los_Angeles
   place: San Diego, California, USA
   date: Dec 2-7, 2025
@@ -78,8 +89,11 @@
   id: neuripsmc25
   full_name: 39th Annual Conference on Neural Information Processing Systems
   link: https://neurips.cc/
-  abstract_deadline: 2025-05-11 23:59
-  deadline: 2025-05-15 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2025-05-11 23:59
+    - type: paper
+      due: 2025-05-15 23:59
   timezone: America/Mexico_City
   place: Mexico City, Mexico
   date: Nov 30 - Dec 5, 2025
@@ -94,8 +108,11 @@
   id: neuripssy26
   full_name: 40th Annual Conference on Neural Information Processing Systems
   link: https://neurips.cc/
-  abstract_deadline: 2026-05-05 21:59
-  deadline: 2026-05-07 21:59
+  deadlines:
+    - type: paper_abstract
+      due: 2026-05-05 21:59
+    - type: paper
+      due: 2026-05-07 21:59
   timezone: Australia/Sydney
   place: Sydney, Australia
   date: Dec 6-12, 2026
@@ -111,8 +128,11 @@
   id: neuripsat26
   full_name: 40th Annual Conference on Neural Information Processing Systems
   link: https://neurips.cc/
-  abstract_deadline: 2026-05-05 07:59
-  deadline: 2026-05-07 07:59
+  deadlines:
+    - type: paper_abstract
+      due: 2026-05-05 07:59
+    - type: paper
+      due: 2026-05-07 07:59
   timezone: America/New_York
   place: Atlanta, Georgia, USA
   date: Dec 9-13, 2026
@@ -128,8 +148,11 @@
   id: neuripspa26
   full_name: 40th Annual Conference on Neural Information Processing Systems
   link: https://neurips.cc/
-  abstract_deadline: 2026-05-05 13:59
-  deadline: 2026-05-07 13:59
+  deadlines:
+    - type: paper_abstract
+      due: 2026-05-05 13:59
+    - type: paper
+      due: 2026-05-07 13:59
   timezone: Europe/Paris
   place: Paris, France
   date: Dec 9-13, 2026
@@ -145,8 +168,11 @@
   id: ieeeicst26
   full_name: 19th IEEE International Conference on Software Testing, Verification and Validation (ICST) 2026
   link: https://conf.researchr.org/home/icst-2026
-  abstract_deadline: 2025-12-15 23:59
-  deadline: 2025-12-22 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2025-12-15 23:59
+    - type: paper
+      due: 2025-12-22 23:59
   timezone: UTC+9
   place: Daejeon, South Korea
   date: May 18-22, 2026
@@ -161,7 +187,9 @@
   id: ieeeicst27
   full_name: 20th IEEE International Conference on Software Testing, Verification and Validation
   link: https://conf.researchr.org/home/icst-2027
-  deadline: 2026-11-02 23:59
+  deadlines:
+    - type: paper
+      due: 2026-11-02 23:59
   timezone: UTC-12
   place: San Sebastian, Spain
   date: May 17-21, 2027
@@ -176,8 +204,11 @@
   id: icml26
   full_name: Forty-third International Conference on Machine Learning
   link: https://icml.cc/Conferences/2026
-  abstract_deadline: 2026-01-23 23:59
-  deadline: 2026-01-28 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2026-01-23 23:59
+    - type: paper
+      due: 2026-01-28 23:59
   timezone: UTC-12
   place: Seoul, South Korea
   date: July 6-11, 2026
@@ -202,8 +233,11 @@
   id: cvpr26
   full_name: Conference on Computer Vision and Pattern Recognition
   link: https://cvpr.thecvf.com/
-  abstract_deadline: 2025-11-07 23:59
-  deadline: 2025-11-13 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2025-11-07 23:59
+    - type: paper
+      due: 2025-11-13 23:59
   timezone: UTC-12
   place: Denver, Colorado, United States
   date: Jun 6-10, 2026
@@ -218,8 +252,11 @@
   id: cvpr27
   full_name: Conference on Computer Vision and Pattern Recognition
   link: https://cvpr.thecvf.com/Conferences/2027
-  abstract_deadline: 2026-11-10 23:59
-  deadline: 2026-11-16 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2026-11-10 23:59
+    - type: paper
+      due: 2026-11-16 23:59
   timezone: UTC-12
   place: Seattle, WA, United States
   date: Jun 20-25, 2027
@@ -234,8 +271,11 @@
   id: iclr26
   full_name: The Fourteenth International Conference on Learning Representations
   link: https://iclr.cc/
-  abstract_deadline: 2025-09-19 23:59
-  deadline: 2025-09-24 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2025-09-19 23:59
+    - type: paper
+      due: 2025-09-24 23:59
   timezone: UTC-12
   place: Rio de Janeiro, Brazil
   date: April 23-27, 2026
@@ -249,8 +289,11 @@
   id: iclr27
   full_name: The Fifteenth International Conference on Learning Representations
   link: https://iclr.cc/Conferences/2027
-  abstract_deadline: 2026-09-18 23:59
-  deadline: 2026-09-25 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2026-09-18 23:59
+    - type: paper
+      due: 2026-09-25 23:59
   timezone: UTC-12
   place: San Francisco, CA, USA
   date: Apr 26-30, 2027
@@ -265,7 +308,9 @@
   id: eacl26
   full_name: The 19th Conference of the European Chapter of the Association for Computational Linguistics
   link: https://2026.eacl.org/
-  deadline: 2025-10-06 23:59
+  deadlines:
+    - type: paper
+      due: 2025-10-06 23:59
   timezone: UTC-12
   place: Rabat, Morocco
   date: March 24-29, 2026
@@ -279,7 +324,9 @@
   id: eacl27
   full_name: The 20th Conference of the European Chapter of the Association for Computational Linguistics
   link: https://2027.eacl.org/
-  deadline: 2026-08-03 23:59
+  deadlines:
+    - type: paper
+      due: 2026-08-03 23:59
   timezone: UTC-12
   place: Athens, Greece
   date: Mar 9-14, 2027
@@ -295,8 +342,11 @@
   id: log25
   full_name: Learning on Graphs Conference
   link: https://logconference.org/
-  abstract_deadline: 2025-08-24 23:59
-  deadline: 2025-08-29 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2025-08-24 23:59
+    - type: paper
+      due: 2025-08-29 23:59
   timezone: UTC-12
   place: Arizona State University, Phoenix, USA
   date: December 10-12, 2025
@@ -311,8 +361,11 @@
   id: log26
   full_name: The Fifth Learning on Graphs Conference
   link: https://logconference.org/
-  abstract_deadline: 2026-08-05 23:59
-  deadline: 2026-08-07 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2026-08-05 23:59
+    - type: paper
+      due: 2026-08-07 23:59
   timezone: UTC-12
   place: Boston, Massachusetts, USA
   date: November 20-22, 2026
@@ -327,8 +380,11 @@
   id: ecir26
   full_name: 48th European Conference on Information Retrieval
   link: https://ecir2026.eu/
-  abstract_deadline: 2025-09-25 23:59
-  deadline: 2025-10-02 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2025-09-25 23:59
+    - type: paper
+      due: 2025-10-02 23:59
   timezone: UTC-12
   place: Delft, The Netherlands
   date: Mar 29 - Apr 1, 2026
@@ -343,8 +399,11 @@
   id: ecir27
   full_name: 49th European Conference on Information Retrieval
   link: https://www.ecir2027.co.uk/
-  abstract_deadline: 2026-09-21 23:59
-  deadline: 2026-10-05 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2026-09-21 23:59
+    - type: paper
+      due: 2026-10-05 23:59
   timezone: UTC-12
   place: Southampton, UK
   date: Mar 21-25, 2027
@@ -359,7 +418,11 @@
   id: wacv26
   full_name: Winter Conference on Applications of Computer Vision
   link: https://wacv.thecvf.com/
-  deadline: 2025-09-19 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2025-09-12 23:59
+    - type: paper
+      due: 2025-09-19 23:59
   timezone: UTC-12
   place: Tucson, Arizona, United States
   date: March 6-10, 2026
@@ -368,14 +431,15 @@
   paperslink: https://wacv.thecvf.com/Conferences/2026/CallForPapers
   sub: CV
   type: conference
-  abstract_deadline: 2025-09-12 23:59
 
 - title: WACV
   year: 2027
   id: wacv27
   full_name: IEEE/CVF Winter Conference on Applications of Computer Vision
   link: https://wacv.thecvf.com/
-  deadline: 2026-08-28 23:59
+  deadlines:
+    - type: paper
+      due: 2026-08-28 23:59
   timezone: UTC-12
   place: Disney Springs, Orlando, Florida, USA
   date: January 4-8, 2027
@@ -391,8 +455,11 @@
   id: chi26
   full_name: The ACM Conference on Human Factors in Computing Systems
   link: https://chi2026.acm.org/
-  abstract_deadline: 2025-09-04 23:59
-  deadline: 2025-09-11 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2025-09-04 23:59
+    - type: paper
+      due: 2025-09-11 23:59
   timezone: UTC-12
   place: Barcelona, Spain
   date: April 13-17, 2026
@@ -407,7 +474,9 @@
   id: chi27
   full_name: The ACM Conference on Human Factors in Computing Systems
   link: https://chi2027.acm.org/
-  deadline: 2026-09-10 23:59
+  deadlines:
+    - type: paper
+      due: 2026-09-10 23:59
   timezone: UTC-12
   place: Pittsburgh, Pennsylvania, USA
   date: May 10-14, 2027
@@ -422,7 +491,9 @@
   id: coling25
   full_name: The 31st International Conference on Computational Linguistics
   link: https://coling2025.org/
-  deadline: 2024-09-16 23:59
+  deadlines:
+    - type: paper
+      due: 2024-09-16 23:59
   timezone: UTC-12
   place: Abu Dhabi, UAE
   date: January 21-24, 2025
@@ -437,7 +508,9 @@
   id: coling27
   full_name: The 32nd International Conference on Computational Linguistics
   link: https://2027.coling-iccl.org/
-  deadline: 2026-10-12 23:59
+  deadlines:
+    - type: paper
+      due: 2026-10-12 23:59
   timezone: UTC-12
   place: Macau, China
   date: May 9-14, 2027
@@ -453,8 +526,11 @@
   id: wsdm26
   full_name: 19th ACM International Conference on Web Search and Data Mining
   link: https://wsdm-conference.org/2026/
-  abstract_deadline: 2025-08-07 23:59
-  deadline: 2025-08-14 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2025-08-07 23:59
+    - type: paper
+      due: 2025-08-14 23:59
   timezone: UTC-12
   place: Boise, Idaho, USA
   date: Feb 22-26, 2026
@@ -469,8 +545,11 @@
   id: wsdm27
   full_name: 20th ACM International Conference on Web Search and Data Mining
   link: https://wsdm-conference.org/2027/
-  abstract_deadline: 2026-08-17 23:59
-  deadline: 2026-08-24 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2026-08-17 23:59
+    - type: paper
+      due: 2026-08-24 23:59
   timezone: UTC-12
   place: Hong Kong, China
   date: Feb 15-19, 2027
@@ -485,7 +564,9 @@
   id: iberamia26
   full_name: 19th Ibero-American Conference on Artificial Intelligence
   link: https://www.iberamia.org/iberamia/iberamia2026/
-  deadline: 2026-06-10 23:59
+  deadlines:
+    - type: paper
+      due: 2026-06-10 23:59
   timezone: UTC-12
   place: Asunción, Paraguay
   date: Nov 18-20, 2026
@@ -500,8 +581,11 @@
   id: aaai26
   full_name: The Fortieth AAAI Conference on Artificial Intelligence
   link: https://aaai.org/conference/aaai/aaai-26/
-  abstract_deadline: 2025-07-25 23:59
-  deadline: 2025-08-01 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2025-07-25 23:59
+    - type: paper
+      due: 2025-08-01 23:59
   timezone: UTC-12
   place: Singapore
   date: Jan 20-27, 2026
@@ -515,8 +599,11 @@
   id: aaai27
   full_name: The Forty-First AAAI Conference on Artificial Intelligence
   link: https://aaai.org/conference/aaai/aaai-27/
-  abstract_deadline: 2026-07-21 23:59
-  deadline: 2026-07-28 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2026-07-21 23:59
+    - type: paper
+      due: 2026-07-28 23:59
   timezone: UTC-12
   place: Montréal, Canada
   date: Feb 16-23, 2027
@@ -531,7 +618,9 @@
   id: aabi25
   full_name: Advances in Approximate Bayesian Inference
   link: https://probml.cc/
-  deadline: 2025-02-14 23:59
+  deadlines:
+    - type: paper
+      due: 2025-02-14 23:59
   timezone: UTC-12
   place: NTU College of Computing and Data Science, Singapore
   date: April 29, 2025
@@ -546,7 +635,9 @@
   id: probml26
   full_name: Symposium on Probabilistic Machine Learning
   link: https://probml.cc/
-  deadline: 2026-03-20 23:59
+  deadlines:
+    - type: paper
+      due: 2026-03-20 23:59
   timezone: UTC-12
   place: Korea Institute for Advanced Study, Seoul, South Korea
   date: July 5, 2026
@@ -562,8 +653,11 @@
   id: colm25
   full_name: 2nd Conference on Language Modeling
   link: https://colmweb.org/
-  abstract_deadline: 2025-03-22 23:59
-  deadline: 2025-03-28 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2025-03-22 23:59
+    - type: paper
+      due: 2025-03-28 23:59
   timezone: UTC-12
   place: Montreal, Canada
   date: October 7-10, 2025
@@ -578,8 +672,11 @@
   id: colm26
   full_name: Third Conference on Language Modeling
   link: https://colmweb.org/
-  abstract_deadline: 2026-03-26 23:59
-  deadline: 2026-04-01 00:15
+  deadlines:
+    - type: paper_abstract
+      due: 2026-03-26 23:59
+    - type: paper
+      due: 2026-04-01 00:15
   timezone: UTC-12
   place: San Francisco, USA
   date: October 6-9, 2026
@@ -594,7 +691,9 @@
   id: ijcai26
   full_name: 35th International Joint Conference on Artificial Intelligence
   link: https://2026.ijcai.org/
-  deadline: 2026-01-19 23:59
+  deadlines:
+    - type: paper
+      due: 2026-01-19 23:59
   timezone: UTC-12
   place: Bremen, Germany
   date: August 15-21, 2026
@@ -624,9 +723,10 @@
   id: chil26
   full_name: 7th Annual Conference on Health, Inference, and Learning
   link: https://chil.ahli.cc/
-  deadline: 2026-02-04 23:59
-  sync_pin:
-    - deadline
+  deadlines:
+    - type: paper
+      due: 2026-02-04 23:59
+      pin: true
   timezone: UTC-12
   place: Seattle, Washington, USA
   date: June 28-30, 2026
@@ -641,7 +741,9 @@
   id: satml26
   full_name: 4th IEEE Conference on Secure and Trustworthy Machine Learning
   link: https://satml.org/
-  deadline: 2025-09-24 23:59
+  deadlines:
+    - type: paper
+      due: 2025-09-24 23:59
   timezone: UTC-12
   place: Technical University of Munich, Germany
   date: March 23-25, 2026
@@ -656,8 +758,11 @@
   id: satml27
   full_name: 5th IEEE Conference on Secure and Trustworthy Machine Learning
   link: https://satml.org/
-  abstract_deadline: 2026-09-22 23:59
-  deadline: 2026-09-29 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2026-09-22 23:59
+    - type: paper
+      due: 2026-09-29 23:59
   timezone: UTC-12
   place: Reykjavik, Iceland
   paperslink: https://satml.org/participate-cfp/
@@ -670,7 +775,9 @@
   id: icprai26
   full_name: 5th International Conference on Pattern Recognition and Artificial Intelligence
   link: https://icprai2026.com/
-  deadline: 2026-01-15 23:59
+  deadlines:
+    - type: paper
+      due: 2026-01-15 23:59
   timezone: UTC-12
   place: Montreal, Canada
   date: June 15-18, 2026
@@ -685,7 +792,9 @@
   id: lrec26
   full_name: 15th Language Resources and Evaluation Conference
   link: https://lrec2026.info/
-  deadline: 2025-10-17 23:59
+  deadlines:
+    - type: paper
+      due: 2025-10-17 23:59
   timezone: UTC-12
   place: Palma, Mallorca, Spain
   date: May 11-16, 2026
@@ -700,7 +809,9 @@
   id: sigir26
   full_name: 49th International ACM SIGIR Conference on Research and Development in Information Retrieval
   link: https://sigir2026.org/en-AU
-  deadline: 2026-04-29 23:59
+  deadlines:
+    - type: paper
+      due: 2026-04-29 23:59
   timezone: UTC-12
   place: Melbourne, Australia
   date: July 20-24, 2026
@@ -714,8 +825,11 @@
   id: sigir27
   full_name: 50th International ACM SIGIR Conference on Research and Development in Information Retrieval
   link: https://sigir2027.org/
-  abstract_deadline: 2027-01-14 23:59
-  deadline: 2027-01-21 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2027-01-14 23:59
+    - type: paper
+      due: 2027-01-21 23:59
   timezone: UTC-12
   place: San Jose, California, USA
   date: Jul 18-24, 2027
@@ -731,8 +845,11 @@
   id: siggraph26
   full_name: The Premier Conference & Exhibition on Computer Graphics & Interactive Techniques
   link: https://s2026.siggraph.org/
-  abstract_deadline: 2026-01-15 22:00
-  deadline: 2026-01-22 22:00
+  deadlines:
+    - type: paper_abstract
+      due: 2026-01-15 22:00
+    - type: paper
+      due: 2026-01-22 22:00
   timezone: GMT
   place: Los Angeles, California, USA
   date: July 19-23, 2026
@@ -761,8 +878,11 @@
   id: ecmlpkdd26
   full_name: European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases
   link: https://ecmlpkdd.org/2026/
-  abstract_deadline: 2026-03-05 23:59
-  deadline: 2026-03-12 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2026-03-05 23:59
+    - type: paper
+      due: 2026-03-12 23:59
   timezone: UTC-12
   place: Naples, Italy
   date: Sep 07-11, 2026
@@ -791,8 +911,11 @@
   id: cikm26
   full_name: Conference on Information and Knowledge Management
   link: http://www.cikmconference.org/
-  abstract_deadline: 2026-05-16 23:59
-  deadline: 2026-05-23 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2026-05-16 23:59
+    - type: paper
+      due: 2026-05-23 23:59
   timezone: UTC-12
   place: Rome, Italy
   date: November 7-11, 2026
@@ -821,7 +944,9 @@
   id: specom25
   full_name: 27th International Conference on Speech and Computer
   link: https://specom.nw.ru/2025/
-  deadline: 2025-07-07 23:59
+  deadlines:
+    - type: paper
+      due: 2025-07-07 23:59
   timezone: UTC-12
   place: Szeged, Hungary
   date: October 13-15, 2025
@@ -835,7 +960,9 @@
   id: specom26
   full_name: 28th International Conference on Speech and Computer
   link: https://specom.nw.ru/2026/
-  deadline: 2026-06-08 23:59
+  deadlines:
+    - type: paper
+      due: 2026-06-08 23:59
   timezone: UTC-12
   place: Ohrid, North Macedonia
   date: September 17-18, 2026
@@ -849,7 +976,9 @@
   id: automl25
   full_name: International Conference on Automated Machine Learning
   link: https://2025.automl.cc/
-  deadline: 2025-03-31 23:59
+  deadlines:
+    - type: paper
+      due: 2025-03-31 23:59
   timezone: UTC-12
   place: Roosevelt Island, New York City, USA
   date: Sep 08-11, 2025
@@ -864,7 +993,9 @@
   id: automl26
   full_name: International Conference on Automated Machine Learning
   link: https://2026.automl.cc/
-  deadline: 2026-04-30 23:59
+  deadlines:
+    - type: paper
+      due: 2026-04-30 23:59
   timezone: UTC-12
   place: Ljubljana, Slovenia
   date: Sep 28 - Oct 1, 2026
@@ -879,7 +1010,9 @@
   id: pets26
   full_name: 26th Privacy Enhancing Technologies Symposium
   link: https://petsymposium.org/2026/
-  deadline: 2026-02-28 23:59
+  deadlines:
+    - type: paper
+      due: 2026-02-28 23:59
   timezone: UTC-12
   place: Calgary, Canada
   date: July 20-25, 2026
@@ -894,7 +1027,9 @@
   id: pets27
   full_name: 27th Privacy Enhancing Technologies Symposium
   link: https://petsymposium.org/2027/
-  deadline: 2026-11-30 23:59
+  deadlines:
+    - type: paper
+      due: 2026-11-30 23:59
   timezone: UTC-12
   place: Delft, The Netherlands
   date: Jul 19-24, 2027
@@ -910,8 +1045,11 @@
   id: privacysymposium26
   full_name: The Privacy and Data Governance Symposium
   link: https://privacysymposium.org/
-  abstract_deadline: 2025-11-28 23:59
-  deadline: 2026-02-04 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2025-11-28 23:59
+    - type: paper
+      due: 2026-02-04 23:59
   timezone: UTC-12
   place: Venice, Italy
   date: April 20-24, 2026
@@ -926,7 +1064,9 @@
   id: privacysymposium27
   full_name: The Privacy and Data Governance Symposium
   link: https://privacysymposium.org/
-  deadline: 2026-10-25 23:59
+  deadlines:
+    - type: paper
+      due: 2026-10-25 23:59
   timezone: UTC-12
   place: Venice, Italy
   date: Apr 26-30, 2027
@@ -941,7 +1081,9 @@
   id: sacmat26
   full_name: 31st ACM Symposium on Access Control Models and Technologies
   link: https://sacmat.org/2026/index.php
-  deadline: 2026-03-02 23:59
+  deadlines:
+    - type: paper
+      due: 2026-03-02 23:59
   timezone: UTC-12
   place: Waterloo, Canada
   date: July 8-10, 2026
@@ -956,7 +1098,9 @@
   id: sacmat27
   full_name: 32nd ACM Symposium on Access Control Models and Technologies
   link: https://sacmat.org/2027/index.php
-  deadline: 2026-10-30 23:59
+  deadlines:
+    - type: paper
+      due: 2026-10-30 23:59
   timezone: UTC-12
   place: Durham, UK
   date: Jul 19-21, 2027
@@ -972,8 +1116,11 @@
   id: thewebconference26
   full_name: THE ACM WEB CONFERENCE
   link: https://www2026.thewebconf.org/
-  abstract_deadline: 2025-09-30 23:59
-  deadline: 2025-10-07 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2025-09-30 23:59
+    - type: paper
+      due: 2025-10-07 23:59
   timezone: UTC-12
   place: Dubai, UAE
   date: April 13-17, 2026
@@ -988,8 +1135,11 @@
   id: thewebconference27
   full_name: The ACM Web Conference
   link: https://www2027.thewebconf.org/
-  abstract_deadline: 2026-10-18 23:59
-  deadline: 2026-10-25 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2026-10-18 23:59
+    - type: paper
+      due: 2026-10-25 23:59
   timezone: UTC-12
   place: Dublin, Ireland
   date: May 10-14, 2027
@@ -1004,7 +1154,9 @@
   id: mlhc26
   full_name: Machine Learning for Healthcare
   link: https://www.mlforhc.org/2026-conference
-  deadline: 2026-04-17 23:59
+  deadlines:
+    - type: paper
+      due: 2026-04-17 23:59
   timezone: UTC-12
   place: Baltimore, Maryland, USA
   date: August 13-14, 2026
@@ -1033,7 +1185,9 @@
   id: pmac27
   full_name: Prince Mahidol Award Conference
   link: https://pmac2027.com/
-  abstract_deadline: 2026-08-15 16:00
+  deadlines:
+    - type: abstract
+      due: 2026-08-15 16:00
   timezone: Asia/Bangkok
   place: Bangkok, Thailand
   date: Jan 26-30, 2027
@@ -1061,7 +1215,9 @@
   id: icgh26
   full_name: 20th International Conference on Global Health
   link: https://waset.org/global-health-conference-in-january-2026-in-london?utm_source=conferenceindex&utm_medium=referral&utm_campaign=listing
-  deadline: 2025-12-21 23:59
+  deadlines:
+    - type: paper
+      due: 2025-12-21 23:59
   timezone: UTC-12
   place: London, United Kingdom
   date: Jan 19-20, 2026
@@ -1076,7 +1232,9 @@
   id: cugh26
   full_name: 17th Consortium of Universities for Global Health Annual Conference
   link: https://www.cugh2026.org/
-  deadline: 2025-10-15 23:59
+  deadlines:
+    - type: paper
+      due: 2025-10-15 23:59
   timezone: EST
   place: Washington, D.C., USA
   date: April 09-12, 2026
@@ -1091,7 +1249,9 @@
   id: cugh27
   full_name: 18th Consortium of Universities for Global Health Annual Conference
   link: https://cughlima2027.org/
-  deadline: 2026-08-31 23:59
+  deadlines:
+    - type: paper
+      due: 2026-08-31 23:59
   timezone: EST
   place: Lima, Peru
   date: Feb 25-28, 2027
@@ -1189,7 +1349,9 @@
   id: msf26
   full_name: Médecins Sans Frontières Scientific Days
   link: https://msf.org.uk/msf-scientific-days
-  deadline: 2026-01-18 23:59
+  deadlines:
+    - type: paper
+      due: 2026-01-18 23:59
   timezone: GMT
   place: Royal College of Physicians, London, UK
   date: May 20, 2026
@@ -1203,7 +1365,9 @@
   id: ict4d26
   full_name: ICT4D Conference 2026
   link: https://www.ict4dconference.org/
-  deadline: 2026-01-16 23:59
+  deadlines:
+    - type: paper
+      due: 2026-01-16 23:59
   timezone: Africa/Nairobi
   place: Nairobi, Kenya
   date: May 20-22, 2026
@@ -1217,7 +1381,9 @@
   id: acl26
   full_name: Annual Meeting of the Association for Computational Linguistics
   link: https://2026.aclweb.org/
-  deadline: '2026-01-05 23:59:59'
+  deadlines:
+    - type: paper
+      due: '2026-01-05 23:59:59'
   timezone: UTC-12
   place: San Diego, CA, USA
   date: July 02-07, 2026
@@ -1247,7 +1413,9 @@
   id: emnlp26
   full_name: Conference on Empirical Methods in Natural Language Processing
   link: https://2026.emnlp.org/
-  deadline: '2026-05-25 23:59:00'
+  deadlines:
+    - type: paper
+      due: '2026-05-25 23:59:00'
   timezone: UTC-12
   place: Budapest, Hungary
   date: October 24-29, 2026
@@ -1262,7 +1430,9 @@
   id: uai26
   full_name: Forty-Second Annual Conference on Uncertainty in Artificial Intelligence
   link: https://www.auai.org/uai2026/
-  deadline: 2026-02-25 23:59
+  deadlines:
+    - type: paper
+      due: 2026-02-25 23:59
   timezone: UTC-12
   place: Amsterdam, Netherlands
   date: August 17-21, 2026
@@ -1276,8 +1446,11 @@
   id: kdd26
   full_name: ACM SIGKDD Conference on Knowledge Discovery and Data Mining
   link: https://kdd2026.kdd.org/
-  deadline: '2025-07-31 23:59:59'
-  abstract_deadline: '2025-07-24 23:59:59'
+  deadlines:
+    - type: paper_abstract
+      due: '2025-07-24 23:59:59'
+    - type: paper
+      due: '2025-07-31 23:59:59'
   timezone: UTC-12
   place: Jeju, Korea
   date: August 9-13, 2026
@@ -1291,8 +1464,11 @@
   id: kdd27
   full_name: ACM SIGKDD Conference on Knowledge Discovery and Data Mining
   link: https://kdd2027.kdd.org/
-  abstract_deadline: 2026-07-19 23:59
-  deadline: 2026-07-26 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2026-07-19 23:59
+    - type: paper
+      due: 2026-07-26 23:59
   timezone: UTC-12
   place: San Jose, California, USA
   date: Aug 1-5, 2027
@@ -1308,8 +1484,11 @@
   id: icdm26
   full_name: IEEE International Conference on Data Mining
   link: http://icdm2026.neu.edu.cn/
-  deadline: '2026-06-06 23:59:00'
-  abstract_deadline: '2026-05-30 23:59:00'
+  deadlines:
+    - type: paper_abstract
+      due: '2026-05-30 23:59:00'
+    - type: paper
+      due: '2026-06-06 23:59:00'
   timezone: UTC-12
   place: Shenyang, China
   date: November 12-15, 2026
@@ -1323,7 +1502,9 @@
   id: icdm27
   full_name: IEEE International Conference on Data Mining
   link: https://icdm2027-website.onrender.com/
-  deadline: 2027-06-06 23:59
+  deadlines:
+    - type: paper
+      due: 2027-06-06 23:59
   timezone: UTC-12
   place: Brisbane, Australia
   date: Nov 15-18, 2027
@@ -1338,8 +1519,11 @@
   id: eccv26
   full_name: The 19th European Conference on Computer Vision
   link: https://eccv.ecva.net/Conferences/2026
-  deadline: 2026-03-05 22:59
-  abstract_deadline: 2026-02-26 22:59
+  deadlines:
+    - type: paper_abstract
+      due: 2026-02-26 22:59
+    - type: paper
+      due: 2026-03-05 22:59
   timezone: Europe/Paris
   place: Malmö, Sweden
   date: Sep 8-13, 2026
@@ -1353,8 +1537,11 @@
   id: miccai26
   full_name: International Conference on Medical Image Computing and Computer Assisted Intervention
   link: https://conferences.miccai.org/2026/
-  abstract_deadline: 2026-02-12 19:59
-  deadline: 2026-02-26 19:59
+  deadlines:
+    - type: paper_abstract
+      due: 2026-02-12 19:59
+    - type: paper
+      due: 2026-02-26 19:59
   timezone: UTC-12
   place: Strasbourg, France
   date: September 27 - October 1, 2026
@@ -1384,8 +1571,11 @@
   id: midl26
   full_name: Medical Imaging with Deep Learning
   link: https://2026.midl.io/
-  abstract_deadline: 2025-12-04 00:01
-  deadline: 2025-12-11 00:01
+  deadlines:
+    - type: paper_abstract
+      due: 2025-12-04 00:01
+    - type: paper
+      due: 2025-12-11 00:01
   timezone: UTC-12
   place: Taipei, Taiwan, ROC
   date: July 8-10, 2026
@@ -1413,7 +1603,11 @@
   id: aime26
   full_name: International Conference on Artificial Intelligence in Medicine
   link: https://aime26.aimedicine.info/
-  deadline: 2026-02-17 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2026-02-10 23:59
+    - type: paper
+      due: 2026-02-17 23:59
   timezone: UTC-12
   place: Ottawa, Canada
   date: July 7-10, 2026
@@ -1421,15 +1615,17 @@
   end: '2026-07-10'
   sub: Health AI
   type: conference
-  abstract_deadline: 2026-02-10 23:59
 
 - title: AIME
   year: 2027
   id: aime27
   full_name: International Conference on Artificial Intelligence in Medicine
   link: https://aime27.aimedicine.info/
-  abstract_deadline: 2027-01-31 23:59
-  deadline: 2027-02-07 23:59
+  deadlines:
+    - type: paper_abstract
+      due: 2027-01-31 23:59
+    - type: paper
+      due: 2027-02-07 23:59
   timezone: UTC-12
   place: Amsterdam, The Netherlands
   date: Jul 6-7, 2027
@@ -1451,14 +1647,18 @@
   end: '2026-07-30'
   sub: Health AI
   type: conference
-  abstract_deadline: 2026-04-30 23:59
+  deadlines:
+    - type: abstract
+      due: 2026-04-30 23:59
 
 - title: IEEE EMBC
   year: 2027
   id: embc27
   full_name: 49th Annual International Conference of the IEEE Engineering in Medicine and Biology Society
   link: https://embc.embs.org/2027/
-  deadline: 2027-01-24 23:59
+  deadlines:
+    - type: paper
+      due: 2027-01-24 23:59
   timezone: UTC-12
   place: Singapore
   date: Jul 11-15, 2027
@@ -1474,7 +1674,9 @@
   id: amia26
   full_name: AMIA Annual Symposium (American Medical Informatics Association)
   link: https://amia.org/education-events/amia-2026-annual-symposium
-  deadline: 2026-03-10 23:59
+  deadlines:
+    - type: paper
+      due: 2026-03-10 23:59
   timezone: UTC-12
   place: Dallas, TX, USA
   date: November 7-11, 2026
@@ -1488,8 +1690,11 @@
   id: psb27
   full_name: Pacific Symposium on Biocomputing
   link: https://psb.stanford.edu/
-  abstract_deadline: 2026-12-01 23:59
-  deadline: 2026-08-03 23:59
+  deadlines:
+    - type: paper
+      due: 2026-08-03 23:59
+    - type: paper_abstract
+      due: 2026-12-01 23:59
   timezone: America/Los_Angeles
   place: Big Island, Hawaii, USA
   date: January 3-7, 2027
@@ -1521,7 +1726,9 @@
   id: gdhf26
   full_name: Global Digital Health Forum
   link: https://www.gdhf.digital/
-  abstract_deadline: 2026-07-07 11:59
+  deadlines:
+    - type: abstract
+      due: 2026-07-07 11:59
   timezone: America/New_York
   place: Bangkok, Thailand
   date: December 2-4, 2026
@@ -1549,7 +1756,9 @@
   id: ghf26
   full_name: Geneva Health Forum
   link: https://genevahealthforum.com/
-  abstract_deadline: 2026-09-15 23:59
+  deadlines:
+    - type: abstract
+      due: 2026-09-15 23:59
   timezone: UTC-12
   place: Geneva, Switzerland
   date: November 10-12, 2026
@@ -1565,7 +1774,9 @@
   id: unionconf26
   full_name: Union World Conference on Lung Health
   link: https://theunion.org/
-  abstract_deadline: 2026-04-13 23:59
+  deadlines:
+    - type: abstract
+      due: 2026-04-13 23:59
   timezone: UTC-12
   place: Rio de Janeiro, Brazil
   date: November 17-20, 2026
@@ -1580,7 +1791,9 @@
   id: unionnar27
   full_name: 31st Annual TB Conference of The Union North America Region
   link: https://bclung.ca/lung-health/tuberculosis/annual-tb-conference-the-union-nar/
-  abstract_deadline: 2026-10-10 23:59
+  deadlines:
+    - type: abstract
+      due: 2026-10-10 23:59
   timezone: UTC-12
   place: Vancouver, Canada
   date: February 24-27, 2027
@@ -1594,7 +1807,9 @@
   id: unionaprc26
   full_name: 10th Asia Pacific Region Conference of the International Union Against Tuberculosis and Lung Disease
   link: https://aprc2026.org/
-  abstract_deadline: 2025-11-30 23:59
+  deadlines:
+    - type: abstract
+      due: 2025-11-30 23:59
   timezone: UTC-12
   place: Bangkok, Thailand
   date: February 4-7, 2026

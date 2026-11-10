@@ -1,9 +1,28 @@
 import type { JSX } from 'react';
-import { Box, VStack, Text, Flex } from '@chakra-ui/react';
+import { Box, VStack, HStack, Text, Flex } from '@chakra-ui/react';
 import { DateTime } from 'luxon';
+import { FileText, HandCoins, Ticket, type LucideIcon } from 'lucide-react';
 import Countdown from './Countdown';
 import { formatTimeWithZone } from './format';
+import { DEADLINE_GROUP_LABELS, type DeadlineGroup } from '@/constants/deadlineTypes';
 import type { DeadlineInfo } from '@/types/conference';
+
+const GROUP_ICONS: Record<DeadlineGroup, LucideIcon> = {
+  submission: FileText,
+  registration: Ticket,
+  funding: HandCoins,
+};
+
+/** The deadline's group icon and label; the icon takes the label's color. */
+function DeadlineLabel({ deadline }: { deadline: DeadlineInfo }): JSX.Element {
+  const Icon = GROUP_ICONS[deadline.group];
+  return (
+    <HStack gap="1.5">
+      <Icon size={12} strokeWidth={2} role="img" aria-label={DEADLINE_GROUP_LABELS[deadline.group]} />
+      <span>{deadline.label}</span>
+    </HStack>
+  );
+}
 
 interface DeadlineCardProps {
   deadline: DeadlineInfo;
@@ -38,8 +57,8 @@ export default function DeadlineCard({
           borderColor="line.default"
           bg="brand.50"
         >
-          <Text textStyle="eyebrow" color="brand.500">
-            {deadline.label}
+          <Text as="div" textStyle="eyebrow" color="brand.500">
+            <DeadlineLabel deadline={deadline} />
           </Text>
           {isExpired && (
             <Text textStyle="metaLabel" color="gray.500">
@@ -142,8 +161,8 @@ export default function DeadlineCard({
 
       {/* Detail */}
       <VStack align="stretch" gap="1.5" flex="1" justify="center">
-        <Text textStyle="fieldLabel" color="brand.500">
-          {deadline.label}
+        <Text as="div" textStyle="fieldLabel" color="brand.500">
+          <DeadlineLabel deadline={deadline} />
         </Text>
         <Text fontSize="xs" color="gray.600" className="tabular" lineHeight="1.5">
           {formatTimeWithZone(deadline.localDatetime)}

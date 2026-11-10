@@ -3,14 +3,20 @@
 
 import { DateTime } from 'luxon';
 import { SUBJECT_CODES } from '../constants/subjects.data.js';
+import { DEADLINE_TYPES, DEADLINE_TYPE_CODES } from '../constants/deadlineTypes.data.js';
 
 /** Fields every event must define. */
 const REQUIRED_FIELDS = ['title', 'year', 'id', 'timezone', 'type'];
 
 const OPTIONAL_FIELDS = [
-  'full_name', 'link', 'deadline', 'abstract_deadline', 'place', 'date',
+  'full_name', 'link', 'deadlines', 'place', 'date',
   'start', 'end', 'paperslink', 'sub', 'note', 'deadline_status', 'sync_pin',
 ];
+
+/** Fields replaced by `deadlines`; an entry still using one is an error. */
+const OLD_DEADLINE_FIELDS = ['deadline', 'abstract_deadline'];
+
+const DEADLINE_ITEM_KEYS = new Set(['type', 'due', 'label', 'pin']);
 
 const KNOWN_FIELDS = new Set([...REQUIRED_FIELDS, ...OPTIONAL_FIELDS]);
 
@@ -20,15 +26,13 @@ export const VALID_TYPES = ['conference', 'summit', 'workshop'];
 /** Allowed values for the optional `deadline_status` field. */
 const VALID_DEADLINE_STATUS = ['attendance', 'tba'];
 
-/** Fields a sync may write into an entry, i.e. the ones `sync_pin` accepts. */
-export const SYNC_PINNABLE_FIELDS = [
-  'deadline', 'abstract_deadline', 'place', 'start', 'end', 'date',
-];
+/** Fields a sync may write into an entry, i.e. the ones `sync_pin` accepts. Deadlines pin per item. */
+export const SYNC_PINNABLE_FIELDS = ['place', 'start', 'end', 'date'];
 
 const YEAR_MIN = 1900;
 const YEAR_MAX = 2100;
 
-// Datetime fields (deadline, abstract_deadline): "YYYY-MM-DD HH:MM" or "...:SS".
+// Datetime fields (a deadline's `due`): "YYYY-MM-DD HH:MM" or "...:SS".
 const DATETIME_RE = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}(:\d{2})?$/;
 // Date-only fields (start, end): "YYYY-MM-DD".
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -77,17 +81,17 @@ export function validateEntry(conf, index) {
     if (!conf[field]) error(`Missing required field '${field}'`);
   }
   for (const field of Object.keys(conf)) {
-    if (!KNOWN_FIELDS.has(field)) warning(`Unknown field '${field}'`);
+    if (OLD_DEADLINE_FIELDS.includes(field)) {
+      error(`Field '${field}' was replaced by 'deadlines' (a list of {type, due}; see README)`);
+    } else if (!KNOWN_FIELDS.has(field)) {
+      warning(`Unknown field '${field}'`);
+    }
   }
 
   if (conf.timezone && !isValidTimezone(conf.timezone)) {
     error(`Invalid IANA timezone '${conf.timezone}'`);
   }
-  for (const field of ['deadline', 'abstract_deadline']) {
-    if (conf[field] && !isValidDateTime(conf[field])) {
-      error(`Invalid datetime for '${field}': ${JSON.stringify(conf[field])} (use YYYY-MM-DD HH:MM:SS or YYYY-MM-DD HH:MM)`);
-    }
-  }
+  if (conf.deadlines !== undefined) validateDeadlines(conf.deadlines, error);
   for (const field of ['start', 'end']) {
     if (conf[field] && !isValidDate(conf[field])) {
       error(`Invalid date for '${field}': ${JSON.stringify(conf[field])} (use YYYY-MM-DD)`);
@@ -104,7 +108,8 @@ export function validateEntry(conf, index) {
     } else {
       for (const field of conf.sync_pin) {
         if (!SYNC_PINNABLE_FIELDS.includes(field)) {
-          error(`sync_pin field '${field}' is not synced (use one of: ${SYNC_PINNABLE_FIELDS.join(', ')})`);
+          const hint = OLD_DEADLINE_FIELDS.includes(field) ? '; pin a deadline with pin: true on its item' : '';
+          error(`sync_pin field '${field}' is not synced (use one of: ${SYNC_PINNABLE_FIELDS.join(', ')})${hint}`);
         }
       }
     }
@@ -152,13 +157,70 @@ export function validateEntry(conf, index) {
     error('Start date is after end date');
   }
 
-  if (isValidDateTime(conf.abstract_deadline) && isValidDateTime(conf.deadline)) {
-    const abstract = parseEntryDateTime(conf.abstract_deadline);
-    const paper = parseEntryDateTime(conf.deadline);
-    if (abstract > paper) warning('Abstract deadline is after paper submission deadline');
+  if (Array.isArray(conf.deadlines)) {
+    const earliest = earliestByType(conf.deadlines);
+    if (earliest.paper_abstract > earliest.paper) {
+      warning('Paper abstract deadline is after the full paper deadline');
+    }
+    if (earliest.early_registration > earliest.registration) {
+      warning('Early-bird registration closes after registration closes');
+    }
+    if (conf.deadline_status === 'attendance'
+      && conf.deadlines.some((d) => DEADLINE_TYPES[d?.type]?.group === 'submission')) {
+      warning("deadline_status is 'attendance' but a submission deadline is listed");
+    }
   }
 
   return issues;
+}
+
+/**
+ * Check an entry's `deadlines` list and each of its items.
+ * @param {unknown} deadlines
+ * @param {(message: string) => void} error
+ */
+function validateDeadlines(deadlines, error) {
+  if (!Array.isArray(deadlines) || deadlines.length === 0) {
+    error('deadlines must be a non-empty list (omit it when there are none)');
+    return;
+  }
+  const seen = new Set();
+  deadlines.forEach((item, i) => {
+    const itemError = (message) => error(`deadlines[${i}]: ${message}`);
+    if (!item || typeof item !== 'object' || Array.isArray(item)) {
+      itemError('must be a mapping with type and due');
+      return;
+    }
+    for (const key of Object.keys(item)) {
+      if (!DEADLINE_ITEM_KEYS.has(key)) itemError(`unknown key '${key}'`);
+    }
+    if (!DEADLINE_TYPE_CODES.includes(item.type)) {
+      itemError(`unknown type '${item.type}' (use one of: ${DEADLINE_TYPE_CODES.join(', ')})`);
+    }
+    if (!isValidDateTime(item.due)) {
+      itemError(`invalid due ${JSON.stringify(item.due)} (use YYYY-MM-DD HH:MM or YYYY-MM-DD HH:MM:SS)`);
+    }
+    if (item.label !== undefined && (typeof item.label !== 'string' || !item.label.trim())) {
+      itemError('label must be a non-empty string');
+    } else if (item.type === 'other' && item.label === undefined) {
+      itemError("type 'other' needs a label");
+    }
+    if (item.pin !== undefined && item.pin !== true) itemError('pin must be true when present');
+    const identity = `${item.type}\n${item.label ?? ''}`;
+    if (seen.has(identity)) itemError(`a '${item.type}' deadline with this label is already listed`);
+    seen.add(identity);
+  });
+}
+
+/** Earliest due (UTC millis) of each type among the valid items. */
+function earliestByType(deadlines) {
+  const earliest = {};
+  for (const item of deadlines) {
+    if (!isValidDateTime(item?.due)) continue;
+    const at = parseEntryDateTime(item.due).toMillis();
+    if (!(item.type in earliest) || at < earliest[item.type]) earliest[item.type] = at;
+  }
+  return earliest;
 }
 
 /**

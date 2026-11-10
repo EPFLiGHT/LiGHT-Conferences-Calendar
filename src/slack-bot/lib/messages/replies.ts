@@ -27,8 +27,7 @@ export function buildDeadlineList(
     deadlines.map(({ conference, deadline }) => ({
       kind: 'deadline' as const,
       conference,
-      deadline,
-      daysLeft: getDaysUntilDeadline(deadline),
+      deadlines: [{ deadline, daysLeft: getDaysUntilDeadline(deadline) }],
     }))
   );
   return { blocks: [...intro, ...cards], text: `${title}: ${plural(deadlines.length, 'upcoming deadline')}` };

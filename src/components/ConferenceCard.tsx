@@ -7,8 +7,10 @@ import SubjectBadge from './SubjectBadge';
 import TypeBadge from './TypeBadge';
 import NoteBadge from './NoteBadge';
 import ConferenceDetails from './ConferenceDetails';
-import { getDeadlineInfo, getNoDeadlineLabel } from '@/utils/parser';
+import { getCardDeadlines, getNoDeadlineLabel } from '@/utils/parser';
 import type { Conference } from '@/types/conference';
+
+export const CARD_MAX_DEADLINES = 3;
 
 interface ConferenceCardProps {
   conference: Conference;
@@ -17,7 +19,7 @@ interface ConferenceCardProps {
 }
 
 export default function ConferenceCard({ conference, onClick, index }: ConferenceCardProps): JSX.Element {
-  const allDeadlines = getDeadlineInfo(conference);
+  const { shown, more } = getCardDeadlines(conference, CARD_MAX_DEADLINES);
 
   return (
     <AnimatedCard index={index} onClick={onClick}>
@@ -64,7 +66,7 @@ export default function ConferenceCard({ conference, onClick, index }: Conferenc
       </Box>
 
       {/* Deadlines */}
-      {allDeadlines.length > 0 ? (
+      {shown.length > 0 ? (
         <VStack
           align="stretch"
           gap="4"
@@ -75,9 +77,14 @@ export default function ConferenceCard({ conference, onClick, index }: Conferenc
           borderColor="line.default"
           mb="4"
         >
-          {allDeadlines.map((deadline) => (
-            <DeadlineCard key={deadline.kind} deadline={deadline} variant="compact" />
+          {shown.map((deadline) => (
+            <DeadlineCard key={deadline.key} deadline={deadline} variant="compact" />
           ))}
+          {more > 0 && (
+            <Text textStyle="caption" color="gray.500">
+              +{more} more in details
+            </Text>
+          )}
         </VStack>
       ) : (
         <Box

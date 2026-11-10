@@ -1,12 +1,19 @@
 import { describe, it, expect } from 'vitest';
 import { buildDigest, CHANNEL_DIGEST, DM_DIGEST } from './digest';
-import { deadlineItem, eventItem } from '@/slack-bot/testing/fixtures';
+import { conference, deadlineItem, eventItem, typedDeadlineItem as item } from '@/slack-bot/testing/fixtures';
 
 const DATE = new Date('2026-06-19T12:00:00Z');
 
 const blocksText = (blocks: unknown[]) => JSON.stringify(blocks);
 
 describe('buildDigest', () => {
+  it('puts two deadlines of one event in one card and still counts both', () => {
+    const a = conference({ id: 'a26', title: 'A' });
+    const msg = buildDigest({ ...CHANNEL_DIGEST, deadlines: [item(a, 'poster', 7), item(a, 'grant', 7)], eventStarts: [], date: new Date('2026-09-08') });
+    expect(msg.blocks.filter((b) => b.type === 'actions')).toHaveLength(1);
+    expect(msg.text).toBe('📅 Conference Update: 2 deadlines');
+  });
+
   it('has the title, the date, and the footer', () => {
     const msg = buildDigest({ ...CHANNEL_DIGEST, deadlines: [deadlineItem('pets', 1)], eventStarts: [], date: DATE });
     const header = msg.blocks.find((b) => b.type === 'header') as any;

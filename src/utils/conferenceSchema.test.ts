@@ -7,6 +7,7 @@ import {
   validateEntry,
   findDuplicateIds,
 } from '@/utils/conferenceSchema';
+import { DEADLINE_TYPE_CODES } from '@/constants/deadlineTypes.data';
 
 describe('isValidTimezone', () => {
   it('accepts valid IANA zones', () => {
@@ -72,8 +73,7 @@ describe('validateEntry', () => {
     timezone: 'UTC-12',
     type: 'conference',
     sub: 'ML',
-    abstract_deadline: '2026-01-20 23:59',
-    deadline: '2026-01-28 23:59',
+    deadlines: [{ type: 'paper_abstract', due: '2026-01-20 23:59' }, { type: 'paper', due: '2026-01-28 23:59' }],
     start: '2026-07-06',
     end: '2026-07-11',
     link: 'https://icml.cc',
@@ -88,10 +88,54 @@ describe('validateEntry', () => {
     expect(issues({})).toEqual([]);
   });
 
-  it('warns when the abstract deadline falls after the paper deadline', () => {
-    expect(warnings({ abstract_deadline: '2026-12-01 23:59', deadline: '2026-08-03 23:59' })).toEqual([
-      'icml26: Abstract deadline is after paper submission deadline',
+  const due = '2026-03-01 23:59';
+  it('errors on the old deadline fields with a hint, without the unknown-field warning', () => {
+    expect(errors({ deadline: due })).toEqual([
+      "icml26: Field 'deadline' was replaced by 'deadlines' (a list of {type, due}; see README)",
     ]);
+    expect(errors({ abstract_deadline: due })).toEqual([
+      "icml26: Field 'abstract_deadline' was replaced by 'deadlines' (a list of {type, due}; see README)",
+    ]);
+    expect(warnings({ deadline: due })).toEqual([]);
+  });
+
+  it('errors on a deadlines value that is not a non-empty list', () => {
+    expect(errors({ deadlines: [] })).toEqual(['icml26: deadlines must be a non-empty list (omit it when there are none)']);
+    expect(errors({ deadlines: 'soon' })).toHaveLength(1);
+  });
+
+  it('errors on a bad deadline item', () => {
+    const one = (item: object) => errors({ deadlines: [item] });
+    expect(one({ type: 'camera_ready', due })).toEqual([
+      `icml26: deadlines[0]: unknown type 'camera_ready' (use one of: ${DEADLINE_TYPE_CODES.join(', ')})`,
+    ]);
+    expect(one({ type: 'paper', due: '2026-03-01' })).toHaveLength(1);
+    expect(one({ type: 'other', due })).toEqual(["icml26: deadlines[0]: type 'other' needs a label"]);
+    expect(one({ type: 'paper', due, label: '' })).toHaveLength(1);
+    expect(one({ type: 'paper', due, pin: false })).toEqual(['icml26: deadlines[0]: pin must be true when present']);
+    expect(one({ type: 'paper', due, note: 'x' })).toEqual(["icml26: deadlines[0]: unknown key 'note'"]);
+  });
+
+  it('errors on two items sharing type and label', () => {
+    const regs = (a?: string, b?: string) => errors({ deadlines: [
+      { type: 'registration', due, ...(a && { label: a }) },
+      { type: 'registration', due: '2026-04-01 23:59', ...(b && { label: b }) },
+    ] });
+    expect(regs()).toEqual(["icml26: deadlines[1]: a 'registration' deadline with this label is already listed"]);
+    expect(regs(undefined, 'Student rate')).toEqual([]);
+  });
+
+  it('warns on paper abstracts after full papers and early-bird after regular registration', () => {
+    expect(warnings({ deadlines: [{ type: 'paper', due: '2026-01-28 23:59' }, { type: 'paper_abstract', due: '2026-02-01 23:59' }] }))
+      .toEqual(['icml26: Paper abstract deadline is after the full paper deadline']);
+    expect(warnings({ deadlines: [{ type: 'registration', due: '2026-05-01 23:59' }, { type: 'early_registration', due: '2026-06-01 23:59' }] }))
+      .toEqual(['icml26: Early-bird registration closes after registration closes']);
+  });
+
+  it('warns on an attendance entry listing a submission deadline', () => {
+    expect(warnings({ deadline_status: 'attendance', deadlines: [{ type: 'poster', due }] }))
+      .toEqual(["icml26: deadline_status is 'attendance' but a submission deadline is listed"]);
+    expect(warnings({ deadline_status: 'attendance', deadlines: [{ type: 'early_registration', due }] })).toEqual([]);
   });
 
   it('errors on a missing required field, reporting the index when the id is missing', () => {
@@ -100,7 +144,7 @@ describe('validateEntry', () => {
 
   it('errors on invalid timezone, datetime, date, subject, type and year', () => {
     expect(errors({ timezone: 'Mars/Base' })).toHaveLength(1);
-    expect(errors({ deadline: '2026-01-28' })).toHaveLength(1);
+    expect(errors({ deadlines: [{ type: 'paper', due: '2026-01-28' }] })).toHaveLength(1);
     expect(errors({ start: '2026-7-6' })).toHaveLength(1);
     expect(errors({ sub: ['ML', 'Astrology'] })).toHaveLength(1);
     expect(errors({ type: 'meetup' })).toHaveLength(1);
@@ -113,7 +157,10 @@ describe('validateEntry', () => {
 
   it('errors on a sync_pin naming a field no sync writes', () => {
     expect(errors({ sync_pin: ['note'] })).toHaveLength(1);
-    expect(errors({ sync_pin: ['deadline'] })).toEqual([]);
+    expect(errors({ sync_pin: ['deadline'] })).toEqual([
+      "icml26: sync_pin field 'deadline' is not synced (use one of: place, start, end, date); pin a deadline with pin: true on its item",
+    ]);
+    expect(errors({ sync_pin: ['place'] })).toEqual([]);
   });
 
   it('warns on unknown fields', () => {

@@ -15,7 +15,7 @@ const { send, CONFERENCES } = vi.hoisted(() => ({
       sub: ['ML'],
       type: 'conference',
       timezone: 'UTC',
-      deadline: '2026-10-09 09:00',
+      deadlines: [{ type: 'paper', due: '2026-10-09 09:00' }],
     },
     {
       id: 'summit26',

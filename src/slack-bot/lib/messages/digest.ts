@@ -3,7 +3,7 @@
 import type { KnownBlock } from '@slack/web-api';
 import type { BlockKitMessage } from '@/types/slack';
 import { NOTIFICATION_CONFIG } from '../../config/constants';
-import { cardList, type ConferenceCardItem, type DeadlineItem, type EventStartItem } from './cards';
+import { cardList, groupDeadlineItems, type ConferenceCardItem, type DeadlineItem, type EventStartItem } from './cards';
 import { context, divider, header, plural, section } from './blocks';
 
 export interface DigestStyle {
@@ -53,7 +53,9 @@ function renderDigest(params: DigestParams, maxItems: number): BlockKitMessage {
 
   const parts: KnownBlock[][] = [];
   if (deadlines.length > 0) {
-    parts.push(digestSection('*⏳ Deadlines approaching*', deadlines.map((d) => ({ kind: 'deadline' as const, ...d }))));
+    // Cards (one per event) are capped; the summary below still counts deadlines.
+    const cards = groupDeadlineItems(deadlines).map((card) => ({ kind: 'deadline' as const, ...card }));
+    parts.push(digestSection('*⏳ Deadlines approaching*', cards));
   }
   if (eventStarts.length > 0) {
     parts.push(digestSection('*🎟️ Starting soon*', eventStarts.map((e) => ({ kind: 'event' as const, ...e }))));

@@ -50,7 +50,7 @@ export default function ConferenceModal({ conference, onClose }: ConferenceModal
             <SectionRule variant="modal" label="Deadlines" trailing="§ 02" />
             <VStack align="stretch" gap="4">
               {deadlines.map((deadline) => (
-                <DeadlineCard key={deadline.kind} deadline={deadline} variant="detailed" />
+                <DeadlineCard key={deadline.key} deadline={deadline} variant="detailed" />
               ))}
             </VStack>
           </Box>
