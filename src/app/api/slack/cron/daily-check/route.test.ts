@@ -85,11 +85,12 @@ describe('daily-check cron', () => {
     expect(sent().map((m) => m.channel).sort()).toEqual(['U1', 'U2']);
   });
 
-  it('sends deadlines and event starts as one digest with a single header', async () => {
+  it('sends deadlines and event starts as one digest, each section under its own header', async () => {
     await run();
 
     const { blocks } = sent()[0];
-    expect(blocks.filter((b) => b.type === 'header')).toHaveLength(1);
+    expect(blocks.filter((b) => b.type === 'header').map((b) => (b as { text: { text: string } }).text.text))
+      .toEqual(['⏳ Deadlines approaching', '🎟️ Starting soon']);
     const text = JSON.stringify(blocks);
     expect(text).toContain('CONF 2026');
     expect(text).toContain('SUMMIT 2026');

@@ -14,12 +14,13 @@ describe('buildDigest', () => {
     expect(msg.text).toBe('📅 Conference Update: 2 deadlines');
   });
 
-  it('has the title, the date, and the footer', () => {
+  it('opens with the first section title, then the date, and ends with the footer', () => {
     const msg = buildDigest({ ...CHANNEL_DIGEST, deadlines: [deadlineItem('pets', 1)], eventStarts: [], date: DATE });
-    const header = msg.blocks.find((b) => b.type === 'header') as any;
-    expect(header.text.text).toBe('📅 Conference Update');
+    expect(msg.blocks[0]).toMatchObject({ type: 'header', text: { text: '⏳ Deadlines approaching' } });
+    expect(blocksText([msg.blocks[1]])).toContain('June 19, 2026');
+    expect(msg.text).toBe('📅 Conference Update: 1 deadline');
     const all = blocksText(msg.blocks);
-    expect(all).toContain('June 19, 2026');
+    expect(all).not.toContain('Conference Update');
     expect(all).toContain('/conf-help');
     expect(all).toContain('/conf-subscribe');
   });
@@ -32,17 +33,21 @@ describe('buildDigest', () => {
     expect(all).not.toContain('Starting soon');
   });
 
-  it('shows both sections under a single header', () => {
+  it('gives each section its own header', () => {
     const msg = buildDigest({
       ...DM_DIGEST,
       deadlines: [deadlineItem('pets', 1)],
       eventStarts: [eventItem('icml', 7)],
       date: DATE,
     });
-    const all = blocksText(msg.blocks);
-    expect(all).toContain('Deadlines approaching');
-    expect(all).toContain('Starting soon');
-    expect(msg.blocks.filter((b) => b.type === 'header')).toHaveLength(1);
+    const headers = msg.blocks.filter((b) => b.type === 'header').map((b: any) => b.text.text);
+    expect(headers).toEqual(['⏳ Deadlines approaching', '🎟️ Starting soon']);
+  });
+
+  it('puts the date under the starting-soon header when no deadline is due', () => {
+    const msg = buildDigest({ ...CHANNEL_DIGEST, deadlines: [], eventStarts: [eventItem('icml', 7)], date: DATE });
+    expect(msg.blocks[0]).toMatchObject({ type: 'header', text: { text: '🎟️ Starting soon' } });
+    expect(blocksText([msg.blocks[1]])).toContain('June 19, 2026');
   });
 
   it('caps items and adds an overflow line', () => {
@@ -79,8 +84,7 @@ describe('buildDigest', () => {
 
   it('uses the DM title and settings footer for DMs', () => {
     const msg = buildDigest({ ...DM_DIGEST, deadlines: [deadlineItem('pets', 1)], eventStarts: [], date: DATE });
-    const header = msg.blocks.find((b) => b.type === 'header') as any;
-    expect(header.text.text).toBe('🔔 Your deadline reminder');
+    expect(msg.text).toBe('🔔 Your deadline reminder: 1 deadline');
     const all = blocksText(msg.blocks);
     expect(all).toContain('/conf-settings');
     expect(all).toContain('/conf-unsubscribe');
@@ -90,6 +94,7 @@ describe('buildDigest', () => {
 
   it('says so when nothing is coming up', () => {
     const msg = buildDigest({ ...CHANNEL_DIGEST, deadlines: [], eventStarts: [], date: DATE });
+    expect(msg.blocks[0]).toMatchObject({ type: 'header', text: { text: '📅 Conference Update' } });
     expect(blocksText(msg.blocks)).toContain('Nothing coming up');
   });
 });
