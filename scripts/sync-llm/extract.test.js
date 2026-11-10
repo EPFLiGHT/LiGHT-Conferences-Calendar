@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { EDITIONS_SCHEMA, extractFromPage } from './extract.js';
+import { EDITIONS_SCHEMA, PAGE_RULES, extractFromPage } from './extract.js';
+import { DEADLINE_TYPE_CODES } from '../../src/constants/deadlineTypes.data.js';
 import { TODAY, edition, deadline, fakeLlm, jsonReply } from './test-helpers.js';
 
 const RESULT = {
@@ -21,6 +22,15 @@ describe('EDITIONS_SCHEMA', () => {
       if (node?.items) check(node.items);
     };
     check(EDITIONS_SCHEMA.schema);
+  });
+
+  it('offers every type but other, and reads registration and grants', () => {
+    const item = EDITIONS_SCHEMA.schema.properties.editions.items.properties.deadlines.items;
+    expect(item.properties.type.enum).toEqual(DEADLINE_TYPE_CODES.filter((t) => t !== 'other'));
+    expect(item.required).toContain('before');
+    expect(PAGE_RULES).toContain('"early_registration"');
+    expect(PAGE_RULES).not.toContain('Ignore every other date, including registration');
+    expect(PAGE_RULES).toContain('A date that only ends one fee tier while a later tier follows is not "registration"');
   });
 });
 
@@ -50,8 +60,8 @@ describe('extractFromPage', () => {
       });
       return llm.requests[0].input.find((m) => m.role === 'system').content;
     };
-    expect(await systemFor(true)).toMatch(/even with no submission deadline/i);
-    expect(await systemFor(false)).not.toMatch(/even with no submission deadline/i);
+    expect(await systemFor(true)).toMatch(/registration and grant deadlines if the\s+page gives them/i);
+    expect(await systemFor(false)).not.toMatch(/registration and grant deadlines if the\s+page gives them/i);
   });
 
   it('returns null instead of throwing when the response came back incomplete', async () => {

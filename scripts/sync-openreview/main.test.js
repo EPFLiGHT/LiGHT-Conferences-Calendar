@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { DateTime } from 'luxon';
 import { syncEdition, syncVenue } from './main.js';
+import { changeFieldName } from '../sync-shared/deadlines.js';
 
 const TODAY = DateTime.fromISO('2026-09-28T12:00:00Z', { zone: 'utc' });
 
@@ -30,7 +31,7 @@ const apiServing = (content, duedate = Date.parse('2026-09-19T11:59:00Z')) => ({
 
 const iclr26 = () => ({
   title: 'ICLR', year: 2026, id: 'iclr26', link: 'https://iclr.cc/',
-  abstract_deadline: '2025-09-19 23:59', deadline: '2025-09-24 23:59', timezone: 'UTC-12',
+  deadlines: [{ type: 'paper_abstract', due: '2025-09-19 23:59' }, { type: 'paper', due: '2025-09-24 23:59' }], timezone: 'UTC-12',
   place: 'Rio de Janeiro, Brazil', date: 'April 23-27, 2026', start: '2026-04-23', end: '2026-04-27',
   sub: 'ML', type: 'conference',
 });
@@ -41,16 +42,15 @@ describe('syncEdition', () => {
     const out = await syncEdition({
       api: apiServing(ICLR27), entries, title: 'ICLR', venue: { prefix: 'ICLR.cc' }, year: 2027, today: TODAY,
     });
-    expect(entries[1].deadline).toBeUndefined();
-    expect(entries[1].abstract_deadline).toBeUndefined();
-    expect(out.updates.map((c) => c.field)).not.toContain('deadline');
+    expect(entries[1].deadlines).toBeUndefined();
+    expect(out.updates.filter((c) => c.field === 'deadlines')).toEqual([]);
     expect(out.flags).toContain(
-      'ICLR 2027: OpenReview states no deadlines; its submission form closes 2026-09-19 11:59 UTC, which is the abstract deadline at some venues and the paper deadline at others; deadline fields left untouched',
+      'ICLR 2027: OpenReview states no deadlines; its submission form closes 2026-09-19 11:59 UTC, which is the abstract deadline at some venues and the paper deadline at others; deadlines left untouched',
     );
   });
 
   it('stays quiet about missing deadlines when the entry already has them', async () => {
-    const entries = [{ ...iclr26(), year: 2027, id: 'iclr27', deadline: '2026-09-24 23:59', start: undefined, end: undefined, date: undefined }];
+    const entries = [{ ...iclr26(), year: 2027, id: 'iclr27', deadlines: [{ type: 'paper', due: '2026-09-24 23:59' }], start: undefined, end: undefined, date: undefined }];
     const out = await syncEdition({
       api: apiServing(ICLR27), entries, title: 'ICLR', venue: { prefix: 'ICLR.cc' }, year: 2027, today: TODAY,
     });
@@ -58,14 +58,14 @@ describe('syncEdition', () => {
   });
 
   it('leaves an edition that has already ended alone', async () => {
-    const entries = [{ title: 'COLM', year: 2026, id: 'colm26', link: 'https://colmweb.org/', deadline: '2026-03-31 23:59',
+    const entries = [{ title: 'COLM', year: 2026, id: 'colm26', link: 'https://colmweb.org/', deadlines: [{ type: 'paper', due: '2026-03-31 23:59' }],
       timezone: 'UTC-12', place: 'San Francisco, CA, USA', start: '2026-10-06', end: '2026-10-09', sub: 'NLP', type: 'conference' }];
     const later = DateTime.fromISO('2026-10-20T00:00:00Z', { zone: 'utc' });
     const out = await syncEdition({
       api: apiServing(COLM26), entries, title: 'COLM', venue: { prefix: 'colmweb.org/COLM' }, year: 2026, today: later,
     });
     expect(out.updates).toEqual([]);
-    expect(entries[0].deadline).toBe('2026-03-31 23:59');
+    expect(entries[0].deadlines).toEqual([{ type: 'paper', due: '2026-03-31 23:59' }]);
   });
 
   it('writes deadlines OpenReview states outright', async () => {
@@ -75,10 +75,11 @@ describe('syncEdition', () => {
     const out = await syncEdition({
       api: apiServing(COLM26), entries, title: 'COLM', venue: { prefix: 'colmweb.org/COLM' }, year: 2026, today: early,
     });
-    expect(entries[0].abstract_deadline).toBe('2026-03-26 23:59');
-    expect(entries[0].deadline).toBe('2026-04-01 00:15');
+    expect(entries[0].deadlines).toEqual([
+      { type: 'paper_abstract', due: '2026-03-26 23:59' }, { type: 'paper', due: '2026-04-01 00:15' },
+    ]);
     expect(entries[0].place).toBe('San Francisco, CA, USA');
-    expect(out.updates.map((c) => c.field).sort()).toEqual(['abstract_deadline', 'deadline', 'full_name']);
+    expect(out.updates.map(changeFieldName).sort()).toEqual(['full_name', 'paper', 'paper_abstract']);
   });
 
   it('drafts a new edition with the website OpenReview gives for it', async () => {
@@ -90,7 +91,7 @@ describe('syncEdition', () => {
     const draft = entries.find((e) => e.id === 'iclr27');
     expect(draft.link).toBe('https://iclr.cc/Conferences/2027');
     expect(draft.place).toBe('San Francisco, CA, USA');
-    expect(draft.deadline).toBeUndefined();
+    expect(draft.deadlines).toBeUndefined();
     expect(draft.start).toBeUndefined();
   });
 
@@ -116,13 +117,13 @@ describe('syncEdition', () => {
   });
 
   it('flags a large deadline move', async () => {
-    const entries = [{ title: 'COLM', year: 2026, id: 'colm26', link: 'https://colmweb.org/', deadline: '2025-12-01 23:59',
+    const entries = [{ title: 'COLM', year: 2026, id: 'colm26', link: 'https://colmweb.org/', deadlines: [{ type: 'paper', due: '2025-12-01 23:59' }],
       timezone: 'UTC-12', place: 'San Francisco, CA, USA', start: '2026-10-06', end: '2026-10-09', sub: 'NLP', type: 'conference' }];
     const early = DateTime.fromISO('2026-03-01T00:00:00Z', { zone: 'utc' });
     const out = await syncEdition({
       api: apiServing(COLM26), entries, title: 'COLM', venue: { prefix: 'colmweb.org/COLM' }, year: 2026, today: early,
     });
-    expect(out.flags.some((f) => f.startsWith('colm26: large deadline move on deadline'))).toBe(true);
+    expect(out.flags.some((f) => f.startsWith('colm26: large deadline move on paper'))).toBe(true);
   });
 });
 

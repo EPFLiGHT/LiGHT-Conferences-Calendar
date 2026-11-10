@@ -60,8 +60,9 @@ describe('runSync', () => {
 
   const setDeadline = async (title, cfg, { entries }) => {
     const entry = entries.find((e) => e.title === title);
-    entry.deadline = '2026-09-01 23:59';
-    return { updates: [{ id: entry.id, field: 'deadline', old: null, new: entry.deadline }], flags: [`${title}: checked`] };
+    entry.deadlines = [{ type: 'paper', due: '2026-09-01 23:59' }];
+    const change = { id: entry.id, field: 'deadlines', type: 'paper', reported: 'paper', old: null, new: '2026-09-01 23:59' };
+    return { updates: [change], flags: [`${title}: checked`] };
   };
 
   it('hands each venue its config, the entries and today, then writes the file and the report', async () => {
@@ -76,9 +77,9 @@ describe('runSync', () => {
       ['Conf', 'https://conf.example/', '2026-07-08', 2],
       ['Other', 'https://other.example/', '2026-07-08', 2],
     ]);
-    expect(fs.readFileSync(dataPath, 'utf8')).toContain('deadline: 2026-09-01 23:59');
+    expect(fs.readFileSync(dataPath, 'utf8')).toContain('due: 2026-09-01 23:59');
     expect(report).toContain('## Test sync report');
-    expect(report).toContain('| conf26 | deadline |  | 2026-09-01 23:59 |');
+    expect(report).toContain('| conf26 | paper |  | 2026-09-01 23:59 |');
     expect(report).toContain('- Other: checked');
     expect(fs.readFileSync(reportPath, 'utf8')).toBe(report);
     expect(logs).toEqual([report]);
@@ -141,7 +142,7 @@ describe('runSync', () => {
       },
     });
     expect(seen).toEqual([['Summit', ['summit26']], ['Conf', ['conf26', 'other26']]]);
-    expect(fs.readFileSync(summitsPath, 'utf8')).toContain('deadline: 2026-09-01 23:59');
+    expect(fs.readFileSync(summitsPath, 'utf8')).toContain('due: 2026-09-01 23:59');
     expect(fs.readFileSync(dataPath, 'utf8')).toBe(serializeEntries(ENTRIES));
   });
 

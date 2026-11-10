@@ -2,17 +2,20 @@ import { describe, it, expect } from 'vitest';
 import { DateTime } from 'luxon';
 import { previousEdition, applyEdition, bigMoveFlags } from './apply.js';
 
+const paperDue = (e) => e.deadlines?.find((d) => d.type === 'paper')?.due;
+const paperChange = (id, old, next) => ({ id, field: 'deadlines', type: 'paper', reported: 'paper', old, new: next });
+
 const utc = (iso) => DateTime.fromISO(iso, { zone: 'utc' });
 
 const entry = (over = {}) => ({
   title: 'Conf', year: 2026, id: 'conf26', link: 'https://conf.example/',
-  deadline: '2026-01-01 23:59', timezone: 'UTC', sub: 'ML', type: 'conference',
+  deadlines: [{ type: 'paper', due: '2026-01-01 23:59' }], timezone: 'UTC', sub: 'ML', type: 'conference',
   ...over,
 });
 
 const facts = (over = {}) => ({
   fullName: null, location: null, startIso: null, endIso: null, link: null,
-  abstractDeadline: null, deadline: utc('2026-02-01T23:59:00Z'),
+  deadlines: [{ type: 'paper', due: utc('2026-02-01T23:59:00Z') }],
   ...over,
 });
 
@@ -37,7 +40,7 @@ describe('applyEdition', () => {
   it('updates every open entry of the edition', () => {
     const entries = [entry(), entry({ id: 'conf26b', place: 'Lima, Peru' })];
     const out = apply(entries);
-    expect(entries.map((e) => e.deadline)).toEqual(['2026-02-01 23:59', '2026-02-01 23:59']);
+    expect(entries.map(paperDue)).toEqual(['2026-02-01 23:59', '2026-02-01 23:59']);
     expect(out.updates.map((c) => c.id)).toEqual(['conf26', 'conf26b']);
     expect(out.drafts).toEqual([]);
     expect(out.drafted).toBeNull();
@@ -47,7 +50,7 @@ describe('applyEdition', () => {
     const entries = [entry({ start: '2026-03-01', end: '2026-03-03' })];
     const out = apply(entries, { today: utc('2026-06-01T00:00:00Z') });
     expect(out.updates).toEqual([]);
-    expect(entries[0].deadline).toBe('2026-01-01 23:59');
+    expect(paperDue(entries[0])).toBe('2026-01-01 23:59');
   });
 
   it('leaves out a missing edition the source dates before today', () => {
@@ -62,7 +65,7 @@ describe('applyEdition', () => {
   it('writes only deadlines for a venue with several entries per year', () => {
     const entries = [entry()];
     apply(entries, { multiEntry: true, factsFor: () => facts({ location: 'Lima, Peru' }) });
-    expect(entries[0].deadline).toBe('2026-02-01 23:59');
+    expect(paperDue(entries[0])).toBe('2026-02-01 23:59');
     expect(entries[0].place).toBeUndefined();
   });
 
@@ -118,22 +121,22 @@ describe('applyEdition', () => {
     const targets = [];
     const screen = (f, target) => {
       targets.push(target);
-      f.deadline = null;
+      f.deadlines = [];
       return [`${target.id}: screened`];
     };
     const existing = [entry()];
     const updated = apply(existing, { screen });
-    expect(existing[0].deadline).toBe('2026-01-01 23:59');
+    expect(paperDue(existing[0])).toBe('2026-01-01 23:59');
     expect(updated.flags).toEqual(['conf26: screened']);
 
     const drafted = apply([entry({ year: 2025, id: 'conf25' })], { screen });
-    expect(drafted.drafted.deadline).toBeUndefined();
+    expect(drafted.drafted.deadlines).toBeUndefined();
     expect(drafted.flags[0]).toBe('conf26: screened');
     expect(targets[1]).toEqual({ id: 'conf26', timezone: 'UTC' });
   });
 
   it('flags a large deadline move', () => {
-    const out = apply([entry()], { factsFor: () => facts({ deadline: utc('2026-06-01T23:59:00Z') }) });
+    const out = apply([entry()], { factsFor: () => facts({ deadlines: [{ type: 'paper', due: utc('2026-06-01T23:59:00Z') }] }) });
     expect(out.flags.some((f) => f.includes('large deadline move'))).toBe(true);
   });
 });
@@ -141,18 +144,17 @@ describe('applyEdition', () => {
 describe('bigMoveFlags', () => {
   it('flags moves beyond the threshold and ignores small ones', () => {
     const flags = bigMoveFlags([
-      { id: 'conf26', field: 'deadline', old: '2026-01-01 23:59', new: '2026-06-01 23:59' },
-      { id: 'conf26', field: 'deadline', old: '2026-01-01 23:59', new: '2026-01-15 23:59' },
+      paperChange('conf26', '2026-01-01 23:59', '2026-06-01 23:59'),
+      paperChange('conf26', '2026-01-01 23:59', '2026-01-15 23:59'),
       { id: 'conf26', field: 'place', old: 'A', new: 'B' },
-      { id: 'conf27', field: 'abstract_deadline', old: null, new: '2026-06-01 23:59' },
+      paperChange('conf27', null, '2026-06-01 23:59'),
     ]);
-    expect(flags).toHaveLength(1);
-    expect(flags[0]).toMatch(/conf26.*large deadline move/);
+    expect(flags).toEqual(['conf26: large deadline move on paper (151 days); verify against the venue site']);
   });
 
   it('flags a move away from a hand-authored deadline that carries seconds', () => {
     const flags = bigMoveFlags([
-      { id: 'conf26', field: 'deadline', old: '2026-05-25 23:59:00', new: '2026-09-01 23:59' },
+      paperChange('conf26', '2026-05-25 23:59:00', '2026-09-01 23:59'),
     ]);
     expect(flags).toHaveLength(1);
     expect(flags[0]).toMatch(/large deadline move/);

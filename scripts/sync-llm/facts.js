@@ -45,13 +45,16 @@ export function resolveZone(timezoneText) {
 }
 
 /**
- * @param {{date: string, time: string|null, timezone_text: string|null}} d
+ * @param {{date: string, time: string|null, timezone_text: string|null, before?: boolean}} d
+ *   With before, date is the first day too late: the deadline is the day before at
+ *   23:59, or one minute before a stated time (the hand-check stores it the same way).
  * @param {string} entryTimezone Fallback when the page names no usable zone.
  * @returns {DateTime|null} UTC instant, or null when unparseable.
  */
-export function parseDeadline({ date, time, timezone_text }, entryTimezone) {
+export function parseDeadline({ date, time, timezone_text, before = false }, entryTimezone) {
   const zone = resolveZone(timezone_text) ?? entryTimezone;
-  const dt = DateTime.fromISO(`${date}T${time ?? '23:59'}`, { zone });
+  let dt = DateTime.fromISO(`${date}T${time ?? '23:59'}`, { zone });
+  if (before) dt = time ? dt.minus({ minutes: 1 }) : dt.minus({ days: 1 });
   return dt.isValid ? dt.toUTC() : null;
 }
 
@@ -60,18 +63,17 @@ export function parseDeadline({ date, time, timezone_text }, entryTimezone) {
  * @param {object} edition Validated edition.
  * @param {string} entryTimezone The matched entry's timezone field.
  * @returns {{fullName: string|null, location: string|null, startIso: string|null,
- *   endIso: string|null, abstractDeadline: DateTime|null, deadline: DateTime|null}}
+ *   endIso: string|null, deadlines: Array<{type: string, due: DateTime}>}} One per
+ *   deadline the gates kept (at most one per type), unparseable dates left out.
  */
 export function editionToFacts(edition, entryTimezone) {
-  const byKind = (kind) => edition.deadlines.find((d) => d.kind === kind);
-  const abstract = byKind('abstract');
-  const paper = byKind('paper');
   return {
     fullName: edition.full_name || null,
     location: edition.location || null,
     startIso: edition.start_date || null,
     endIso: edition.end_date || null,
-    abstractDeadline: abstract ? parseDeadline(abstract, entryTimezone) : null,
-    deadline: paper ? parseDeadline(paper, entryTimezone) : null,
+    deadlines: edition.deadlines
+      .map((d) => ({ type: d.type, due: parseDeadline(d, entryTimezone) }))
+      .filter((d) => d.due),
   };
 }

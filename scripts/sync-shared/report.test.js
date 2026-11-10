@@ -12,12 +12,16 @@ describe('renderReport', () => {
   it('renders updates as a table plus drafts and flags as lists', () => {
     const md = renderReport({
       title,
-      updates: [{ id: 'colm26', field: 'deadline', old: '2026-04-01 23:59', new: '2026-04-01 00:15' }],
+      updates: [
+        { id: 'colm26', field: 'deadlines', type: 'paper', reported: 'paper', old: '2026-04-01 23:59', new: '2026-04-01 00:15' },
+        { id: 'ghf26', field: 'deadlines', type: 'presenter_registration', label: 'Poster presenter registration', reported: 'presenter_registration', old: '2026-10-20 23:59', new: '2026-10-30 23:59' },
+      ],
       drafts: [{ id: 'colm27', title: 'COLM', year: 2027 }],
       flags: ['colm27: no end date from the source yet; set end and date by hand'],
       skipped: ['SaTML 2026: request failed (network)'],
     });
-    expect(md).toContain('| colm26 | deadline | 2026-04-01 23:59 | 2026-04-01 00:15 |');
+    expect(md).toContain('| colm26 | paper | 2026-04-01 23:59 | 2026-04-01 00:15 |');
+    expect(md).toContain('| ghf26 | presenter_registration "Poster presenter registration" | 2026-10-20 23:59 | 2026-10-30 23:59 |');
     expect(md).toContain('- colm27 (COLM 2027)');
     expect(md).toContain('### Needs attention');
     expect(md).toContain('### Skipped');

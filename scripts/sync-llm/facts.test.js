@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { DateTime } from 'luxon';
 import { resolveZone, parseDeadline, editionToFacts } from './facts.js';
-import { edition } from './test-helpers.js';
+import { edition, deadline } from './test-helpers.js';
 
 describe('resolveZone', () => {
   it('maps AoE variants to UTC-12', () => {
@@ -71,19 +71,35 @@ describe('parseDeadline', () => {
   it('returns null for garbage dates', () => {
     expect(parseDeadline({ date: 'soon', time: null, timezone_text: null }, 'UTC')).toBeNull();
   });
+  it('reads "before 15 October" as 14 October 23:59 in the entry zone', () => {
+    expect(parseDeadline({ date: '2026-10-15', time: null, timezone_text: null, before: true }, 'UTC-12').toISO())
+      .toBe('2026-10-15T11:59:00.000Z');
+  });
+  it('reads "before 15 October 10:00" as one minute earlier', () => {
+    expect(parseDeadline({ date: '2026-10-15', time: '10:00', timezone_text: 'UTC', before: true }, 'UTC-12').toISO())
+      .toBe('2026-10-15T09:59:00.000Z');
+  });
 });
 
 describe('editionToFacts', () => {
-  it('maps abstract and paper deadlines into merge.js facts', () => {
+  it('maps each deadline into merge.js facts by type', () => {
     const e = edition({ start_date: '2026-11-10', end_date: '2026-11-12' });
-    e.deadlines.push({ kind: 'abstract', date: '2026-08-01', time: '12:00', timezone_text: 'UTC',
-      evidence: 'x' });
+    e.deadlines.push({ type: 'abstract', date: '2026-08-01', time: '12:00', timezone_text: 'UTC',
+      before: false, evidence: 'x' });
     e.location = 'Kigali, Rwanda';
     const facts = editionToFacts(e, 'UTC-12');
     expect(facts.location).toBe('Kigali, Rwanda');
     expect(facts.startIso).toBe('2026-11-10');
     expect(facts.endIso).toBe('2026-11-12');
-    expect(facts.deadline.toISO()).toBe('2026-09-16T11:59:00.000Z');
-    expect(facts.abstractDeadline.toISO()).toBe('2026-08-01T12:00:00.000Z');
+    expect(facts.deadlines.map((d) => [d.type, d.due.toISO()])).toEqual([
+      ['paper', '2026-09-16T11:59:00.000Z'], ['abstract', '2026-08-01T12:00:00.000Z'],
+    ]);
+  });
+
+  it('builds one fact per surviving deadline and drops unparseable ones', () => {
+    const facts = editionToFacts(edition({ deadlines: [
+      deadline({ type: 'poster' }), deadline({ type: 'grant', date: '2026-08-01' }), deadline({ type: 'registration', date: 'soon' }),
+    ] }), 'UTC-12');
+    expect(facts.deadlines.map((d) => d.type)).toEqual(['poster', 'grant']);
   });
 });

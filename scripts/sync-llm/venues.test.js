@@ -25,7 +25,13 @@ describe('venues.json', () => {
 
   it.each(Object.entries(llmVenues))('configures %s for the LLM sync with a url and known keys', (_, cfg) => {
     expect(typeof cfg.url).toBe('string');
-    expect(unknownKeys(cfg, ['url', 'home', 'multiEntry', 'attendance', 'note'])).toEqual([]);
+    expect(unknownKeys(cfg, ['url', 'home', 'pages', 'multiEntry', 'attendance', 'note'])).toEqual([]);
+  });
+
+  it.each(Object.entries(llmVenues).filter(([, c]) => c.pages))('lists %s extra pages as distinct http URLs other than url', (_, cfg) => {
+    expect(cfg.pages.length).toBeGreaterThan(0);
+    expect(new Set(cfg.pages).size).toBe(cfg.pages.length);
+    expect(cfg.pages.every((u) => /^https?:\/\//.test(u) && u !== cfg.url)).toBe(true);
   });
 
   it.each(Object.entries(openreviewVenues))('configures %s for the OpenReview sync with a prefix and known keys', (_, cfg) => {

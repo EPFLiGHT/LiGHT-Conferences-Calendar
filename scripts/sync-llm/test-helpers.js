@@ -9,7 +9,7 @@ export const TODAY = DateTime.fromISO('2026-07-08T12:00:00Z', { zone: 'utc' });
 
 /** A deadline as EDITIONS_SCHEMA reports it. */
 export const deadline = (over = {}) => ({
-  kind: 'paper', date: '2026-09-15', time: null, timezone_text: null,
+  type: 'paper', date: '2026-09-15', time: null, timezone_text: null, before: false,
   evidence: 'Paper deadline: September 15, 2026',
   ...over,
 });

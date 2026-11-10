@@ -2,6 +2,7 @@
 // multiEntry venues (one entry per location) only get deadline updates; new editions are flagged, not drafted.
 import { parseEntryDateTime } from '../../src/utils/conferenceSchema.js';
 import { updateEntry, draftEntry } from './merge.js';
+import { changeFieldName } from './deadlines.js';
 import { editionEnded, nextId } from './dates.js';
 
 const BIG_MOVE_DAYS = 60;
@@ -23,20 +24,20 @@ export function previousEdition(entries, title, year) {
 /**
  * Flag applied deadline changes that moved by more than BIG_MOVE_DAYS.
  * @param {Array<{id: string, field: string, old: string|null, new: string}>} changes
- *   The change list updateEntry returns; values are "yyyy-MM-dd HH:mm[:ss]".
+ *   The change list updateEntry returns; deadline rows have field 'deadlines'
+ *   and values "yyyy-MM-dd HH:mm[:ss]".
  * @returns {string[]}
  */
 export function bigMoveFlags(changes) {
   const flags = [];
   for (const c of changes) {
-    if (c.field !== 'deadline' && c.field !== 'abstract_deadline') continue;
-    if (!c.old) continue;
+    if (c.field !== 'deadlines' || !c.old) continue;
     const oldDt = parseEntryDateTime(c.old);
     const newDt = parseEntryDateTime(c.new);
     if (!oldDt.isValid || !newDt.isValid) continue;
     const days = Math.abs(newDt.diff(oldDt, 'days').days);
     if (days > BIG_MOVE_DAYS) {
-      flags.push(`${c.id}: large deadline move on ${c.field} (${Math.round(days)} days); verify against the venue site`);
+      flags.push(`${c.id}: large deadline move on ${changeFieldName(c)} (${Math.round(days)} days); verify against the venue site`);
     }
   }
   return flags;
