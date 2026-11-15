@@ -1925,3 +1925,59 @@
     - AI
     - Global Affairs
   type: conference
+
+- title: KATAMED
+  year: 2027
+  id: katamed27
+  deadline_status: attendance
+  full_name: Swiss Conference on Disaster Health
+  link: https://katamed-conference.ch/en
+  timezone: Europe/Zurich
+  place: Bern, Switzerland
+  date: Mar 4, 2027
+  start: '2027-03-04'
+  end: '2027-03-04'
+  sub: Global Health
+  type: conference
+
+- title: Swiss Public Health Conference
+  year: 2027
+  id: swisspublichealthconference27
+  deadline_status: attendance
+  link: https://sphc.ch/en/sphc-2027
+  timezone: Europe/Zurich
+  place: Sion, Switzerland
+  date: Aug 31 - Sep 1, 2027
+  start: '2027-08-31'
+  end: '2027-09-01'
+  sub: Global Health
+  type: conference
+
+- title: ICPIC
+  year: 2027
+  id: icpic27
+  deadline_status: attendance
+  full_name: International Conference on Prevention & Infection Control
+  link: https://conference.icpic.com/
+  timezone: Europe/Zurich
+  place: Geneva, Switzerland
+  date: Sep 14-16, 2027
+  start: '2027-09-14'
+  end: '2027-09-16'
+  sub: Global Health
+  type: conference
+
+- title: Society 5.0 Conference
+  year: 2027
+  id: society50conference27
+  deadline_status: attendance
+  link: https://www.conference-society5.org/
+  timezone: Europe/Zurich
+  place: Basel, Switzerland
+  date: Jun 6-9, 2027
+  start: '2027-06-06'
+  end: '2027-06-09'
+  sub:
+    - AI
+    - Global Affairs
+  type: conference
