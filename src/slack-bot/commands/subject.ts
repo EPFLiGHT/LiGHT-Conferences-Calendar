@@ -1,8 +1,9 @@
 import type { BlockKitMessage } from '@/types/slack';
-import { filterBySubject, getUpcomingDeadlines } from '@/utils/conferenceQueries';
+import { filterBySubject } from '@/utils/conferenceQueries';
 import { SUBJECT_LABELS, resolveSubjectCode } from '@/constants/subjects';
 import { getConferences } from '../lib/conferences';
-import { buildDeadlineList } from '../lib/messages/replies';
+import { upcomingCards } from '../lib/messages/cards';
+import { buildResultList } from '../lib/messages/replies';
 import { plural, section } from '../lib/messages/blocks';
 import type { CommandContext } from './index';
 
@@ -31,9 +32,9 @@ export async function handleSubject({ text }: CommandContext): Promise<BlockKitM
     };
   }
 
-  return buildDeadlineList(
+  return buildResultList(
     `📚 ${SUBJECT_LABELS[subject] || subject} Conferences`,
     `Found ${plural(filtered.length, 'conference')}`,
-    getUpcomingDeadlines(filtered, 10)
+    upcomingCards(filtered, 10)
   );
 }

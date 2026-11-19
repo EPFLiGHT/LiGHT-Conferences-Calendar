@@ -4,7 +4,7 @@ import type { Button, KnownBlock } from '@slack/web-api';
 import type { DateTime } from 'luxon';
 import type { Conference, DeadlineInfo } from '@/types/conference';
 import type { BlockKitMessage } from '@/types/slack';
-import { getDaysUntilDeadline } from '@/utils/conferenceQueries';
+import { getDaysUntilDeadline, getUpcomingDeadlines, getUpcomingEvents } from '@/utils/conferenceQueries';
 import { getCardDeadlines, getNoDeadlineLabel } from '@/utils/parser';
 import { DEADLINE_GROUP_EMOJIS } from '@/constants/deadlineTypes';
 import { SUBJECT_LABELS, SUBJECT_EMOJIS } from '@/constants/subjects';
@@ -34,6 +34,24 @@ export function groupDeadlineItems(items: DeadlineItem[]): DeadlineCardItem[] {
     card.deadlines.sort((x, y) => x.deadline.datetime.toMillis() - y.deadline.datetime.toMillis());
   }
   return [...cards.values()];
+}
+
+/**
+ * Cards for conferences still ahead: each open one's next deadline (soonest due), then those with
+ * no open deadline but a future start (soonest first), so attendance-only events still show.
+ */
+export function upcomingCards(conferences: Conference[], limit: number): ConferenceCardItem[] {
+  const deadlines = getUpcomingDeadlines(conferences).map(({ conference, deadline }) => ({
+    kind: 'deadline' as const,
+    conference,
+    deadlines: [{ deadline, daysLeft: getDaysUntilDeadline(deadline) }],
+  }));
+  const open = new Set(deadlines.map((d) => d.conference.id));
+  const events = getUpcomingEvents(conferences.filter((c) => !open.has(c.id))).map((e) => ({
+    kind: 'event' as const,
+    ...e,
+  }));
+  return [...deadlines, ...events].slice(0, limit);
 }
 
 export function buildConferenceCard(item: ConferenceCardItem): KnownBlock[] {

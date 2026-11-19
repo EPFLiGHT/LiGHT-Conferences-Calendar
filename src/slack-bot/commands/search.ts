@@ -1,7 +1,8 @@
 import type { BlockKitMessage } from '@/types/slack';
-import { searchConferences, getUpcomingDeadlines } from '@/utils/conferenceQueries';
+import { searchConferences } from '@/utils/conferenceQueries';
 import { getConferences } from '../lib/conferences';
-import { buildDeadlineList, buildErrorMessage } from '../lib/messages/replies';
+import { upcomingCards } from '../lib/messages/cards';
+import { buildResultList, buildErrorMessage } from '../lib/messages/replies';
 import { plural, section } from '../lib/messages/blocks';
 import type { CommandContext } from './index';
 
@@ -23,9 +24,9 @@ export async function handleSearch({ text: query }: CommandContext): Promise<Blo
     };
   }
 
-  return buildDeadlineList(
+  return buildResultList(
     `🔍 Search results for "${query}"`,
     `Found ${plural(results.length, 'conference')}`,
-    getUpcomingDeadlines(results, 10)
+    upcomingCards(results, 10)
   );
 }
