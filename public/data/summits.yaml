@@ -663,8 +663,12 @@
 - title: Geneva AI Summit
   year: 2027
   id: genevaaisummit27
-  deadline_status: attendance
   link: https://genevaaisummit.swiss/
+  deadlines:
+    - type: other
+      label: Call for Input
+      due: 2026-12-18 23:59
+      pin: true
   timezone: Europe/Zurich
   place: Geneva, Switzerland
   date: Jun 21-22, 2027
@@ -673,6 +677,7 @@
   sub:
     - AI
     - Global Affairs
+  note: Road to Geneva pre-events accepted on a rolling basis; side-event call opens early 2027.
   type: summit
 
 - title: St. Gallen Symposium
