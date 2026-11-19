@@ -58,8 +58,7 @@
     "note": "SDC has no permanent IC Forum page; this news page names the 2027 dates, so point it at the next announcement after that edition"
   },
   "Geneva AI Summit": {
-    "url": "https://genevaaisummit.swiss/",
-    "attendance": true
+    "url": "https://genevaaisummit.swiss/"
   },
   "MMS Symposium": {
     "url": "https://www.medicusmundi.ch/en/symposium-2026",
