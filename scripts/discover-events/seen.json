@@ -1,4 +1,11 @@
 {
+  "ai house davos|2027": {
+    "title": "AI House Davos",
+    "full_name": null,
+    "year": 2027,
+    "link": "https://www.aihousedavos.com/davos",
+    "proposed": "2026-11-15"
+  },
   "ai x summit|2027": {
     "title": "AI+X Summit",
     "full_name": null,
@@ -19,6 +26,13 @@
     "year": 2027,
     "link": "https://www.caritas.ch/de/caritas-forum-2027",
     "proposed": "2026-10-24"
+  },
+  "caux arts peace forum|2027": {
+    "title": "Caux Arts and Peace Forum",
+    "full_name": null,
+    "year": 2027,
+    "link": "https://www.iofc.ch/caux-forum-2027",
+    "proposed": "2026-11-15"
   },
   "cfc st moritz|2027": {
     "title": "CfC St. Moritz",
@@ -62,6 +76,13 @@
     "link": null,
     "proposed": "2026-10-24"
   },
+  "geneva peace forum|2027": {
+    "title": "Geneva Peace Forum",
+    "full_name": null,
+    "year": 2027,
+    "link": "https://www.genevapeaceforum.ch/en/home",
+    "proposed": "2026-11-15"
+  },
   "ic forum|2027": {
     "title": "IC Forum",
     "full_name": "International Cooperation Forum",
@@ -69,12 +90,26 @@
     "link": "https://www.deza.eda.admin.ch/en/5th-edition-ic-forum",
     "proposed": "2026-10-24"
   },
+  "icpic|2027": {
+    "title": "ICPIC",
+    "full_name": "International Conference on Prevention & Infection Control",
+    "year": 2027,
+    "link": "https://conference.icpic.com/",
+    "proposed": "2026-11-15"
+  },
   "international trade forum|2027": {
     "title": "International Trade Forum",
     "full_name": null,
     "year": 2027,
     "link": "https://www.s-ge.com/export/en/events/s-ge-event/international-trade-forum-2027",
     "proposed": "2026-10-24"
+  },
+  "katamed|2027": {
+    "title": "KATAMED",
+    "full_name": "Swiss Conference on Disaster Health",
+    "year": 2027,
+    "link": "https://katamed-conference.ch/en",
+    "proposed": "2026-11-15"
   },
   "mms symposium|2026": {
     "title": "MMS Symposium",
@@ -89,6 +124,13 @@
     "year": 2027,
     "link": "https://www.societasethica.info/2027-call-for-papers",
     "proposed": "2026-10-24"
+  },
+  "society 5 0 conference|2027": {
+    "title": "Society 5.0 Conference",
+    "full_name": null,
+    "year": 2027,
+    "link": "https://www.conference-society5.org/",
+    "proposed": "2026-11-15"
   },
   "st gallen symposium|2027": {
     "title": "St. Gallen Symposium",
@@ -111,6 +153,13 @@
     "link": null,
     "proposed": "2026-10-24"
   },
+  "swiss public health conference|2027": {
+    "title": "Swiss Public Health Conference",
+    "full_name": null,
+    "year": 2027,
+    "link": "https://sphc.ch/en/sphc-2027",
+    "proposed": "2026-11-15"
+  },
   "swiss quantum days|2027": {
     "title": "Swiss Quantum Days",
     "full_name": null,
@@ -131,5 +180,12 @@
     "year": 2027,
     "link": "https://www.swissmem.ch/en/news/calendar-of-events/19th-swissmem-industry-day-2026.html",
     "proposed": "2026-10-24"
+  },
+  "united nations forum business human rights|2026": {
+    "title": "United Nations Forum on Business and Human Rights",
+    "full_name": null,
+    "year": 2026,
+    "link": "https://www.genevaenvironmentnetwork.org/events/15th-united-nations-forum-on-business-and-human-rights",
+    "proposed": "2026-11-15"
   }
 }
