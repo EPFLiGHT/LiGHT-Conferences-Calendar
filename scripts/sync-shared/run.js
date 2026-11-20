@@ -10,7 +10,7 @@ import { renderReport, emptyOutcome, addOutcome } from './report.js';
 const DATA_PATHS = ['conferences', 'summits'].map((name) =>
   fileURLToPath(new URL(`../../public/data/${name}.yaml`, import.meta.url)));
 
-const serializeConfig = (config) => `${JSON.stringify(config, null, 2)}\n`;
+export const serializeConfig = (config) => `${JSON.stringify(config, null, 2)}\n`;
 
 /**
  * @param {string[]} argv Command-line arguments after the script path.

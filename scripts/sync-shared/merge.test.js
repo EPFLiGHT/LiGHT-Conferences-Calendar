@@ -54,6 +54,21 @@ describe('updateEntry', () => {
     expect(changes[0].id).toBe('neuripssy26');
   });
 
+  it('flags an attendance entry that now lists a submission deadline, keeping its status', () => {
+    const entry = { ...sydneyEntry(), deadline_status: 'attendance' };
+    const { flags } = updateEntry(entry, neuripsFacts(), { deadlinesOnly: true });
+    expect(entry.deadline_status).toBe('attendance');
+    expect(flags).toContain('neuripssy26: a submission deadline is listed now; remove deadline_status: attendance');
+  });
+
+  it('does not flag an attendance entry whose new deadline is a registration one', () => {
+    const { deadlines: _, ...noDeadlines } = sydneyEntry();
+    const entry = { ...noDeadlines, deadline_status: 'attendance' };
+    const early = { type: 'early_registration', due: DateTime.fromISO('2026-10-01T00:00:00Z', { zone: 'utc' }) };
+    const { flags } = updateEntry(entry, { ...neuripsFacts(), deadlines: [early] }, { deadlinesOnly: true });
+    expect(flags).toEqual([]);
+  });
+
   it('deadlinesOnly leaves place, start, end, full_name alone', () => {
     const entry = sydneyEntry();
     updateEntry(entry, neuripsFacts(), { deadlinesOnly: true });
