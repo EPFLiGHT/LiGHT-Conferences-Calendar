@@ -62,6 +62,30 @@ describe('buildDraft', () => {
     expect(notes).toEqual([]);
   });
 
+  it('drafts the page\'s deadlines after the link, dropping attendance for a call', () => {
+    const abstract = {
+      type: 'abstract', date: '2027-01-15', time: null, timezone_text: null, before: false,
+      evidence: 'Abstracts due 15 January 2027',
+    };
+    const { entry } = buildDraft(event({ deadlines: [abstract] }), { takenIds: new Set() });
+    expect(entry.deadlines).toEqual([{ type: 'abstract', due: '2027-01-15 23:59' }]);
+    expect(entry.deadline_status).toBeUndefined();
+    const keys = Object.keys(entry);
+    expect(keys[keys.indexOf('link') + 1]).toBe('deadlines');
+    expect(validateEntry(entry, 0)).toEqual([]);
+  });
+
+  it('stays attendance-only when the page gives registration deadlines alone', () => {
+    const early = {
+      type: 'early_registration', date: '2027-03-01', time: '12:00', timezone_text: 'CET', before: false,
+      evidence: 'Early-bird registration until 1 March 2027, 12:00 CET',
+    };
+    const { entry } = buildDraft(event({ deadlines: [early] }), { takenIds: new Set() });
+    expect(entry.deadline_status).toBe('attendance');
+    expect(entry.deadlines).toEqual([{ type: 'early_registration', due: '2027-03-01 12:00' }]);
+    expect(validateEntry(entry, 0)).toEqual([]);
+  });
+
   it('lists several subjects as an array', () => {
     const { entry } = buildDraft(event({ subjects: ['AI', 'Global Affairs'] }), { takenIds: new Set() });
     expect(entry.sub).toEqual(['AI', 'Global Affairs']);

@@ -17,7 +17,7 @@
  *       "home": "<where the agent starts; defaults to the entry's link>",
  *       "multiEntry": true,  // optional, as in scripts/sync-openreview/venues.json
  *       "pages": ["<registration, fees or scholarship page>"],  // optional: read at tier 0 every run, never rewritten
- *       "attendance": true,  // optional: no call for submissions, so dated editions count; tier 0 only
+ *       "attendance": true,  // optional: mainly attended, so dated editions count; deadlines still read; tier 0 only
  *       "note": "<free-form comment for humans; the sync ignores it>"
  *   } }
  * When the deadlines turn up elsewhere, the sync rewrites url (and moves a

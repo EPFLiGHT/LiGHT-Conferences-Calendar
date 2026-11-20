@@ -20,6 +20,7 @@ jobs:
         public/data/summits.yaml
         public/data/workshops.yaml
         scripts/discover-events/seen.json
+        scripts/sync-llm/venues.json
       title: "chore(data): propose new events for review"
     secrets:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

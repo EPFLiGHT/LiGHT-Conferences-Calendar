@@ -7,11 +7,12 @@
  * Africa, has a real time zone), the event starts inside the window, and a
  * one-day event whose quote gives its hours runs for at least four of them.
  * A link the page does not carry is replaced by the page itself, so a draft
- * never points at an invented URL.
+ * never points at an invented URL; a calls link it does not carry is dropped.
+ * A surviving event's deadlines go through the LLM sync's own deadline gates.
  */
 import { DateTime, IANAZone } from 'luxon';
 import { isValidDate } from '../../src/utils/conferenceSchema.js';
-import { conferenceDatesShown, normalize, squash, escapeRe } from '../sync-llm/gates.js';
+import { conferenceDatesShown, normalize, squash, escapeRe, validateEditions } from '../sync-llm/gates.js';
 import { normalizeUrl, isAllowedUrl } from '../sync-llm/urls.js';
 import { HORIZON_MONTHS, EXCLUDED_KINDS, WORLDWIDE_TOPICS } from './criteria.js';
 
@@ -126,11 +127,27 @@ function placeOf(ev, haystack) {
 }
 
 /**
+ * @param {string|null} url As the model reported it.
+ * @param {string} pageUrl
+ * @param {Set<string>} pageLinks
+ * @returns {string|null} The URL, normalized, when it is this page or one of its links.
+ */
+function linkOnPage(url, pageUrl, pageLinks) {
+  try {
+    const candidate = normalizeUrl(url);
+    return isAllowedUrl(candidate).ok && (candidate === pageUrl || pageLinks.has(candidate)) ? candidate : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * @param {Array<object>} events Raw EVENTS_SCHEMA items.
  * @param {{pageText: string, pageUrl: string, links?: Array<{href: string}>, today: DateTime}} ctx
  * @returns {{events: Array<object>, dropped: string[]}} Survivors as
- *   {title, full_name, year, start, end, city, country, timezone, link, type, topics, subjects,
- *   fit, why, evidence, sourceUrl}; one line per dropped event.
+ *   {title, full_name, year, start, end, city, country, timezone, link, callsLink, type, topics,
+ *   subjects, fit, why, evidence, sourceUrl, deadlines, deadlineFlags}; one line per dropped event.
+ *   deadlines are the raw items the gates kept, deadlineFlags say what they dropped or doubt.
  */
 export function validateEvents(events = [], { pageText, pageUrl, links = [], today }) {
   const haystack = normalize(pageText);
@@ -169,20 +186,23 @@ export function validateEvents(events = [], { pageText, pageUrl, links = [], tod
     const place = placeOf(ev, haystack);
     if (typeof place === 'string') { drop(place); continue; }
 
-    let link = pageUrl;
-    try {
-      const candidate = normalizeUrl(ev.link);
-      if (isAllowedUrl(candidate).ok && (candidate === pageUrl || pageLinks.has(candidate))) link = candidate;
-    } catch { /* malformed; the page stands in */ }
+    const year = DateTime.fromISO(start).year;
+    const { editions: [checked], flags: deadlineFlags } = validateEditions({
+      editions: [{
+        year, full_name: null, location: null, start_date: start, end_date: end === start ? null : end,
+        dates_evidence: quote, deadlines: ev.deadlines ?? [],
+      }],
+    }, { pageText, today });
 
     out.push({
       title: ev.title,
       full_name: ev.full_name && ev.full_name !== ev.title ? ev.full_name : null,
-      year: DateTime.fromISO(start).year,
+      year,
       start,
       end,
       ...place,
-      link,
+      link: linkOnPage(ev.link, pageUrl, pageLinks) ?? pageUrl,
+      callsLink: linkOnPage(ev.calls_link ?? null, pageUrl, pageLinks),
       type: ev.type,
       topics: ev.topics,
       subjects: ev.subjects?.length ? ev.subjects : ['Global Affairs'],
@@ -190,6 +210,8 @@ export function validateEvents(events = [], { pageText, pageUrl, links = [], tod
       why: ev.why,
       evidence: quote,
       sourceUrl: pageUrl,
+      deadlines: checked?.deadlines ?? [],
+      deadlineFlags,
     });
   }
   return { events: out, dropped };

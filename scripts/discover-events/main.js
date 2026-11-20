@@ -7,7 +7,9 @@
  * leads each returns. Every page gets one extraction call and the checks in
  * gates.js. Strong fits not already listed (dedupe.js) are appended to the data
  * file for their type and recorded in seen.json, so a deleted draft is not
- * proposed again; possible fits only make the report.
+ * proposed again; possible fits only make the report. Drafts carry the
+ * deadlines their page states, and follow.js adds each draft it can to the LLM
+ * sync's venues.json, so its deadlines stay current once kept.
  *
  * sources.json format, one entry per curated page:
  *   { "<name>": { "url": "<page announcing events>", "note": "<for humans; ignored>" } }
@@ -19,7 +21,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { DateTime } from 'luxon';
 import OpenAI from 'openai';
-import { runIfMain } from '../sync-shared/run.js';
+import { runIfMain, serializeConfig } from '../sync-shared/run.js';
 import { parseEntries, serializeEntries } from '../sync-shared/yamlio.js';
 import { loadApiKey, createLlm } from '../sync-llm/llm.js';
 import { createFetcher } from '../sync-llm/fetcher.js';
@@ -31,11 +33,14 @@ import { validateEvents } from './gates.js';
 import { findLeads } from './search.js';
 import { matchExisting, wasProposed, seenKey } from './dedupe.js';
 import { buildDraft, DATA_FILES } from './drafts.js';
+import { followConfig } from './follow.js';
 import { renderReport } from './report.js';
 
 const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const SOURCES_PATH = fileURLToPath(new URL('./sources.json', import.meta.url));
 const SEEN_PATH = fileURLToPath(new URL('./seen.json', import.meta.url));
+const LLM_VENUES_PATH = fileURLToPath(new URL('../sync-llm/venues.json', import.meta.url));
+const OPENREVIEW_VENUES_PATH = fileURLToPath(new URL('../sync-openreview/venues.json', import.meta.url));
 const RUN_MAX_TOKENS = 800_000;
 const MAX_LEADS = 20;
 
@@ -57,13 +62,17 @@ export function parseArgs(argv) {
 /**
  * The whole run except file IO. Exported for tests.
  * @param {{llm, fetcher, sources: object, entries: Array<object>, seen: object,
- *   today: DateTime, budget: {exceeded: () => string|null}, search?: boolean}} ctx
- *   entries are those of every data file.
- * @returns {Promise<{proposals: Array<{event: object, entry: object, file: string}>,
+ *   today: DateTime, budget: {exceeded: () => string|null}, search?: boolean,
+ *   followed?: Set<string>}} ctx entries are those of every data file; followed
+ *   holds the titles either sync follows (mutated as drafts are followed).
+ * @returns {Promise<{proposals: Array<{event: object, entry: object, file: string, follow: object}>,
  *   possible: Array<object>, attention: string[], dropped: string[],
- *   stats: {pages: number, searches: number}}>} proposals are the strong fits, drafted.
+ *   stats: {pages: number, searches: number}}>} proposals are the strong fits, drafted;
+ *   follow is from followConfig.
  */
-export async function discover({ llm, fetcher, sources, entries, seen, today, budget, search = true }) {
+export async function discover({
+  llm, fetcher, sources, entries, seen, today, budget, search = true, followed = new Set(),
+}) {
   const accepted = [];
   const attention = [];
   const dropped = [];
@@ -109,6 +118,7 @@ export async function discover({ llm, fetcher, sources, entries, seen, today, bu
     for (const event of checked.events) {
       // A curated page lists many events, so its own URL identifies none of them.
       event.ownLink = !(curated && event.link === page.finalUrl);
+      event.curated = curated;
       const label = `${event.title} ${event.year}`;
       const { same, prior } = matchExisting(event, entries);
       const twin = matchExisting(event, accepted).same;
@@ -170,7 +180,10 @@ export async function discover({ llm, fetcher, sources, entries, seen, today, bu
     }
     takenIds.add(draft.entry.id);
     for (const note of draft.notes) attention.push(`${draft.entry.id}: ${note}`);
-    proposals.push({ event, entry: draft.entry, file: draft.file });
+    const proposal = { event, entry: draft.entry, file: draft.file };
+    proposal.follow = followConfig(proposal, followed);
+    if (proposal.follow.cfg) followed.add(draft.entry.title);
+    proposals.push(proposal);
   }
   return { proposals, possible, attention, dropped, stats };
 }
@@ -194,6 +207,8 @@ async function main() {
     return { name, filePath, raw, entries: parseEntries(raw) ?? [] };
   });
   const seen = JSON.parse(fs.readFileSync(SEEN_PATH, 'utf8'));
+  const llmVenues = JSON.parse(fs.readFileSync(LLM_VENUES_PATH, 'utf8'));
+  const openreviewVenues = JSON.parse(fs.readFileSync(OPENREVIEW_VENUES_PATH, 'utf8'));
   const today = DateTime.utc();
 
   const run = await discover({
@@ -205,6 +220,7 @@ async function main() {
     today,
     budget,
     search,
+    followed: new Set([...Object.keys(llmVenues), ...Object.keys(openreviewVenues)]),
   });
 
   if (!dryRun && run.proposals.length > 0) {
@@ -221,12 +237,16 @@ async function main() {
     }
     const sorted = Object.fromEntries(Object.entries(seen).sort(([a], [b]) => a.localeCompare(b)));
     fs.writeFileSync(SEEN_PATH, `${JSON.stringify(sorted, null, 2)}\n`);
+    const follows = run.proposals.filter((p) => p.follow.cfg);
+    for (const { entry, follow } of follows) llmVenues[entry.title] = follow.cfg;
+    if (follows.length > 0) fs.writeFileSync(LLM_VENUES_PATH, serializeConfig(llmVenues));
   }
 
   const report = renderReport({
     ...run,
     totals: budget.snapshot(),
     seenPath: path.relative(REPO_ROOT, SEEN_PATH),
+    venuesPath: path.relative(REPO_ROOT, LLM_VENUES_PATH),
   });
   console.log(dryRun ? `[dry run, nothing written]\n${report}` : report);
   if (process.env.SYNC_REPORT_PATH) fs.writeFileSync(process.env.SYNC_REPORT_PATH, report);

@@ -52,7 +52,7 @@ describe('extractFromPage', () => {
     expect(system).toMatch(/untrusted/i);
   });
 
-  it('asks for editions by their dates alone for an attendance-only venue', async () => {
+  it('asks an attendance venue for dated editions and any deadline, so a later call is caught', async () => {
     const systemFor = async (attendance) => {
       const llm = fakeLlm(jsonReply(RESULT));
       await extractFromPage(llm, {
@@ -60,8 +60,9 @@ describe('extractFromPage', () => {
       });
       return llm.requests[0].input.find((m) => m.role === 'system').content;
     };
-    expect(await systemFor(true)).toMatch(/registration and grant deadlines if the\s+page gives them/i);
-    expect(await systemFor(false)).not.toMatch(/registration and grant deadlines if the\s+page gives them/i);
+    expect(await systemFor(true)).toMatch(/with every deadline the page gives/i);
+    expect(await systemFor(true)).not.toMatch(/without a call for submissions/i);
+    expect(await systemFor(false)).not.toMatch(/with every deadline the page gives/i);
   });
 
   it('returns null instead of throwing when the response came back incomplete', async () => {

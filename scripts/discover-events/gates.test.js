@@ -38,6 +38,41 @@ describe('validateEvents', () => {
     })]);
   });
 
+  describe('deadlines', () => {
+    const CALL_PAGE = `${PAGE} Abstract submission deadline: 15 January 2027.`;
+    const abstract = (over = {}) => ({
+      type: 'abstract', date: '2027-01-15', time: null, timezone_text: null, before: false,
+      evidence: 'Abstract submission deadline: 15 January 2027', ...over,
+    });
+
+    it('keeps a deadline the page states', () => {
+      const { events } = check([raw({ deadlines: [abstract()] })], { pageText: CALL_PAGE });
+      expect(events[0].deadlines).toEqual([abstract()]);
+      expect(events[0].deadlineFlags).toEqual([]);
+    });
+
+    it('drops a deadline the page does not state, keeping the event', () => {
+      const invented = abstract({ date: '2027-01-20', evidence: 'Abstracts due 20 January 2027' });
+      const { events } = check([raw({ deadlines: [invented] })], { pageText: CALL_PAGE });
+      expect(events[0].deadlines).toEqual([]);
+      expect(events[0].deadlineFlags).toEqual(['2027 abstract deadline 2027-01-20: evidence not found on the page; dropped']);
+    });
+
+    it('drops a deadline after the event starts', () => {
+      const page = `${PAGE} Abstract submission deadline: 15 May 2027.`;
+      const late = abstract({ date: '2027-05-15', evidence: 'Abstract submission deadline: 15 May 2027' });
+      const { events } = check([raw({ deadlines: [late] })], { pageText: page });
+      expect(events[0].deadlines).toEqual([]);
+    });
+  });
+
+  it('keeps a calls link only when the page links it', () => {
+    const call = 'https://summit.example/call';
+    const linked = check([raw({ calls_link: call })], { links: [{ href: call }] });
+    expect(linked.events[0].callsLink).toBe(call);
+    expect(check([raw({ calls_link: call })]).events[0].callsLink).toBeNull();
+  });
+
   it('drops dates the quote does not show', () => {
     const { events, dropped } = check([raw({ start_date: '2027-05-28', end_date: '2027-05-29' })]);
     expect(events).toEqual([]);

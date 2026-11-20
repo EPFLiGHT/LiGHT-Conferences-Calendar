@@ -40,6 +40,41 @@ describe('discover', () => {
     expect(out.stats).toEqual({ pages: 1, searches: 0 });
   });
 
+  it('drafts the deadlines a page states', async () => {
+    const abstract = {
+      type: 'abstract', date: '2027-01-15', time: null, timezone_text: null, before: false,
+      evidence: 'Abstracts due 15 January 2027',
+    };
+    const out = await run({
+      llm: fakeLlm(jsonReply({ events: [found({ deadlines: [abstract] })] })),
+      fetcher: fakeFetcher({ [SOURCE_URL]: `${SOURCE_PAGE} Abstracts due 15 January 2027.` }),
+    });
+    expect(out.proposals[0].entry.deadlines).toEqual([{ type: 'abstract', due: '2027-01-15 23:59' }]);
+  });
+
+  describe('following drafts in the deadline sync', () => {
+    const own = 'https://alpine.example/summit';
+    const page = `${SOURCE_PAGE} Alpine Futures Summit. 3 - 4 June 2028, Geneva.`;
+    const fetcher = () => fakeFetcher({ [SOURCE_URL]: { text: page, links: [{ text: 'Summit', href: own }] } });
+
+    it('follows a draft at its own page', async () => {
+      const out = await run({ llm: fakeLlm(jsonReply({ events: [found({ link: own })] })), fetcher: fetcher() });
+      expect(out.proposals[0].follow).toEqual({ cfg: { url: own, attendance: true } });
+    });
+
+    it('follows a venue once, leaving alone one a sync already follows', async () => {
+      const next = found({ link: own, start_date: '2028-06-03', end_date: '2028-06-04', dates_evidence: '3 - 4 June 2028' });
+      const out = await run({ llm: fakeLlm(jsonReply({ events: [found({ link: own }), next] })), fetcher: fetcher() });
+      expect(out.proposals.map((p) => p.follow)).toEqual([{ cfg: { url: own, attendance: true } }, { note: 'already followed' }]);
+
+      const known = await run({
+        llm: fakeLlm(jsonReply({ events: [found({ link: own })] })), fetcher: fetcher(),
+        followed: new Set(['Alpine Futures Summit']),
+      });
+      expect(known.proposals[0].follow).toEqual({ note: 'already followed' });
+    });
+  });
+
   it('lists a possible fit without drafting it', async () => {
     const out = await run({ llm: fakeLlm(jsonReply({ events: [found({ fit: 'possible' })] })) });
     expect(out.proposals).toEqual([]);
