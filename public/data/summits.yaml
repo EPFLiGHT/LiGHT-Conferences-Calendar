@@ -878,3 +878,18 @@
   sub: AI
   type: summit
   note: Formerly MCP Dev Summit Europe.
+
+- title: Prototypes for Humanity
+  year: 2026
+  id: prototypesforhumanity26
+  deadline_status: attendance
+  full_name: Dubai Future Solutions - Prototypes for Humanity Summit
+  link: https://prototypesforhumanity.com/summit
+  timezone: Asia/Dubai
+  place: Dubai, UAE
+  date: Nov 18-21, 2026
+  start: '2026-11-18'
+  end: '2026-11-21'
+  sub: Global Affairs
+  type: summit
+  note: University prototypes for global challenges, held during Dubai Future Week.
