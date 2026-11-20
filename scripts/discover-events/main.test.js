@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { discover, parseArgs } from './main.js';
-import { TOPIC_KEYS } from './criteria.js';
+import { SEARCHES } from './criteria.js';
 import { seenKey } from './dedupe.js';
 import { createTokenBudget } from '../sync-llm/budget.js';
 import { TODAY, fakeFetcher, fakeLlm, jsonReply } from '../sync-llm/test-helpers.js';
@@ -12,7 +12,7 @@ const SOURCE_PAGE = 'Alpine Futures Summit. 28 - 29 April 2027, Geneva, Switzerl
 const found = (over = {}) => ({
   title: 'Alpine Futures Summit', full_name: null,
   start_date: '2027-04-28', end_date: '2027-04-29', dates_evidence: '28 - 29 April 2027',
-  city: 'Geneva', link: SOURCE_URL, kind: 'summit_or_forum', type: 'summit', topics: ['foresight'],
+  city: 'Geneva', country: 'Switzerland', timezone: 'Europe/Zurich', link: SOURCE_URL, kind: 'summit_or_forum', type: 'summit', topics: ['foresight'],
   subjects: ['Global Affairs'], fit: 'strong', why: 'Leaders discuss the long-term future.',
   ...over,
 });
@@ -135,7 +135,7 @@ describe('discover', () => {
       search: true,
     });
     expect(out.stats.pages).toBe(1);
-    expect(llm.requests).toHaveLength(1 + TOPIC_KEYS.length);
+    expect(llm.requests).toHaveLength(1 + SEARCHES.length);
   });
 
   it('reads web search leads after the sources, telling each search what is already known', async () => {
@@ -149,7 +149,7 @@ describe('discover', () => {
       jsonReply({ events: [found()] }),
       { ...jsonReply({ leads: [{ name: 'Lakeside Dialogue', url: leadUrl }] }), output: [{ type: 'web_search_call' }] },
       jsonReply({ events: [lead] }),
-      ...TOPIC_KEYS.slice(1).map(() => jsonReply({ leads: [] })),
+      ...SEARCHES.slice(1).map(() => jsonReply({ leads: [] })),
     );
     const out = await run({
       llm,

@@ -4,7 +4,7 @@ import { validateEntry } from '../../src/utils/conferenceSchema.js';
 
 const event = (over = {}) => ({
   title: 'St. Gallen Symposium', full_name: null, year: 2027,
-  start: '2027-04-28', end: '2027-04-29', city: 'St. Gallen',
+  start: '2027-04-28', end: '2027-04-29', city: 'St. Gallen', country: 'Switzerland', timezone: 'Europe/Zurich',
   link: 'https://symposium.org/', type: 'summit', subjects: ['Global Affairs'],
   ...over,
 });
@@ -27,6 +27,15 @@ describe('buildDraft', () => {
       sub: 'Global Affairs',
       type: 'summit',
     });
+    expect(validateEntry(entry, 0)).toEqual([]);
+  });
+
+  it('places an event abroad in its own country and time zone', () => {
+    const { entry } = buildDraft(
+      event({ title: 'CPHIA', city: 'Addis Ababa', country: 'Ethiopia', timezone: 'Africa/Addis_Ababa' }),
+      { takenIds: new Set() },
+    );
+    expect(entry).toMatchObject({ place: 'Addis Ababa, Ethiopia', timezone: 'Africa/Addis_Ababa' });
     expect(validateEntry(entry, 0)).toEqual([]);
   });
 

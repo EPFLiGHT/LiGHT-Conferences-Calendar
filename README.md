@@ -92,7 +92,7 @@ pnpm test             # tests
 pnpm build            # production build
 pnpm sync:openreview  # pull deadline updates from OpenReview
 pnpm sync:llm         # pull health-venue deadlines from their websites
-pnpm discover:events  # propose new Swiss events for review
+pnpm discover:events  # propose new events for review
 ```
 
 ## Conference data
@@ -178,13 +178,14 @@ To run it locally, put `OPENAI_API_KEY=...` in `.env.local`. If a synced value k
 it with `sync_pin: [place]` (or `start`, `end`, `date`) and both syncs will leave that field alone. A
 deadline is pinned on its own item with `pin: true`.
 
-### Discovering Swiss events
+### Discovering new events
 
 The syncs only update events the calendar already has. A third monthly Action (`pnpm discover:events`)
-looks for new ones: high-level events held in Switzerland on frontier science, policy, diplomacy,
-geopolitics, business, societal challenges or foresight (GESDA, the St. Gallen Symposium, the Geneva AI
-Summit). It reads the pages listed in `scripts/discover-events/sources.json`, then runs a few OpenAI web
-searches per topic. As with the syncs, dates, city and name must all appear on the page, and courses,
+looks for new ones: high-level events held in Switzerland on humanitarian aid, AI, diplomacy, frontier
+science, policy or foresight (GESDA, the St. Gallen Symposium, the Geneva AI Summit), plus major global and
+public health events anywhere in the world (CPHIA) and events on any of these topics held in or about
+Africa. It reads the pages listed in `scripts/discover-events/sources.json`, then runs one OpenAI web
+search per topic, plus one for Africa. As with the syncs, dates, city and name must all appear on the page, and courses,
 talks, webinars and UN body sessions are skipped. Strong fits are drafted into the YAML of a pull request
 and remembered in `scripts/discover-events/seen.json`, so a draft deleted in review is not proposed
 again; possible fits are only listed in the PR body. What counts as a fit lives in

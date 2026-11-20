@@ -1,12 +1,13 @@
 /**
  * Entry point for `pnpm discover:events`, run monthly by discover-events.yml.
- * Looks for upcoming high-level events in Switzerland (criteria.js) that the
- * calendar lacks and drafts them for a human to keep or delete in the PR. It
- * reads every page in sources.json, then runs one capped web search per topic
- * and reads the leads each returns. Every page gets one extraction call and
- * the checks in gates.js. Strong fits not already listed (dedupe.js) are
- * appended to the data file for their type and recorded in seen.json, so a
- * deleted draft is not proposed again; possible fits only make the report.
+ * Looks for upcoming high-level events in Switzerland, global health events
+ * anywhere and events in or about Africa (criteria.js) that the calendar lacks,
+ * and drafts them for a human to keep or delete in the PR. It reads every page
+ * in sources.json, then runs the capped web searches in SEARCHES and reads the
+ * leads each returns. Every page gets one extraction call and the checks in
+ * gates.js. Strong fits not already listed (dedupe.js) are appended to the data
+ * file for their type and recorded in seen.json, so a deleted draft is not
+ * proposed again; possible fits only make the report.
  *
  * sources.json format, one entry per curated page:
  *   { "<name>": { "url": "<page announcing events>", "note": "<for humans; ignored>" } }
@@ -24,7 +25,7 @@ import { loadApiKey, createLlm } from '../sync-llm/llm.js';
 import { createFetcher } from '../sync-llm/fetcher.js';
 import { createTokenBudget } from '../sync-llm/budget.js';
 import { normalizeUrl } from '../sync-llm/urls.js';
-import { TOPIC_KEYS, TOPICS } from './criteria.js';
+import { SEARCHES } from './criteria.js';
 import { extractEvents } from './extract.js';
 import { validateEvents } from './gates.js';
 import { findLeads } from './search.js';
@@ -130,25 +131,25 @@ export async function discover({ llm, fetcher, sources, entries, seen, today, bu
 
   if (search) {
     let leadsRead = 0;
-    for (const topic of TOPIC_KEYS) {
+    for (const s of SEARCHES) {
       if (budget.exceeded() || leadsRead >= MAX_LEADS) break;
-      // Recomputed per topic, so events found under one topic are not searched for again.
+      // Recomputed per search, so events one search found are not searched for again.
       const known = [
-        ...entries.filter((e) => /switzerland/i.test(e.place ?? '') && (e.end ?? '') >= today.toISODate()),
+        ...entries.filter((e) => (e.end ?? '') >= today.toISODate()),
         ...accepted,
         ...Object.values(seen).filter((s) => s.year >= today.year),
       ].map((e) => `${e.title} ${e.year}`);
-      const out = await findLeads(llm, { topic, today, known })
+      const out = await findLeads(llm, { search: s, today, known })
         .catch((err) => ({ leads: null, searches: 0, error: err.message }));
       stats.searches += out.searches;
       if (!out.leads) {
         const why = out.error ? ` (${out.error})` : '';
-        attention.push(`web search on "${TOPICS[topic]}" returned no usable answer${why}`);
+        attention.push(`web search on "${s.label}" returned no usable answer${why}`);
         continue;
       }
       for (const lead of out.leads) {
         if (leadsRead >= MAX_LEADS) break;
-        if (await readPage(lead.url, `web search, ${TOPICS[topic].toLowerCase()}`, false)) leadsRead += 1;
+        if (await readPage(lead.url, `web search, ${s.label.toLowerCase()}`, false)) leadsRead += 1;
       }
     }
   }

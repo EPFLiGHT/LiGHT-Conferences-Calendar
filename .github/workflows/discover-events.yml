@@ -1,4 +1,4 @@
-name: Discover Swiss events
+name: Discover events
 
 on:
   schedule:
@@ -20,6 +20,6 @@ jobs:
         public/data/summits.yaml
         public/data/workshops.yaml
         scripts/discover-events/seen.json
-      title: "chore(data): propose Swiss events for review"
+      title: "chore(data): propose new events for review"
     secrets:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

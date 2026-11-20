@@ -17,7 +17,7 @@ const SEARCH_PRICE = 0.01;
  * @returns {string}
  */
 export function renderReport({ proposals, possible, attention, dropped, stats, totals, seenPath }) {
-  const lines = ['## Swiss event discovery', ''];
+  const lines = ['## Event discovery', ''];
   if (proposals.length === 0) {
     lines.push('No new events to draft.', '');
   } else {
@@ -46,7 +46,7 @@ export function renderReport({ proposals, possible, attention, dropped, stats, t
   if (possible.length > 0) {
     lines.push('### Possible fits, not drafted', '');
     for (const e of [...possible].sort((a, b) => a.start.localeCompare(b.start))) {
-      lines.push(`- **${e.title}**, ${formatDateRange(e.start, e.end)}, ${e.city}: ${e.why} ${e.link}`);
+      lines.push(`- **${e.title}**, ${formatDateRange(e.start, e.end)}, ${e.city}, ${e.country}: ${e.why} ${e.link}`);
     }
     lines.push('');
   }

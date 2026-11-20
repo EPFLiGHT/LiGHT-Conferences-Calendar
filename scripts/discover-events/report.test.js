@@ -17,12 +17,12 @@ describe('renderReport', () => {
     const report = renderReport({
       ...base,
       proposals: [proposal('Later', '2027-06-01'), proposal('Sooner', '2027-02-01')],
-      possible: [{ title: 'Maybe', start: '2027-01-01', end: '2027-01-02', city: 'Bern', why: 'Maybe fits.', link: 'https://maybe.example/' }],
+      possible: [{ title: 'Maybe', start: '2027-01-01', end: '2027-01-02', city: 'Bern', country: 'Switzerland', why: 'Maybe fits.', link: 'https://maybe.example/' }],
       dropped: ['X: dropped'],
     });
     expect(report.indexOf('#### Sooner')).toBeLessThan(report.indexOf('#### Later'));
     expect(report).toContain('Geneva, Switzerland. Sooner fits.');
-    expect(report).toContain('- **Maybe**, Jan 1-2, 2027, Bern: Maybe fits. https://maybe.example/');
+    expect(report).toContain('- **Maybe**, Jan 1-2, 2027, Bern, Switzerland: Maybe fits. https://maybe.example/');
     expect(report).toContain('Dropped by the checks (1)');
     // 0.40 + 0.20 for tokens, 0.02 for two searches.
     expect(report).toContain('est. $0.620');
