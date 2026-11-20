@@ -75,5 +75,10 @@
   "AGNTCon + MCPCon Europe": {
     "url": "https://events.linuxfoundation.org/agntcon-mcpcon-europe-2027/",
     "attendance": true
+  },
+  "CPHIA": {
+    "url": "https://cphia.africacdc.org/abstracts",
+    "home": "https://cphia.africacdc.org/",
+    "note": "Africa CDC; the Open Calls page lists each edition's key dates"
   }
 }

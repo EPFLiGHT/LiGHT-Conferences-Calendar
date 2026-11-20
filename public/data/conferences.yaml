@@ -1925,3 +1925,22 @@
     - AI
     - Global Affairs
   type: conference
+
+- title: CPHIA
+  year: 2026
+  id: cphia26
+  full_name: 5th International Conference on Public Health in Africa
+  link: https://cphia.africacdc.org/
+  deadlines:
+    - type: early_registration
+      due: 2026-08-22 23:59
+    - type: abstract
+      due: 2026-09-30 23:59
+  timezone: Africa/Addis_Ababa
+  place: Addis Ababa, Ethiopia
+  date: Nov 23-27, 2026
+  start: '2026-11-23'
+  end: '2026-11-27'
+  sub: Global Health
+  type: conference
+  note: Africa CDC's flagship conference; pre-events on Nov 22.
