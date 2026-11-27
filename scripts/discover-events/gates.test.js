@@ -13,6 +13,8 @@ const raw = (over = {}) => ({
   end_date: '2027-04-29',
   dates_evidence: '28 - 29 April 2027',
   city: 'Geneva',
+  country: 'Switzerland',
+  timezone: 'Europe/Zurich',
   link: PAGE_URL,
   kind: 'summit_or_forum',
   type: 'summit',
@@ -34,6 +36,41 @@ describe('validateEvents', () => {
       title: 'Alpine Futures Summit', year: 2027, start: '2027-04-28', end: '2027-04-29',
       city: 'Geneva', link: PAGE_URL, sourceUrl: PAGE_URL,
     })]);
+  });
+
+  describe('deadlines', () => {
+    const CALL_PAGE = `${PAGE} Abstract submission deadline: 15 January 2027.`;
+    const abstract = (over = {}) => ({
+      type: 'abstract', date: '2027-01-15', time: null, timezone_text: null, before: false,
+      evidence: 'Abstract submission deadline: 15 January 2027', ...over,
+    });
+
+    it('keeps a deadline the page states', () => {
+      const { events } = check([raw({ deadlines: [abstract()] })], { pageText: CALL_PAGE });
+      expect(events[0].deadlines).toEqual([abstract()]);
+      expect(events[0].deadlineFlags).toEqual([]);
+    });
+
+    it('drops a deadline the page does not state, keeping the event', () => {
+      const invented = abstract({ date: '2027-01-20', evidence: 'Abstracts due 20 January 2027' });
+      const { events } = check([raw({ deadlines: [invented] })], { pageText: CALL_PAGE });
+      expect(events[0].deadlines).toEqual([]);
+      expect(events[0].deadlineFlags).toEqual(['2027 abstract deadline 2027-01-20: evidence not found on the page; dropped']);
+    });
+
+    it('drops a deadline after the event starts', () => {
+      const page = `${PAGE} Abstract submission deadline: 15 May 2027.`;
+      const late = abstract({ date: '2027-05-15', evidence: 'Abstract submission deadline: 15 May 2027' });
+      const { events } = check([raw({ deadlines: [late] })], { pageText: page });
+      expect(events[0].deadlines).toEqual([]);
+    });
+  });
+
+  it('keeps a calls link only when the page links it', () => {
+    const call = 'https://summit.example/call';
+    const linked = check([raw({ calls_link: call })], { links: [{ href: call }] });
+    expect(linked.events[0].callsLink).toBe(call);
+    expect(check([raw({ calls_link: call })]).events[0].callsLink).toBeNull();
   });
 
   it('drops dates the quote does not show', () => {
@@ -78,6 +115,39 @@ describe('validateEvents', () => {
     const { events, dropped } = check([raw({ city: 'Vienna' })], { pageText: page });
     expect(events).toEqual([]);
     expect(dropped[0]).toMatch(/not in Switzerland/);
+  });
+
+  describe('an event outside Switzerland', () => {
+    const page = 'CPHIA 2026. November 23-27, 2026. Addis International Convention Center, Addis Ababa.';
+    const abroad = (over = {}) => raw({
+      title: 'CPHIA', start_date: '2026-11-23', end_date: '2026-11-27', dates_evidence: 'November 23-27, 2026',
+      city: 'Addis Ababa', country: 'Ethiopia', timezone: 'Africa/Addis_Ababa', topics: ['global_health'],
+      ...over,
+    });
+
+    it('keeps a health event in its own country and time zone', () => {
+      const { events, dropped } = check([abroad()], { pageText: page });
+      expect(dropped).toEqual([]);
+      expect(events[0]).toMatchObject({ city: 'Addis Ababa', country: 'Ethiopia', timezone: 'Africa/Addis_Ababa' });
+      expect(check([abroad({ city: 'Addis Ababa, Ethiopia' })], { pageText: page }).events[0].city).toBe('Addis Ababa');
+    });
+
+    it('keeps an event on any topic held in Africa or named for it', () => {
+      expect(check([abroad({ topics: ['ai_digital'] })], { pageText: page }).events).toHaveLength(1);
+      const brussels = 'EU-Africa Digital Forum. November 23-27, 2026, Brussels, Belgium.';
+      const named = abroad({
+        title: 'EU-Africa Digital Forum', city: 'Brussels', country: 'Belgium', timezone: 'Europe/Brussels', topics: ['ai_digital'],
+      });
+      expect(check([named], { pageText: brussels }).events).toHaveLength(1);
+    });
+
+    it('drops an event elsewhere on another topic, or without its city on the page or a real time zone', () => {
+      const vienna = 'Alpine Futures Summit. 28 - 29 April 2027, Vienna, Austria.';
+      const elsewhere = raw({ city: 'Vienna', country: 'Austria', timezone: 'Europe/Vienna', topics: ['ai_digital'] });
+      expect(check([elsewhere], { pageText: vienna }).dropped[0]).toMatch(/not in Switzerland/);
+      expect(check([abroad({ city: 'Nairobi', country: 'Kenya' })], { pageText: page }).dropped[0]).toMatch(/"Nairobi" is not on the page/);
+      expect(check([abroad({ timezone: 'East Africa Time' })], { pageText: page }).dropped[0]).toMatch(/not a real one/);
+    });
   });
 
   it('names a Swiss city in English when the page writes it in French', () => {

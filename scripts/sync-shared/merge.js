@@ -79,6 +79,9 @@ export function updateEntry(entry, facts, opts = {}) {
   const merged = mergeDeadlines(entry, facts.deadlines ?? [], { today });
   changes.push(...merged.changes);
   flags.push(...merged.flags);
+  if (entry.deadline_status === 'attendance' && entry.deadlines?.some((d) => DEADLINE_TYPES[d.type]?.group === 'submission')) {
+    flags.push(`${entry.id}: a submission deadline is listed now; remove deadline_status: attendance`);
+  }
 
   if (!deadlinesOnly) {
     const fullName = cleanFullName(facts.fullName, entry);

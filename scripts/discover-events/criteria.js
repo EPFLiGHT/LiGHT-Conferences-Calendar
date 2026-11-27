@@ -3,13 +3,10 @@
  * prompts are built from this file, so tuning the discovery means editing it.
  */
 
-/**
- * Topics an event must touch, keyed as the extraction schema reports them.
- * Searched in this order, closest fits first, since the run caps the leads it reads.
- */
+/** Topics an event must touch, keyed as the extraction schema reports them. */
 export const TOPICS = {
   humanitarian: 'Humanitarian aid and international cooperation',
-  global_health: 'Global health and primary care',
+  global_health: 'Global and public health',
   ai_digital: 'AI, robotics and digital technology',
   governance: 'Diplomacy, peace and global governance',
   frontier_science: 'Frontier science and its impact on society',
@@ -18,6 +15,34 @@ export const TOPICS = {
 };
 
 export const TOPIC_KEYS = Object.keys(TOPICS);
+
+/**
+ * Topics whose events qualify anywhere in the world. Events on the other topics
+ * qualify in Switzerland, in Africa, or wherever held when their name is about Africa.
+ */
+export const WORLDWIDE_TOPICS = new Set(['global_health']);
+
+const inSwitzerland = (key) => ({
+  label: TOPICS[key], ask: `events in Switzerland on this topic: ${TOPICS[key]}`, swiss: true,
+});
+
+/**
+ * One web search each, in this order, closest fits first, since the run caps
+ * the leads it reads. Only the `swiss` ones are located in Switzerland.
+ */
+export const SEARCHES = [
+  inSwitzerland('humanitarian'),
+  {
+    label: TOPICS.global_health,
+    ask: `events anywhere in the world, Switzerland included, on this topic: ${TOPICS.global_health}`,
+  },
+  { label: 'Events in or about Africa', ask: 'events held in Africa, or about Africa wherever held, on any of the topics above' },
+  inSwitzerland('ai_digital'),
+  inSwitzerland('governance'),
+  inSwitzerland('frontier_science'),
+  inSwitzerland('societal'),
+  inSwitzerland('foresight'),
+];
 
 /**
  * What an event is, as the extraction classifies it. Classifying is easier for
@@ -42,6 +67,13 @@ Basel, Bern, Davos and elsewhere) where leaders from government, international o
 and civil society meet. An event qualifies when it is held in Switzerland and touches at least one of these
 topics:
 ${Object.values(TOPICS).map((t) => `- ${t}`).join('\n')}
+Two exceptions qualify outside Switzerland. Global and public health events qualify anywhere in the world
+when they are major continental or global gatherings, such as those convened by WHO, Africa CDC, the African
+Union, global health agencies, foundations or networks, above all on health in low- and middle-income
+countries: the International Conference on Public Health in Africa (CPHIA) and BMJ Future Health Europe are
+typical. And events on any of the topics above qualify when held in Africa, or when they are about Africa
+wherever held, such as the Global AI Summit on Africa and the Africa HealthTech Summit. Outside Switzerland,
+skip local meetings and congresses of one medical specialty.
 Closest fits are events on international cooperation, humanitarian aid, global health or the governance of AI,
 often convened by the Swiss government, International Geneva, UN agencies or major NGOs: the IC Forum, the
 Geneva AI Summit, GESDA's Anticipation Summit and the Medicus Mundi Switzerland Symposium are typical.

@@ -23,7 +23,7 @@ export const edition = (over = {}) => ({
 
 /**
  * A fetcher serving `pages`, each a URL mapped to its text or to
- * {text, finalUrl} for a redirect; any other URL 404s.
+ * {text, finalUrl?, links?} for a redirect or a page with links; any other URL 404s.
  */
 export function fakeFetcher(pages = {}) {
   const texts = new Map();
@@ -31,10 +31,10 @@ export function fakeFetcher(pages = {}) {
     async fetchPage(url) {
       const page = pages[url];
       if (page == null) return { ok: false, error: 'http 404', status: 404 };
-      const { text, finalUrl } = typeof page === 'string' ? { text: page, finalUrl: url } : page;
+      const { text, finalUrl = url, links = [] } = typeof page === 'string' ? { text: page } : page;
       texts.set(url, text);
       texts.set(finalUrl, text);
-      return { ok: true, status: 200, finalUrl, text, links: [], tooShort: false };
+      return { ok: true, status: 200, finalUrl, text, links, tooShort: false };
     },
     getText: (url) => texts.get(url) ?? null,
   };

@@ -4,7 +4,7 @@ import { validateEntry } from '../../src/utils/conferenceSchema.js';
 
 const event = (over = {}) => ({
   title: 'St. Gallen Symposium', full_name: null, year: 2027,
-  start: '2027-04-28', end: '2027-04-29', city: 'St. Gallen',
+  start: '2027-04-28', end: '2027-04-29', city: 'St. Gallen', country: 'Switzerland', timezone: 'Europe/Zurich',
   link: 'https://symposium.org/', type: 'summit', subjects: ['Global Affairs'],
   ...over,
 });
@@ -30,6 +30,15 @@ describe('buildDraft', () => {
     expect(validateEntry(entry, 0)).toEqual([]);
   });
 
+  it('places an event abroad in its own country and time zone', () => {
+    const { entry } = buildDraft(
+      event({ title: 'CPHIA', city: 'Addis Ababa', country: 'Ethiopia', timezone: 'Africa/Addis_Ababa' }),
+      { takenIds: new Set() },
+    );
+    expect(entry).toMatchObject({ place: 'Addis Ababa, Ethiopia', timezone: 'Africa/Addis_Ababa' });
+    expect(validateEntry(entry, 0)).toEqual([]);
+  });
+
   it('keeps a prior edition\'s title, full name, subject, type and id pattern', () => {
     const prior = {
       title: 'GESDA Summit', id: 'gesda26', full_name: 'Geneva Science Diplomacy Anticipation Summit',
@@ -51,6 +60,30 @@ describe('buildDraft', () => {
     );
     expect(entry.full_name).toBe('Eightieth World Health Assembly');
     expect(notes).toEqual([]);
+  });
+
+  it('drafts the page\'s deadlines after the link, dropping attendance for a call', () => {
+    const abstract = {
+      type: 'abstract', date: '2027-01-15', time: null, timezone_text: null, before: false,
+      evidence: 'Abstracts due 15 January 2027',
+    };
+    const { entry } = buildDraft(event({ deadlines: [abstract] }), { takenIds: new Set() });
+    expect(entry.deadlines).toEqual([{ type: 'abstract', due: '2027-01-15 23:59' }]);
+    expect(entry.deadline_status).toBeUndefined();
+    const keys = Object.keys(entry);
+    expect(keys[keys.indexOf('link') + 1]).toBe('deadlines');
+    expect(validateEntry(entry, 0)).toEqual([]);
+  });
+
+  it('stays attendance-only when the page gives registration deadlines alone', () => {
+    const early = {
+      type: 'early_registration', date: '2027-03-01', time: '12:00', timezone_text: 'CET', before: false,
+      evidence: 'Early-bird registration until 1 March 2027, 12:00 CET',
+    };
+    const { entry } = buildDraft(event({ deadlines: [early] }), { takenIds: new Set() });
+    expect(entry.deadline_status).toBe('attendance');
+    expect(entry.deadlines).toEqual([{ type: 'early_registration', due: '2027-03-01 12:00' }]);
+    expect(validateEntry(entry, 0)).toEqual([]);
   });
 
   it('lists several subjects as an array', () => {

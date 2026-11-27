@@ -3,6 +3,7 @@
  * events come first, in words a reviewer outside the team can read, then the
  * possible fits that were not drafted; what the checks dropped is folded away.
  */
+import { DEADLINE_TYPES } from '../../src/constants/deadlineTypes.data.js';
 import { formatDateRange } from '../sync-shared/dates.js';
 import { estimateCost } from '../sync-llm/llm.js';
 import { TOPICS } from './criteria.js';
@@ -10,26 +11,36 @@ import { TOPICS } from './criteria.js';
 // USD per web_search call, on any model; the results it reads are billed as input tokens.
 const SEARCH_PRICE = 0.01;
 
+/** How the LLM sync will follow a draft, from followConfig. */
+function followLine(follow) {
+  if (!follow) return [];
+  if (!follow.cfg) return [`- Deadline sync: ${follow.note}`];
+  const what = follow.cfg.attendance ? 'its dates and any call that opens' : 'its deadlines';
+  return [`- Deadline sync: follows ${follow.cfg.url} for ${what}`];
+}
+
 /**
- * @param {{proposals: Array<{event: object, entry: object, file: string}>, possible: Array<object>,
- *   attention: string[], dropped: string[], stats: {pages: number, searches: number},
- *   totals: {inputTokens: number, outputTokens: number}, seenPath: string}} run
+ * @param {{proposals: Array<{event: object, entry: object, file: string, follow?: object}>,
+ *   possible: Array<object>, attention: string[], dropped: string[],
+ *   stats: {pages: number, searches: number}, totals: {inputTokens: number, outputTokens: number},
+ *   seenPath: string, venuesPath: string}} run
  * @returns {string}
  */
-export function renderReport({ proposals, possible, attention, dropped, stats, totals, seenPath }) {
-  const lines = ['## Swiss event discovery', ''];
+export function renderReport({ proposals, possible, attention, dropped, stats, totals, seenPath, venuesPath }) {
+  const lines = ['## Event discovery', ''];
   if (proposals.length === 0) {
     lines.push('No new events to draft.', '');
   } else {
     lines.push(
       `${proposals.length} new event${proposals.length === 1 ? '' : 's'} drafted in this PR. ` +
-        `Delete the drafts that do not fit before merging; every draft is remembered in \`${seenPath}\`, ` +
-        'so a deleted one is not proposed again.',
+        `Delete each draft that does not fit before merging, along with its entry in \`${venuesPath}\`; ` +
+        `every draft is remembered in \`${seenPath}\`, so a deleted one is not proposed again.`,
       '',
     );
     const sorted = [...proposals].sort((a, b) => a.entry.start.localeCompare(b.entry.start));
-    for (const { event, entry, file } of sorted) {
+    for (const { event, entry, file, follow } of sorted) {
       const name = entry.full_name && entry.full_name !== entry.title ? `${entry.title} (${entry.full_name})` : entry.title;
+      const quotes = new Map((event.deadlines ?? []).map((d) => [d.type, d.evidence.replace(/\s+/g, ' ')]));
       lines.push(
         `#### ${name}`,
         '',
@@ -38,6 +49,9 @@ export function renderReport({ proposals, possible, attention, dropped, stats, t
         `- Topics: ${event.topics.map((t) => TOPICS[t]).join('; ')}`,
         `- Link: ${entry.link}`,
         `- Found on ${event.sourceUrl} (${event.origin}): "${event.evidence.replace(/\s+/g, ' ')}"`,
+        ...(entry.deadlines ?? []).map((d) => `- Deadline: ${DEADLINE_TYPES[d.type].label}, ${d.due} ("${quotes.get(d.type)}")`),
+        ...(event.deadlineFlags ?? []).map((f) => `- Check: ${f.replace(/\s+/g, ' ')}`),
+        ...followLine(follow),
         `- Draft: \`${entry.id}\` in ${file}`,
         '',
       );
@@ -46,7 +60,7 @@ export function renderReport({ proposals, possible, attention, dropped, stats, t
   if (possible.length > 0) {
     lines.push('### Possible fits, not drafted', '');
     for (const e of [...possible].sort((a, b) => a.start.localeCompare(b.start))) {
-      lines.push(`- **${e.title}**, ${formatDateRange(e.start, e.end)}, ${e.city}: ${e.why} ${e.link}`);
+      lines.push(`- **${e.title}**, ${formatDateRange(e.start, e.end)}, ${e.city}, ${e.country}: ${e.why} ${e.link}`);
     }
     lines.push('');
   }

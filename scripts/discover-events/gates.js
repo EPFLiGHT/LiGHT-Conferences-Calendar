@@ -3,16 +3,18 @@
  * scripts/sync-llm/gates.js: nothing is repaired, only kept or dropped with a
  * reason. An event survives when it is not a kind the criteria skip, its dates
  * quote is on the page and shows the dates, its name and city appear on the
- * page, the city is in Switzerland, the event starts inside the window, and a
+ * page, the city is in Switzerland (or, for a health event or one in or about
+ * Africa, has a real time zone), the event starts inside the window, and a
  * one-day event whose quote gives its hours runs for at least four of them.
  * A link the page does not carry is replaced by the page itself, so a draft
- * never points at an invented URL.
+ * never points at an invented URL; a calls link it does not carry is dropped.
+ * A surviving event's deadlines go through the LLM sync's own deadline gates.
  */
-import { DateTime } from 'luxon';
+import { DateTime, IANAZone } from 'luxon';
 import { isValidDate } from '../../src/utils/conferenceSchema.js';
-import { conferenceDatesShown, normalize, squash, escapeRe } from '../sync-llm/gates.js';
+import { conferenceDatesShown, normalize, squash, escapeRe, validateEditions } from '../sync-llm/gates.js';
 import { normalizeUrl, isAllowedUrl } from '../sync-llm/urls.js';
-import { HORIZON_MONTHS, EXCLUDED_KINDS } from './criteria.js';
+import { HORIZON_MONTHS, EXCLUDED_KINDS, WORLDWIDE_TOPICS } from './criteria.js';
 
 // English name first; the rest are how pages in the national languages write it.
 const SWISS_CITIES = [
@@ -33,6 +35,21 @@ const SWISS_CITIES = [
   ['Engelberg'], ['Baden'],
 ];
 const COUNTRY = '(?:switzerland|suisse|schweiz|svizzera)';
+
+const countryKey = (s) =>
+  s.toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/^the\s+/, '').replace(/[^a-z]/g, '');
+// With the variants a model may report: "Ivory Coast", "DR Congo", "Swaziland".
+const AFRICAN_COUNTRIES = new Set([
+  'Algeria', 'Angola', 'Benin', 'Botswana', 'Burkina Faso', 'Burundi', 'Cabo Verde', 'Cape Verde', 'Cameroon',
+  'Central African Republic', 'Chad', 'Comoros', 'Congo', 'Republic of the Congo', 'Democratic Republic of the Congo',
+  'DR Congo', 'DRC', "Côte d'Ivoire", 'Ivory Coast', 'Djibouti', 'Egypt', 'Equatorial Guinea', 'Eritrea', 'Eswatini',
+  'Swaziland', 'Ethiopia', 'Gabon', 'Gambia', 'Ghana', 'Guinea', 'Guinea-Bissau', 'Kenya', 'Lesotho', 'Liberia',
+  'Libya', 'Madagascar', 'Malawi', 'Mali', 'Mauritania', 'Mauritius', 'Morocco', 'Mozambique', 'Namibia', 'Niger',
+  'Nigeria', 'Rwanda', 'São Tomé and Príncipe', 'Senegal', 'Seychelles', 'Sierra Leone', 'Somalia', 'South Africa',
+  'South Sudan', 'Sudan', 'Tanzania', 'Togo', 'Tunisia', 'Uganda', 'Zambia', 'Zimbabwe',
+].map(countryKey));
+// "Africa", "African", "Afrique", "Afrika" at the start of a word.
+const ABOUT_AFRICA_RE = /(?<!\p{L})afri[cqk]/iu;
 const TRAILING_COUNTRY_RE = new RegExp(`[\\s,]+${COUNTRY}$`, 'i');
 
 // "14:00 - 15:30", "12h30-14h00", "3:30 pm - 4:30 pm". Dots are left out: "16.11" is a date.
@@ -87,11 +104,50 @@ function cityOnPage(city, haystack) {
 }
 
 /**
+ * Where an event is held, for a calendar entry's place and timezone. Outside
+ * Switzerland, only a health event or one held in or named for Africa counts.
+ * @param {object} ev Raw EVENTS_SCHEMA item.
+ * @param {string} haystack normalize()d page text.
+ * @returns {{city: string, country: string, timezone: string}|string} The
+ *   place, or why it does not count.
+ */
+function placeOf(ev, haystack) {
+  const swiss = cityOnPage(ev.city ?? '', haystack);
+  if (swiss) return { city: swiss, country: 'Switzerland', timezone: 'Europe/Zurich' };
+  const country = (ev.country ?? '').trim();
+  const counts = ev.topics.some((t) => WORLDWIDE_TOPICS.has(t))
+    || AFRICAN_COUNTRIES.has(countryKey(country))
+    || ABOUT_AFRICA_RE.test(`${ev.title} ${ev.full_name ?? ''}`);
+  if (!counts) return `city "${ev.city}" is not on the page or not in Switzerland`;
+  const city = (ev.city ?? '').replace(new RegExp(`[\\s,]+${escapeRe(country)}$`, 'i'), '').trim();
+  if (!city || !country) return 'no city or country given';
+  if (!mentions(haystack, city)) return `city "${city}" is not on the page`;
+  if (!IANAZone.isValidZone(ev.timezone)) return `time zone "${ev.timezone}" is not a real one`;
+  return { city, country, timezone: ev.timezone };
+}
+
+/**
+ * @param {string|null} url As the model reported it.
+ * @param {string} pageUrl
+ * @param {Set<string>} pageLinks
+ * @returns {string|null} The URL, normalized, when it is this page or one of its links.
+ */
+function linkOnPage(url, pageUrl, pageLinks) {
+  try {
+    const candidate = normalizeUrl(url);
+    return isAllowedUrl(candidate).ok && (candidate === pageUrl || pageLinks.has(candidate)) ? candidate : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * @param {Array<object>} events Raw EVENTS_SCHEMA items.
  * @param {{pageText: string, pageUrl: string, links?: Array<{href: string}>, today: DateTime}} ctx
  * @returns {{events: Array<object>, dropped: string[]}} Survivors as
- *   {title, full_name, year, start, end, city, link, type, topics, subjects,
- *   fit, why, evidence, sourceUrl}; one line per dropped event.
+ *   {title, full_name, year, start, end, city, country, timezone, link, callsLink, type, topics,
+ *   subjects, fit, why, evidence, sourceUrl, deadlines, deadlineFlags}; one line per dropped event.
+ *   deadlines are the raw items the gates kept, deadlineFlags say what they dropped or doubt.
  */
 export function validateEvents(events = [], { pageText, pageUrl, links = [], today }) {
   const haystack = normalize(pageText);
@@ -127,23 +183,26 @@ export function validateEvents(events = [], { pageText, pageUrl, links = [], tod
       return key.length >= MIN_SQUASHED_NAME ? squashed.includes(key) : key !== '' && mentions(haystack, n);
     });
     if (!named) { drop('its name is not on the page'); continue; }
-    const city = cityOnPage(ev.city ?? '', haystack);
-    if (!city) { drop(`city "${ev.city}" is not on the page or not in Switzerland`); continue; }
+    const place = placeOf(ev, haystack);
+    if (typeof place === 'string') { drop(place); continue; }
 
-    let link = pageUrl;
-    try {
-      const candidate = normalizeUrl(ev.link);
-      if (isAllowedUrl(candidate).ok && (candidate === pageUrl || pageLinks.has(candidate))) link = candidate;
-    } catch { /* malformed; the page stands in */ }
+    const year = DateTime.fromISO(start).year;
+    const { editions: [checked], flags: deadlineFlags } = validateEditions({
+      editions: [{
+        year, full_name: null, location: null, start_date: start, end_date: end === start ? null : end,
+        dates_evidence: quote, deadlines: ev.deadlines ?? [],
+      }],
+    }, { pageText, today });
 
     out.push({
       title: ev.title,
       full_name: ev.full_name && ev.full_name !== ev.title ? ev.full_name : null,
-      year: DateTime.fromISO(start).year,
+      year,
       start,
       end,
-      city,
-      link,
+      ...place,
+      link: linkOnPage(ev.link, pageUrl, pageLinks) ?? pageUrl,
+      callsLink: linkOnPage(ev.calls_link ?? null, pageUrl, pageLinks),
       type: ev.type,
       topics: ev.topics,
       subjects: ev.subjects?.length ? ev.subjects : ['Global Affairs'],
@@ -151,6 +210,8 @@ export function validateEvents(events = [], { pageText, pageUrl, links = [], tod
       why: ev.why,
       evidence: quote,
       sourceUrl: pageUrl,
+      deadlines: checked?.deadlines ?? [],
+      deadlineFlags,
     });
   }
   return { events: out, dropped };

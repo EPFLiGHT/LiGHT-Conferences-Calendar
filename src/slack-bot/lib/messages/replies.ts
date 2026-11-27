@@ -1,36 +1,23 @@
 /** Replies to slash commands and buttons. */
 
 import type { Button } from '@slack/web-api';
-import type { Conference, DeadlineInfo } from '@/types/conference';
 import type { BlockKitMessage, UserPreferences } from '@/types/slack';
-import { getDaysUntilDeadline } from '@/utils/conferenceQueries';
 import { COMMANDS, NOTIFICATION_CONFIG, commandUsage } from '../../config/constants';
-import { cardList } from './cards';
+import { cardList, type ConferenceCardItem } from './cards';
 import { context, divider, header, plural, section } from './blocks';
 
-/** Deadline cards under a caller-chosen title, e.g. search or subject results. */
-export function buildDeadlineList(
-  title: string,
-  subtitle: string,
-  deadlines: Array<{ conference: Conference; deadline: DeadlineInfo }>
-): BlockKitMessage {
+/** Cards under a caller-chosen title, e.g. search or subject results. */
+export function buildResultList(title: string, subtitle: string, items: ConferenceCardItem[]): BlockKitMessage {
   const intro = [header(title), context(subtitle), divider];
 
-  if (deadlines.length === 0) {
+  if (items.length === 0) {
     return {
-      blocks: [...intro, section('✨ No upcoming deadlines found. Check back later!')],
-      text: `${title}: no upcoming deadlines`,
+      blocks: [...intro, section('✨ Nothing upcoming: no open deadlines or future events. Check back later!')],
+      text: `${title}: nothing upcoming`,
     };
   }
 
-  const cards = cardList(
-    deadlines.map(({ conference, deadline }) => ({
-      kind: 'deadline' as const,
-      conference,
-      deadlines: [{ deadline, daysLeft: getDaysUntilDeadline(deadline) }],
-    }))
-  );
-  return { blocks: [...intro, ...cards], text: `${title}: ${plural(deadlines.length, 'upcoming deadline')}` };
+  return { blocks: [...intro, ...cardList(items)], text: `${title}: ${plural(items.length, 'upcoming result')}` };
 }
 
 export function buildHelpMessage(): BlockKitMessage {

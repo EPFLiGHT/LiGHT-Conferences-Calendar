@@ -2,10 +2,14 @@
  * A validated event as a calendar entry, in the field order of the hand-written
  * summits. A new edition of an event the calendar already lists keeps that
  * entry's title, subject and type, its id with the year swapped, and its full
- * name when the page gives none.
+ * name when the page gives none. The page's deadlines are drafted in the event's
+ * zone; with no submission deadline among them, the entry is attendance-only.
  */
+import { DEADLINE_TYPES } from '../../src/constants/deadlineTypes.data.js';
 import { formatDateRange, nextId } from '../sync-shared/dates.js';
+import { draftDeadlines } from '../sync-shared/deadlines.js';
 import { cleanFullName } from '../sync-shared/names.js';
+import { parseDeadline } from '../sync-llm/facts.js';
 
 /** The data file each entry type lives in, under public/data/. */
 export const DATA_FILES = { conference: 'conferences.yaml', summit: 'summits.yaml', workshop: 'workshops.yaml' };
@@ -32,15 +36,21 @@ export function buildDraft(event, { prior = null, takenIds }) {
   const notes = !pageName && prior?.full_name ? [`full_name kept from ${prior.id}; check its edition ordinal`] : [];
   const sub = prior?.sub ?? (event.subjects.length === 1 ? event.subjects[0] : event.subjects);
   const type = prior?.type ?? event.type;
+  const deadlines = draftDeadlines(
+    (event.deadlines ?? []).map((d) => ({ type: d.type, due: parseDeadline(d, event.timezone) })).filter((d) => d.due),
+    event.timezone,
+  );
+  const call = deadlines.some((d) => DEADLINE_TYPES[d.type].group === 'submission');
   const entry = {
     title,
     year: event.year,
     id,
-    deadline_status: 'attendance',
+    ...(call ? {} : { deadline_status: 'attendance' }),
     ...(fullName ? { full_name: fullName } : {}),
     link: event.link,
-    timezone: 'Europe/Zurich',
-    place: `${event.city}, Switzerland`,
+    ...(deadlines.length > 0 ? { deadlines } : {}),
+    timezone: event.timezone,
+    place: `${event.city}, ${event.country}`,
     date: formatDateRange(event.start, event.end),
     start: event.start,
     end: event.end,

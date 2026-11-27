@@ -663,8 +663,12 @@
 - title: Geneva AI Summit
   year: 2027
   id: genevaaisummit27
-  deadline_status: attendance
   link: https://genevaaisummit.swiss/
+  deadlines:
+    - type: other
+      label: Call for Input
+      due: 2026-12-18 23:59
+      pin: true
   timezone: Europe/Zurich
   place: Geneva, Switzerland
   date: Jun 21-22, 2027
@@ -673,6 +677,7 @@
   sub:
     - AI
     - Global Affairs
+  note: Road to Geneva pre-events accepted on a rolling basis; side-event call opens early 2027.
   type: summit
 
 - title: St. Gallen Symposium
@@ -772,7 +777,7 @@
   id: icforum27
   deadline_status: attendance
   full_name: International Cooperation Forum
-  link: https://www.deza.eda.admin.ch/en/5th-edition-ic-forum
+  link: https://www.deza.eda.admin.ch/en/6th-edition-ic-forum
   timezone: Europe/Zurich
   place: Baden, Switzerland
   date: Feb 25-26, 2027
@@ -927,3 +932,18 @@
   end: '2027-10-14'
   sub: Global Affairs
   type: summit
+
+- title: Prototypes for Humanity
+  year: 2026
+  id: prototypesforhumanity26
+  deadline_status: attendance
+  full_name: Dubai Future Solutions - Prototypes for Humanity Summit
+  link: https://prototypesforhumanity.com/summit
+  timezone: Asia/Dubai
+  place: Dubai, UAE
+  date: Nov 18-21, 2026
+  start: '2026-11-18'
+  end: '2026-11-21'
+  sub: Global Affairs
+  type: summit
+  note: University prototypes for global challenges, held during Dubai Future Week.

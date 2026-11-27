@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { discover, parseArgs } from './main.js';
-import { TOPIC_KEYS } from './criteria.js';
+import { SEARCHES } from './criteria.js';
 import { seenKey } from './dedupe.js';
 import { createTokenBudget } from '../sync-llm/budget.js';
 import { TODAY, fakeFetcher, fakeLlm, jsonReply } from '../sync-llm/test-helpers.js';
@@ -12,7 +12,7 @@ const SOURCE_PAGE = 'Alpine Futures Summit. 28 - 29 April 2027, Geneva, Switzerl
 const found = (over = {}) => ({
   title: 'Alpine Futures Summit', full_name: null,
   start_date: '2027-04-28', end_date: '2027-04-29', dates_evidence: '28 - 29 April 2027',
-  city: 'Geneva', link: SOURCE_URL, kind: 'summit_or_forum', type: 'summit', topics: ['foresight'],
+  city: 'Geneva', country: 'Switzerland', timezone: 'Europe/Zurich', link: SOURCE_URL, kind: 'summit_or_forum', type: 'summit', topics: ['foresight'],
   subjects: ['Global Affairs'], fit: 'strong', why: 'Leaders discuss the long-term future.',
   ...over,
 });
@@ -38,6 +38,41 @@ describe('discover', () => {
       event: { origin: 'Alpine', fit: 'strong' },
     });
     expect(out.stats).toEqual({ pages: 1, searches: 0 });
+  });
+
+  it('drafts the deadlines a page states', async () => {
+    const abstract = {
+      type: 'abstract', date: '2027-01-15', time: null, timezone_text: null, before: false,
+      evidence: 'Abstracts due 15 January 2027',
+    };
+    const out = await run({
+      llm: fakeLlm(jsonReply({ events: [found({ deadlines: [abstract] })] })),
+      fetcher: fakeFetcher({ [SOURCE_URL]: `${SOURCE_PAGE} Abstracts due 15 January 2027.` }),
+    });
+    expect(out.proposals[0].entry.deadlines).toEqual([{ type: 'abstract', due: '2027-01-15 23:59' }]);
+  });
+
+  describe('following drafts in the deadline sync', () => {
+    const own = 'https://alpine.example/summit';
+    const page = `${SOURCE_PAGE} Alpine Futures Summit. 3 - 4 June 2028, Geneva.`;
+    const fetcher = () => fakeFetcher({ [SOURCE_URL]: { text: page, links: [{ text: 'Summit', href: own }] } });
+
+    it('follows a draft at its own page', async () => {
+      const out = await run({ llm: fakeLlm(jsonReply({ events: [found({ link: own })] })), fetcher: fetcher() });
+      expect(out.proposals[0].follow).toEqual({ cfg: { url: own, attendance: true } });
+    });
+
+    it('follows a venue once, leaving alone one a sync already follows', async () => {
+      const next = found({ link: own, start_date: '2028-06-03', end_date: '2028-06-04', dates_evidence: '3 - 4 June 2028' });
+      const out = await run({ llm: fakeLlm(jsonReply({ events: [found({ link: own }), next] })), fetcher: fetcher() });
+      expect(out.proposals.map((p) => p.follow)).toEqual([{ cfg: { url: own, attendance: true } }, { note: 'already followed' }]);
+
+      const known = await run({
+        llm: fakeLlm(jsonReply({ events: [found({ link: own })] })), fetcher: fetcher(),
+        followed: new Set(['Alpine Futures Summit']),
+      });
+      expect(known.proposals[0].follow).toEqual({ note: 'already followed' });
+    });
   });
 
   it('lists a possible fit without drafting it', async () => {
@@ -135,7 +170,7 @@ describe('discover', () => {
       search: true,
     });
     expect(out.stats.pages).toBe(1);
-    expect(llm.requests).toHaveLength(1 + TOPIC_KEYS.length);
+    expect(llm.requests).toHaveLength(1 + SEARCHES.length);
   });
 
   it('reads web search leads after the sources, telling each search what is already known', async () => {
@@ -149,7 +184,7 @@ describe('discover', () => {
       jsonReply({ events: [found()] }),
       { ...jsonReply({ leads: [{ name: 'Lakeside Dialogue', url: leadUrl }] }), output: [{ type: 'web_search_call' }] },
       jsonReply({ events: [lead] }),
-      ...TOPIC_KEYS.slice(1).map(() => jsonReply({ leads: [] })),
+      ...SEARCHES.slice(1).map(() => jsonReply({ leads: [] })),
     );
     const out = await run({
       llm,

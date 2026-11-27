@@ -7,6 +7,7 @@ import {
   formatDeadlineUrgency,
   formatEventCountdown,
   groupDeadlineItems,
+  upcomingCards,
   type ConferenceCardItem,
 } from './cards';
 import { URGENCY_EMOJIS } from '../../config/constants';
@@ -186,3 +187,36 @@ describe('formatEventCountdown', () => {
   });
 });
 
+
+describe('upcomingCards', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ now: new Date('2026-11-19T12:00:00Z'), toFake: ['Date'] });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const open = conference({ id: 'open', start: '2027-05-01', deadlines: [{ type: 'paper', due: '2027-01-10 23:59' }] });
+  const sooner = conference({ id: 'sooner', start: '2027-06-01', deadlines: [{ type: 'paper', due: '2026-12-01 23:59' }] });
+  const attendance = conference({ id: 'attendance', start: '2027-06-21', deadline_status: 'attendance' });
+  const closed = conference({ id: 'closed', start: '2027-03-01', deadlines: [{ type: 'paper', due: '2026-10-01 23:59' }] });
+  const past = conference({ id: 'past', start: '2026-06-01', deadlines: [{ type: 'paper', due: '2026-02-01 23:59' }] });
+  const ids = (items: ConferenceCardItem[]) => items.map((i) => `${i.kind}:${i.conference.id}`);
+
+  it('keeps events with no open deadline that are still ahead, after the open deadlines', () => {
+    expect(ids(upcomingCards([attendance, open, past, closed, sooner], 10))).toEqual([
+      'deadline:sooner',
+      'deadline:open',
+      'event:closed',
+      'event:attendance',
+    ]);
+  });
+
+  it('caps the list', () => {
+    expect(ids(upcomingCards([attendance, open, closed, sooner], 3))).toEqual([
+      'deadline:sooner',
+      'deadline:open',
+      'event:closed',
+    ]);
+  });
+});
