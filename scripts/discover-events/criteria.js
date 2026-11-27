@@ -76,14 +76,18 @@ wherever held, such as the Global AI Summit on Africa and the Africa HealthTech 
 skip local meetings and congresses of one medical specialty.
 Closest fits are events on international cooperation, humanitarian aid, global health or the governance of AI,
 often convened by the Swiss government, International Geneva, UN agencies or major NGOs: the IC Forum, the
-Geneva AI Summit, GESDA's Anticipation Summit and the Medicus Mundi Switzerland Symposium are typical.
+Geneva AI Summit, GESDA's Anticipation Summit, the Medicus Mundi Switzerland Symposium and AI House Davos are
+typical. So are peace forums (the Geneva Peace Forum, the Caux Arts and Peace Forum) and public health
+conferences held in Switzerland (the Swiss Public Health Conference, KATAMED on disaster health, ICPIC on
+infection prevention).
 Also wanted: AI, robotics and digital technology events (Swiss Robotics Day, GenAI Zürich, AI+X Summit,
-digitalswitzerland @ Davos), life sciences and health technology events (Swiss Biotech Day, the Swiss
-Symposium in Point-of-Care Diagnostics), peace forums (Basel Peace Forum), cross-sector leaders' dialogues
-(St. Gallen Symposium) and national forums on social challenges such as migration, poverty or health
-(Caritas-Forum).
+digitalswitzerland @ Davos, the Society 5.0 Conference on human-centred technology), life sciences and health
+technology events (Swiss Biotech Day, the Swiss Symposium in Point-of-Care Diagnostics), other peace forums
+(Basel Peace Forum), cross-sector leaders' dialogues (St. Gallen Symposium) and national forums on social
+challenges such as migration, poverty or health (Caritas-Forum).
 Skip events mainly about business, finance or investment (economic or trade forums, engineering or
-manufacturing industry days, startup and investor summits, crypto and digital assets), gatherings of one
+manufacturing industry days, startup and investor summits, crypto and digital assets, business and human
+rights such as the UN Forum on Business and Human Rights), gatherings of one
 research or industry community outside AI, digital technology, health and life sciences (quantum, space),
 and academic or learned-society conferences outside global health and AI, such as on ethics or philosophy.
 Never propose: courses, trainings or executive education; webinars or online-only events; single talks,

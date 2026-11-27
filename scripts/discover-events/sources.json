@@ -58,5 +58,13 @@
   "Swiss Symposium in Point-of-Care Diagnostics": {
     "url": "https://www.pocdx.ch/",
     "note": "Winterthur; the homepage announces each edition"
+  },
+  "Caux Initiatives of Change": {
+    "url": "https://www.iofc.ch/events",
+    "note": "Caux Palace near Montreux; its forums, plus trainings and arts events, which the criteria skip"
+  },
+  "Public Health Schweiz": {
+    "url": "https://public-health.ch/de/top-events",
+    "note": "Swiss Society for Public Health; its own and its partners' events, German page"
   }
 }

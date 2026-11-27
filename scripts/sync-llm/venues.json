@@ -88,5 +88,37 @@
     "url": "https://prototypesforhumanity.com/summit",
     "home": "https://prototypesforhumanity.com/",
     "note": "Dubai; its calls for university prototypes and professors' short papers close mid-year"
+  },
+  "AI House Davos": {
+    "url": "https://www.aihousedavos.com/davos",
+    "pages": [
+      "https://www.aihousedavos.com/badges"
+    ],
+    "attendance": true
+  },
+  "KATAMED": {
+    "url": "https://katamed-conference.ch/en/abstracts",
+    "home": "https://katamed-conference.ch/en"
+  },
+  "Society 5.0 Conference": {
+    "url": "https://www.conference-society5.org/"
+  },
+  "Caux Arts and Peace Forum": {
+    "url": "https://www.iofc.ch/caux-forum-2027",
+    "attendance": true
+  },
+  "Swiss Public Health Conference": {
+    "url": "https://sphc.ch/en/sphc-2027/call-abstracts",
+    "home": "https://sphc.ch/en/sphc-2027"
+  },
+  "ICPIC": {
+    "url": "https://conference.icpic.com/",
+    "attendance": true,
+    "note": "Its call for abstracts page (/abstracts) is password-protected until the call opens"
+  },
+  "Geneva Peace Forum": {
+    "url": "https://www.genevapeaceforum.ch/en/home",
+    "attendance": true,
+    "note": "Its call for applications opens each spring"
   }
 }

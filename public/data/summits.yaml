@@ -879,6 +879,51 @@
   type: summit
   note: Formerly MCP Dev Summit Europe.
 
+- title: AI House Davos
+  year: 2027
+  id: aihousedavos27
+  deadline_status: attendance
+  link: https://www.aihousedavos.com/davos
+  deadlines:
+    - type: registration
+      label: Innovator, Local Champion and Media badges
+      due: 2026-12-04 23:59
+  timezone: Europe/Zurich
+  place: Davos, Switzerland
+  date: Jan 18-22, 2027
+  start: '2027-01-18'
+  end: '2027-01-22'
+  sub:
+    - AI
+    - Global Affairs
+  type: summit
+
+- title: Caux Arts and Peace Forum
+  year: 2027
+  id: cauxartsandpeaceforum27
+  deadline_status: attendance
+  link: https://www.iofc.ch/caux-forum-2027
+  timezone: Europe/Zurich
+  place: Caux, Switzerland
+  date: Jul 20-23, 2027
+  start: '2027-07-20'
+  end: '2027-07-23'
+  sub: Global Affairs
+  type: summit
+
+- title: Geneva Peace Forum
+  year: 2027
+  id: genevapeaceforum27
+  deadline_status: attendance
+  link: https://www.genevapeaceforum.ch/en/home
+  timezone: Europe/Zurich
+  place: Geneva, Switzerland
+  date: Oct 11-14, 2027
+  start: '2027-10-11'
+  end: '2027-10-14'
+  sub: Global Affairs
+  type: summit
+
 - title: Prototypes for Humanity
   year: 2026
   id: prototypesforhumanity26
