@@ -1929,9 +1929,11 @@
 - title: KATAMED
   year: 2027
   id: katamed27
-  deadline_status: attendance
   full_name: Swiss Conference on Disaster Health
   link: https://katamed-conference.ch/en
+  deadlines:
+    - type: abstract
+      due: 2026-11-30 23:59
   timezone: Europe/Zurich
   place: Bern, Switzerland
   date: Mar 4, 2027
@@ -1939,12 +1941,15 @@
   end: '2027-03-04'
   sub: Global Health
   type: conference
+  note: Fully booked; waiting list open.
 
 - title: Swiss Public Health Conference
   year: 2027
   id: swisspublichealthconference27
-  deadline_status: attendance
   link: https://sphc.ch/en/sphc-2027
+  deadlines:
+    - type: abstract
+      due: 2027-02-01 23:59
   timezone: Europe/Zurich
   place: Sion, Switzerland
   date: Aug 31 - Sep 1, 2027
@@ -1956,9 +1961,11 @@
 - title: ICPIC
   year: 2027
   id: icpic27
-  deadline_status: attendance
   full_name: International Conference on Prevention & Infection Control
   link: https://conference.icpic.com/
+  deadlines:
+    - type: early_registration
+      due: 2027-04-14 23:59
   timezone: Europe/Zurich
   place: Geneva, Switzerland
   date: Sep 14-16, 2027
@@ -1970,8 +1977,16 @@
 - title: Society 5.0 Conference
   year: 2027
   id: society50conference27
-  deadline_status: attendance
   link: https://www.conference-society5.org/
+  deadlines:
+    - type: paper
+      due: 2027-03-07 23:59
+    - type: proposal
+      label: Workshop proposals
+      due: 2027-03-14 23:59
+    - type: other
+      label: Doctoral symposium
+      due: 2027-03-14 23:59
   timezone: Europe/Zurich
   place: Basel, Switzerland
   date: Jun 6-9, 2027

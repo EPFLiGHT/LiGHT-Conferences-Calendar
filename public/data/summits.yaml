@@ -884,6 +884,10 @@
   id: aihousedavos27
   deadline_status: attendance
   link: https://www.aihousedavos.com/davos
+  deadlines:
+    - type: registration
+      label: Innovator, Local Champion and Media badges
+      due: 2026-12-04 23:59
   timezone: Europe/Zurich
   place: Davos, Switzerland
   date: Jan 18-22, 2027
@@ -892,19 +896,6 @@
   sub:
     - AI
     - Global Affairs
-  type: summit
-
-- title: United Nations Forum on Business and Human Rights
-  year: 2026
-  id: unitednationsforumonbusinessandhumanrights26
-  deadline_status: attendance
-  link: https://www.genevaenvironmentnetwork.org/events/15th-united-nations-forum-on-business-and-human-rights
-  timezone: Europe/Zurich
-  place: Geneva, Switzerland
-  date: Nov 23-25, 2026
-  start: '2026-11-23'
-  end: '2026-11-25'
-  sub: Global Affairs
   type: summit
 
 - title: Caux Arts and Peace Forum
